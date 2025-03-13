@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 const FeaturedCourses = () => {
   const containerRef = useRef(null);
@@ -56,7 +59,7 @@ const FeaturedCourses = () => {
         console.error('Error fetching courses:', error);
         toast({
           title: "Error",
-          description: "Failed to load featured courses",
+          description: "Error al cargar los cursos destacados",
           variant: "destructive",
         });
       } finally {
@@ -78,8 +81,11 @@ const FeaturedCourses = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Most popular courses
+            Acelera tu aprendizaje de IA con nuestros cursos populares
           </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Diseñados para todos los niveles, desde principiantes hasta expertos
+          </p>
         </motion.div>
 
         {isLoading ? (
@@ -102,9 +108,18 @@ const FeaturedCourses = () => {
           </div>
         ) : (
           <div className="text-center py-8">
-            <p className="text-muted-foreground">No courses found. Check back soon!</p>
+            <p className="text-muted-foreground">No se encontraron cursos. ¡Vuelve pronto!</p>
           </div>
         )}
+        
+        <div className="text-center mt-12">
+          <Link to="/courses">
+            <Button className="group">
+              Ver todos los cursos
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </section>
   );

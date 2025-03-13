@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative py-20 md:py-32 flex items-center justify-center overflow-hidden">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-secondary/20 z-0" />
       
@@ -37,19 +37,6 @@ const Hero = () => {
           }}
           style={{ top: '20%', right: '20%' }}
         />
-        <motion.div
-          className="absolute h-72 w-72 rounded-full bg-violet-500/5 blur-3xl"
-          animate={{
-            x: ['-10%', '20%', '-10%'],
-            y: ['30%', '10%', '30%'],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-          style={{ bottom: '15%', left: '30%' }}
-        />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -60,7 +47,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-6xl font-bold mb-6"
           >
-            Build, write and learn with AI
+            Construye, escribe y aprende con IA
           </motion.h1>
           
           <motion.p
@@ -69,7 +56,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto"
           >
-            Join the 20,000+ AI learning community—likeminded people ready to help you get the most out of AI tools, no matter your goals, job role, or skill level.
+            Únete a nuestra comunidad de más de 20.000 personas aprendiendo IA — personas con ideas afines listas para ayudarte a aprovechar al máximo las herramientas de IA, sin importar tus objetivos, rol o nivel de habilidad.
           </motion.p>
           
           <motion.div
@@ -80,12 +67,12 @@ const Hero = () => {
           >
             <Link to="/courses">
               <Button size="lg" className="w-full sm:w-auto">
-                Explore Courses
+                Explorar Cursos
               </Button>
             </Link>
             <Link to="/signup">
               <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                Join the Community
+                Unirse a la Comunidad
               </Button>
             </Link>
           </motion.div>
@@ -98,19 +85,19 @@ const Hero = () => {
           >
             <div className="flex items-start space-x-2">
               <span className="text-primary">•</span>
-              <p className="text-muted-foreground"><span className="text-foreground font-medium">Connect with peers</span> building, sharing tips and lessons learned</p>
+              <p className="text-muted-foreground"><span className="text-foreground font-medium">Conéctate con colegas</span> construyendo y compartiendo consejos y lecciones aprendidas</p>
             </div>
             <div className="flex items-start space-x-2">
               <span className="text-primary">•</span>
-              <p className="text-muted-foreground"><span className="text-foreground font-medium">Get expert insights</span> with our <span className="text-foreground">live workshops and demos</span></p>
+              <p className="text-muted-foreground"><span className="text-foreground font-medium">Obtén insights de expertos</span> con nuestros <span className="text-foreground">talleres y demostraciones en vivo</span></p>
             </div>
             <div className="flex items-start space-x-2">
               <span className="text-primary">•</span>
-              <p className="text-muted-foreground"><span className="text-foreground font-medium">Access 400+ on-demand</span> <span className="text-foreground">bite-sized courses</span></p>
+              <p className="text-muted-foreground"><span className="text-foreground font-medium">Accede a más de 400</span> <span className="text-foreground">cursos bajo demanda</span></p>
             </div>
             <div className="flex items-start space-x-2">
               <span className="text-primary">•</span>
-              <p className="text-muted-foreground"><span className="text-foreground font-medium">Exclusive</span> <span className="text-foreground">discounts</span> on AI tools ($6k+ value)</p>
+              <p className="text-muted-foreground"><span className="text-foreground font-medium">Descuentos exclusivos</span> en herramientas de IA (valor de +$6k)</p>
             </div>
           </motion.div>
         </div>

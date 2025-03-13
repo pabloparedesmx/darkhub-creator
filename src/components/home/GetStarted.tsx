@@ -8,19 +8,19 @@ import { ArrowRight } from 'lucide-react';
 const projectCards = [
   {
     id: 1,
-    title: 'Personal "link-in-bio" website',
+    title: 'Sitio web personal "link-in-bio"',
     icon: '🌐',
     link: '/projects/link-in-bio'
   },
   {
     id: 2,
-    title: 'Simple web app using a public API',
+    title: 'App web simple usando una API pública',
     icon: '🔌',
     link: '/projects/web-app-api'
   },
   {
     id: 3,
-    title: 'Text summariser with an AI API',
+    title: 'Resumidor de texto con API de IA',
     icon: '📝',
     link: '/projects/text-summariser'
   }
@@ -40,10 +40,10 @@ const GetStarted = () => {
           className="max-w-4xl mx-auto text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-primary">Got 2 mins?</span> Build your first app...
+            <span className="text-primary">¿Tienes 2 minutos?</span> Construye tu primera app...
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            A quick, easy and free way to get started building with AI
+            Una forma rápida, fácil y gratuita de comenzar a construir con IA
           </p>
         </motion.div>
 
@@ -56,10 +56,10 @@ const GetStarted = () => {
             className="bg-secondary/30 border border-border/60 rounded-lg p-4 mb-8"
           >
             <div className="inline-block px-4 py-1 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium text-primary mb-4">
-              Step 1 - Pick a project
+              Paso 1 - Elige un proyecto
             </div>
             <p className="text-muted-foreground mb-6">
-              Select a project → copy the PRD prompt → paste into your tool of choice
+              Selecciona un proyecto → copia el prompt de PRD → pégalo en tu herramienta favorita
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -95,7 +95,7 @@ const GetStarted = () => {
           >
             <Link to="/projects">
               <Button variant="outline" className="group">
-                Browse all starter projects
+                Explorar todos los proyectos iniciales
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>

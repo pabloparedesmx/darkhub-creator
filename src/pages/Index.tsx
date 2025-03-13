@@ -5,6 +5,9 @@ import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
 import FeaturedCourses from '@/components/home/FeaturedCourses';
 import GetStarted from '@/components/home/GetStarted';
+import Testimonials from '@/components/home/Testimonials';
+import Education from '@/components/home/Education';
+import FAQ from '@/components/home/FAQ';
 import { motion } from 'framer-motion';
 
 const Index = () => {
@@ -24,8 +27,11 @@ const Index = () => {
       <Navbar />
       <main className="flex-grow">
         <Hero />
-        <FeaturedCourses />
         <GetStarted />
+        <Education />
+        <Testimonials />
+        <FeaturedCourses />
+        <FAQ />
       </main>
       <Footer />
     </motion.div>
