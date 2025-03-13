@@ -58,8 +58,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: data.id,
           email: data.email,
           name: data.name,
-          role: data.role,
-          subscription: data.subscription
+          role: data.role as 'user' | 'admin', // Add type assertion here
+          subscription: data.subscription as 'free' | 'pro' | undefined
         } as User;
       }
       
@@ -79,8 +79,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: userId,
         email: authUser.email || 'user@example.com',
         name: authUser.user_metadata?.name || 'User',
-        role: 'user',
-        subscription: 'free'
+        role: 'user' as 'user', // Fix type here
+        subscription: 'free' as 'free'
       };
       
       const { error: insertError } = await supabase
@@ -97,17 +97,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return newProfile as User;
     } catch (error) {
       console.error('Failed to get profile, using fallback:', error);
-      // Return a fallback user object
+      // Return a fallback user object with explicitly typed role
       return {
         id: userId,
         email: 'user@example.com',
         name: 'User',
-        role: 'user'
+        role: 'user' as 'user' // Fix type here
       } as User;
     }
   };
 
-  // Attempt to update user email from auth session
+  // Attempt to update user email from session
   const updateUserEmailFromSession = async (userId: string, userObj: User): Promise<User> => {
     try {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -157,8 +157,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.warn('Profile fetch timeout, continuing with basic user');
         setIsLoading(false);
         
-        // Create a basic user object if timed out
-        const basicUser = {
+        // Create a basic user object if timed out with proper typing
+        const basicUser: User = {
           id: userId,
           email: 'user@example.com',
           name: 'User',
@@ -197,7 +197,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "destructive",
         });
         
-        // Still set a basic user to prevent being stuck
+        // Still set a basic user to prevent being stuck with proper typing
         setUser({
           id: userId,
           email: 'user@example.com',
@@ -211,6 +211,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (window.location.pathname === '/login') {
           navigate('/courses');
         }
+      }
+    };
+    
+    const initializeAuth = async () => {
+      setIsLoading(true);
+      console.log('Initializing auth state...');
+      
+      try {
+        // Get current session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          console.log('Session found, user is logged in:', session.user.id);
+          handleUserSession(session.user.id);
+        } else {
+          console.log('No session found, user is not logged in');
+          setUser(null);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error during auth initialization:', error);
+        toast({
+          title: "Authentication Error",
+          description: "Failed to initialize authentication. Please refresh the page.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
       }
     };
     
