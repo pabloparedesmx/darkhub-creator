@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -211,33 +210,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (window.location.pathname === '/login') {
           navigate('/courses');
         }
-      }
-    };
-    
-    const initializeAuth = async () => {
-      setIsLoading(true);
-      console.log('Initializing auth state...');
-      
-      try {
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session) {
-          console.log('Session found, user is logged in:', session.user.id);
-          handleUserSession(session.user.id);
-        } else {
-          console.log('No session found, user is not logged in');
-          setUser(null);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error('Error during auth initialization:', error);
-        toast({
-          title: "Authentication Error",
-          description: "Failed to initialize authentication. Please refresh the page.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
       }
     };
     
