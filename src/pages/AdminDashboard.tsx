@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -972,4 +973,206 @@ const AdminDashboard = () => {
                             placeholder="Search users..." 
                             className="pl-10" 
                             value={userSearchTerm}
-                            onChange
+                            onChange={(e) => setUserSearchTerm(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      
+                      {isUserLoading ? (
+                        <div className="flex justify-center py-8">
+                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                        </div>
+                      ) : (
+                        <div className="border rounded-md">
+                          <table className="w-full">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left py-3 px-4 font-medium">Name</th>
+                                <th className="text-left py-3 px-4 font-medium">Email</th>
+                                <th className="text-left py-3 px-4 font-medium">Role</th>
+                                <th className="text-left py-3 px-4 font-medium">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredUsers.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} className="text-center py-4 text-muted-foreground">
+                                    No users found
+                                  </td>
+                                </tr>
+                              ) : (
+                                filteredUsers.map(user => (
+                                  <tr key={user.id} className="border-b last:border-0 hover:bg-secondary/20">
+                                    <td className="py-3 px-4">{user.name}</td>
+                                    <td className="py-3 px-4">{user.email}</td>
+                                    <td className="py-3 px-4">
+                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                        user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-secondary text-secondary-foreground'
+                                      }`}>
+                                        {user.role}
+                                      </span>
+                                    </td>
+                                    <td className="py-3 px-4">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleUpdateUserRole(user.id, user.role)}
+                                      >
+                                        {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+                
+                <TabsContent value="analytics">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Analytics Dashboard</CardTitle>
+                      <CardDescription>View your platform metrics and analytics</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-center py-12">
+                        <p className="text-muted-foreground">Analytics coming soon</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+      
+      {/* Lessons Management Dialog */}
+      <Dialog open={showLessonsDialog} onOpenChange={(open) => !open && setShowLessonsDialog(false)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Course Lessons</DialogTitle>
+            <DialogDescription>
+              Manage lessons for this course
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            <div className="border rounded-md p-4">
+              <h3 className="text-lg font-medium mb-4">Lessons</h3>
+              {currentCourseLessons.length === 0 ? (
+                <p className="text-center text-muted-foreground py-4">No lessons found. Add your first lesson below.</p>
+              ) : (
+                <div className="space-y-2">
+                  {currentCourseLessons.map((lesson, index) => (
+                    <div key={lesson.id} className="flex justify-between items-center p-3 border rounded-md">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/20 text-primary text-sm font-medium">
+                            {index + 1}
+                          </span>
+                          <h4 className="font-medium">{lesson.title}</h4>
+                        </div>
+                        {lesson.description && (
+                          <p className="text-sm text-muted-foreground ml-8 mt-1">{lesson.description}</p>
+                        )}
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditLesson(lesson)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteLesson(lesson.id)}>
+                          <Trash className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="border rounded-md p-4">
+              <h3 className="text-lg font-medium mb-4">
+                {isLessonEditing ? 'Edit Lesson' : 'Add New Lesson'}
+              </h3>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label htmlFor="lessonTitle">Lesson Title*</label>
+                    <Input 
+                      id="lessonTitle" 
+                      value={newLesson.title} 
+                      onChange={(e) => setNewLesson({...newLesson, title: e.target.value})} 
+                      placeholder="e.g. Introduction to AI"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="lessonOrder">Order Index</label>
+                    <Input 
+                      id="lessonOrder" 
+                      type="number"
+                      value={newLesson.order_index} 
+                      onChange={(e) => setNewLesson({...newLesson, order_index: parseInt(e.target.value) || 0})} 
+                      placeholder="e.g. 1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="lessonDescription">Description (optional)</label>
+                  <Textarea 
+                    id="lessonDescription" 
+                    value={newLesson.description} 
+                    onChange={(e) => setNewLesson({...newLesson, description: e.target.value})} 
+                    placeholder="Brief description of the lesson"
+                    rows={2}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="lessonContent">Lesson Content*</label>
+                  <RichTextEditor
+                    value={newLesson.content}
+                    onChange={(content) => setNewLesson({...newLesson, content})}
+                    height={400}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2 mt-4">
+                {isLessonEditing ? (
+                  <>
+                    <Button variant="outline" onClick={() => {
+                      setIsLessonEditing(false);
+                      setEditingLesson(null);
+                      setNewLesson({
+                        title: '',
+                        description: '',
+                        order_index: Math.max(...currentCourseLessons.map(l => l.order_index), 0) + 1,
+                        content: '',
+                      });
+                    }}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleUpdateLesson}>
+                      Update Lesson
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={handleAddLesson}>
+                    Add Lesson
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default AdminDashboard;
