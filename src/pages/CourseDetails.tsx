@@ -1,29 +1,16 @@
 
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import RichTextContent from '@/components/ui/RichTextContent';
-import { 
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip';
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { DbCourse } from '@/types/admin';
+import { useToast } from "@/hooks/use-toast";
+import CourseHeader from '@/components/course/CourseHeader';
+import CourseSharePanel from '@/components/course/CourseSharePanel';
+import LoadingState from '@/components/ui/LoadingState';
+import ErrorState from '@/components/ui/ErrorState';
 
 interface CourseDetailData extends Omit<DbCourse, 'badges'> {
   badges: Array<'tutorial' | 'pro' | 'free'>;
@@ -99,56 +86,13 @@ const CourseDetails = () => {
     window.scrollTo(0, 0);
   }, [slug, navigate, toast]);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link copied",
-      description: "Course link has been copied to clipboard",
-      duration: 3000,
-    });
-  };
-
-  const saveToBookmarks = () => {
-    toast({
-      title: "Saved",
-      description: "Course has been added to your bookmarks",
-      duration: 3000,
-    });
-  };
-
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex-col">
-        <Navbar />
-        <div className="flex justify-center items-center flex-grow py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!course) {
-    return (
-      <div className="min-h-screen flex-col">
-        <Navbar />
-        <div className="flex justify-center items-center flex-grow py-20">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Course Not Found</h1>
-            <p className="mb-6">The course you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/courses">Back to Courses</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorState title="Course Not Found" message="The course you're looking for doesn't exist or has been removed." />;
   }
-
-  const difficultyColors = {
-    beginner: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-    intermediate: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
-    advanced: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-  };
 
   return (
     <motion.div
@@ -162,141 +106,18 @@ const CourseDetails = () => {
       <main className="flex-grow pt-24 pb-20 px-4">
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto">
-            {/* Breadcrumb */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
-              <Breadcrumb>
-                <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <Link to="/courses">Catalog</Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>{course.title}</BreadcrumbPage>
-                  </BreadcrumbItem>
-                </BreadcrumbList>
-              </Breadcrumb>
-            </motion.div>
-
-            {/* Course title and description */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="mb-8"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
-                {course.difficulty && (
-                  <span className={`text-xs rounded-full px-2 py-0.5 ${difficultyColors[course.difficulty as keyof typeof difficultyColors]}`}>
-                    {course.difficulty}
-                  </span>
-                )}
-              </div>
-              <RichTextContent content={course.description} />
-            </motion.div>
+            {/* Course Header with title, breadcrumbs, and description */}
+            <CourseHeader course={course} />
           </div>
 
-          {/* Right side panel */}
+          {/* Right side panel for sharing */}
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.5 }}
-              className="bg-secondary/20 rounded-lg p-6 border border-border"
             >
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-sm text-muted-foreground flex items-center">
-                  <span className="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  Not Started
-                </span>
-                <div className="flex space-x-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={saveToBookmarks}>
-                          <Bookmark className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Save</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={() => {}}>
-                          <CheckCircle className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Mark as complete</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-
-              <h3 className="text-lg font-medium mb-4">Share with a friend</h3>
-              <div className="mb-4">
-                <Button 
-                  variant="outline" 
-                  className="w-full flex items-center justify-center"
-                  onClick={copyToClipboard}
-                >
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy to clipboard
-                </Button>
-              </div>
-
-              <div className="flex justify-center space-x-4">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Twitter className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on Twitter</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Facebook className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on Facebook</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Linkedin className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on LinkedIn</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <CourseSharePanel courseTitle={course.title} />
             </motion.div>
           </div>
         </div>
