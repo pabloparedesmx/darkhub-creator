@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -129,11 +128,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             description: `Welcome back, ${profile.name}!`,
           });
           
-          // Redirect based on role
+          // Redirect to courses page instead of dashboard
           if (profile.role === 'admin') {
             navigate('/admin');
           } else {
-            navigate('/dashboard');
+            navigate('/courses');
           }
         }
       }
