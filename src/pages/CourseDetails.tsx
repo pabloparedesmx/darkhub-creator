@@ -188,26 +188,6 @@ const CourseDetails = () => {
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
               <RichTextContent content={course.description} />
             </motion.div>
-
-            {/* Video player placeholder */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-              className="bg-secondary/10 border border-border rounded-lg aspect-video flex items-center justify-center mb-8"
-            >
-              <div className="text-center p-8">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16.1378 10.5689L9.60498 6.30252C8.40816 5.52105 6.75 6.3764 6.75 7.83361V16.1664C6.75 17.6236 8.40816 18.479 9.60498 17.6975L16.1378 13.4311C17.2527 12.6962 17.2527 11.3038 16.1378 10.5689Z" fill="currentColor" />
-                  </svg>
-                </div>
-                <p className="text-muted-foreground">Premium content available with a Pro subscription</p>
-                <Button variant="default" size="sm" className="mt-4">
-                  Upgrade to Pro
-                </Button>
-              </div>
-            </motion.div>
           </div>
 
           {/* Right side panel */}
