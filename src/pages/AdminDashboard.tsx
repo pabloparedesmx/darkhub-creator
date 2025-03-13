@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,62 +14,108 @@ import { useToast } from "@/hooks/use-toast";
 import { Course } from '@/components/ui/CourseCard';
 import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard } from 'lucide-react';
 import CategoryBadge from '@/components/ui/CategoryBadge';
+import { supabase } from "@/lib/supabase";
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { Database } from '@/lib/database.types';
+
+// Type for category from database
+type Category = Database['public']['Tables']['categories']['Row'];
+
+// Type for course from database with badges
+type DbCourse = Database['public']['Tables']['courses']['Row'] & {
+  badges: Array<'pro' | 'free' | 'tutorial'>;
+  toolName?: string;
+};
 
 const AdminDashboard = () => {
   const { toast } = useToast();
-  const [courses, setCourses] = useState<Course[]>([
-    {
-      id: '1',
-      title: 'AI Product Development',
-      description: 'Learn how to build AI-powered products from scratch.',
-      badges: ['pro'],
-      slug: 'ai-product-development',
-      icon: '🤖',
-      toolName: 'AI Tools',
-    },
-    {
-      id: '2',
-      title: 'Growth Marketing',
-      description: 'Strategies to grow your product and acquire users.',
-      badges: ['tutorial', 'free'],
-      slug: 'growth-marketing',
-      icon: '📈',
-      toolName: 'Marketing',
-    },
-    {
-      id: '3',
-      title: 'UX Research',
-      description: 'Learn how to conduct user research and analyze results.',
-      badges: ['pro'],
-      slug: 'ux-research',
-      icon: '👥',
-      toolName: 'UX Tools',
-    },
-  ]);
-
-  const [categories, setCategories] = useState([
-    { id: '1', name: 'AI Tools', count: 12 },
-    { id: '2', name: 'Marketing', count: 8 },
-    { id: '3', name: 'UX Tools', count: 5 },
-    { id: '4', name: 'Product Management', count: 9 },
-  ]);
-
+  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  
+  const [courses, setCourses] = useState<DbCourse[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [newCourse, setNewCourse] = useState({
     title: '',
     description: '',
     slug: '',
     icon: '',
-    toolName: '',
+    category_id: '',
     isPro: false,
     isFree: false,
     isTutorial: false,
   });
-
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<DbCourse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAddCategory = () => {
+  // Check if user is admin, redirect if not
+  useEffect(() => {
+    if (user && !isAdmin) {
+      toast({
+        title: "Access denied",
+        description: "You don't have permission to access the admin dashboard",
+        variant: "destructive",
+      });
+      navigate('/dashboard');
+    }
+  }, [user, isAdmin, navigate, toast]);
+
+  // Fetch categories and courses from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Fetch categories
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select('*')
+          .order('name');
+        
+        if (categoriesError) throw categoriesError;
+        
+        // Fetch courses
+        const { data: coursesData, error: coursesError } = await supabase
+          .from('courses')
+          .select('*, categories(name)')
+          .order('created_at', { ascending: false });
+        
+        if (coursesError) throw coursesError;
+        
+        // Map courses to the expected format
+        const formattedCourses = coursesData.map(course => {
+          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
+          if (course.is_pro) badges.push('pro');
+          if (course.is_free) badges.push('free');
+          if (course.is_tutorial) badges.push('tutorial');
+          
+          return {
+            ...course,
+            badges,
+            toolName: course.categories ? (course.categories as any).name : undefined
+          };
+        });
+        
+        setCategories(categoriesData);
+        setCourses(formattedCourses);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [toast]);
+
+  const handleAddCategory = async () => {
     if (!newCategory.trim()) {
       toast({
         title: "Error",
@@ -79,31 +125,59 @@ const AdminDashboard = () => {
       return;
     }
 
-    const newCategoryItem = {
-      id: (categories.length + 1).toString(),
-      name: newCategory,
-      count: 0,
-    };
-
-    setCategories([...categories, newCategoryItem]);
-    setNewCategory('');
-    
-    toast({
-      title: "Success",
-      description: "Category added successfully",
-    });
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([{ name: newCategory }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setCategories([...categories, data]);
+      setNewCategory('');
+      
+      toast({
+        title: "Success",
+        description: "Category added successfully",
+      });
+    } catch (error: any) {
+      console.error('Error adding category:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add category",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteCategory = (id: string) => {
-    setCategories(categories.filter(category => category.id !== id));
-    toast({
-      title: "Success",
-      description: "Category deleted successfully",
-    });
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('categories')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setCategories(categories.filter(category => category.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Category deleted successfully",
+      });
+    } catch (error: any) {
+      console.error('Error deleting category:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete category",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAddCourse = () => {
-    const { title, description, slug, icon, toolName, isPro, isFree, isTutorial } = newCourse;
+  const handleAddCourse = async () => {
+    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -114,67 +188,107 @@ const AdminDashboard = () => {
       return;
     }
 
-    const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-    if (isPro) badges.push('pro');
-    if (isFree) badges.push('free');
-    if (isTutorial) badges.push('tutorial');
-
-    const newCourseItem: Course = {
-      id: (courses.length + 1).toString(),
-      title,
-      description,
-      slug,
-      badges,
-      icon: icon || '📚',
-      toolName: toolName || undefined,
-    };
-
-    setCourses([...courses, newCourseItem]);
-    
-    setNewCourse({
-      title: '',
-      description: '',
-      slug: '',
-      icon: '',
-      toolName: '',
-      isPro: false,
-      isFree: false,
-      isTutorial: false,
-    });
-
-    toast({
-      title: "Success",
-      description: "Course added successfully",
-    });
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .insert([{
+          title,
+          description,
+          slug,
+          icon: icon || '📚',
+          category_id: category_id || null,
+          is_pro: isPro,
+          is_free: isFree,
+          is_tutorial: isTutorial,
+          author_id: user?.id
+        }])
+        .select('*, categories(name)')
+        .single();
+      
+      if (error) throw error;
+      
+      const badges: Array<'tutorial' | 'pro' | 'free'> = [];
+      if (isPro) badges.push('pro');
+      if (isFree) badges.push('free');
+      if (isTutorial) badges.push('tutorial');
+      
+      const newCourseItem: DbCourse = {
+        ...data,
+        badges,
+        toolName: data.categories ? (data.categories as any).name : undefined
+      };
+      
+      setCourses([newCourseItem, ...courses]);
+      
+      setNewCourse({
+        title: '',
+        description: '',
+        slug: '',
+        icon: '',
+        category_id: '',
+        isPro: false,
+        isFree: false,
+        isTutorial: false,
+      });
+      
+      toast({
+        title: "Success",
+        description: "Course added successfully",
+      });
+    } catch (error: any) {
+      console.error('Error adding course:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add course",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteCourse = (id: string) => {
-    setCourses(courses.filter(course => course.id !== id));
-    toast({
-      title: "Success",
-      description: "Course deleted successfully",
-    });
+  const handleDeleteCourse = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setCourses(courses.filter(course => course.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Course deleted successfully",
+      });
+    } catch (error: any) {
+      console.error('Error deleting course:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete course",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleEditCourse = (course: Course) => {
+  const handleEditCourse = (course: DbCourse) => {
     setSelectedCourse(course);
     setNewCourse({
       title: course.title,
       description: course.description,
       slug: course.slug,
       icon: course.icon || '',
-      toolName: course.toolName || '',
-      isPro: course.badges.includes('pro'),
-      isFree: course.badges.includes('free'),
-      isTutorial: course.badges.includes('tutorial'),
+      category_id: course.category_id || '',
+      isPro: course.is_pro,
+      isFree: course.is_free,
+      isTutorial: course.is_tutorial,
     });
     setIsEditing(true);
   };
 
-  const handleUpdateCourse = () => {
+  const handleUpdateCourse = async () => {
     if (!selectedCourse) return;
     
-    const { title, description, slug, icon, toolName, isPro, isFree, isTutorial } = newCourse;
+    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -185,45 +299,66 @@ const AdminDashboard = () => {
       return;
     }
 
-    const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-    if (isPro) badges.push('pro');
-    if (isFree) badges.push('free');
-    if (isTutorial) badges.push('tutorial');
-
-    const updatedCourses = courses.map(course => {
-      if (course.id === selectedCourse.id) {
-        return {
-          ...course,
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .update({
           title,
           description,
           slug,
-          badges,
           icon: icon || '📚',
-          toolName: toolName || undefined,
-        };
-      }
-      return course;
-    });
-
-    setCourses(updatedCourses);
-    setSelectedCourse(null);
-    setIsEditing(false);
-    
-    setNewCourse({
-      title: '',
-      description: '',
-      slug: '',
-      icon: '',
-      toolName: '',
-      isPro: false,
-      isFree: false,
-      isTutorial: false,
-    });
-
-    toast({
-      title: "Success",
-      description: "Course updated successfully",
-    });
+          category_id: category_id || null,
+          is_pro: isPro,
+          is_free: isFree,
+          is_tutorial: isTutorial
+        })
+        .eq('id', selectedCourse.id)
+        .select('*, categories(name)')
+        .single();
+      
+      if (error) throw error;
+      
+      const badges: Array<'tutorial' | 'pro' | 'free'> = [];
+      if (isPro) badges.push('pro');
+      if (isFree) badges.push('free');
+      if (isTutorial) badges.push('tutorial');
+      
+      const updatedCourse: DbCourse = {
+        ...data,
+        badges,
+        toolName: data.categories ? (data.categories as any).name : undefined
+      };
+      
+      setCourses(courses.map(course => 
+        course.id === selectedCourse.id ? updatedCourse : course
+      ));
+      
+      setSelectedCourse(null);
+      setIsEditing(false);
+      
+      setNewCourse({
+        title: '',
+        description: '',
+        slug: '',
+        icon: '',
+        category_id: '',
+        isPro: false,
+        isFree: false,
+        isTutorial: false,
+      });
+      
+      toast({
+        title: "Success",
+        description: "Course updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating course:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update course",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -310,23 +445,29 @@ const AdminDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pb-6">
-                  <div className="space-y-2">
-                    {categories.map(category => (
-                      <div key={category.id} className="flex justify-between items-center p-2 rounded-md hover:bg-secondary/50">
-                        <div>
-                          <span className="text-sm font-medium">{category.name}</span>
-                          <span className="ml-2 text-xs text-muted-foreground">({category.count})</span>
+                  {isLoading ? (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {categories.map(category => (
+                        <div key={category.id} className="flex justify-between items-center p-2 rounded-md hover:bg-secondary/50">
+                          <div>
+                            <span className="text-sm font-medium">{category.name}</span>
+                            <span className="ml-2 text-xs text-muted-foreground">({category.count})</span>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            variant="ghost" 
+                            onClick={() => handleDeleteCategory(category.id)}
+                          >
+                            <Trash className="h-4 w-4 text-destructive" />
+                          </Button>
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="ghost" 
-                          onClick={() => handleDeleteCategory(category.id)}
-                        >
-                          <Trash className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -405,12 +546,19 @@ const AdminDashboard = () => {
                             </div>
                             <div className="space-y-2">
                               <label htmlFor="courseCategory">Category</label>
-                              <Input 
-                                id="courseCategory" 
-                                value={newCourse.toolName} 
-                                onChange={(e) => setNewCourse({...newCourse, toolName: e.target.value})} 
-                                placeholder="e.g. AI Tools"
-                              />
+                              <select
+                                id="courseCategory"
+                                value={newCourse.category_id}
+                                onChange={(e) => setNewCourse({...newCourse, category_id: e.target.value})}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                              >
+                                <option value="">Select a category</option>
+                                {categories.map((category) => (
+                                  <option key={category.id} value={category.id}>
+                                    {category.name}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
                           </div>
                           
@@ -472,55 +620,69 @@ const AdminDashboard = () => {
                     </Dialog>
                   </div>
                   
-                  <div className="space-y-4">
-                    {courses.map(course => (
-                      <Card key={course.id}>
-                        <CardContent className="p-6">
-                          <div className="flex justify-between items-start">
-                            <div className="flex items-start space-x-4">
-                              {course.icon && (
-                                <div className="flex items-center justify-center w-12 h-12 bg-secondary rounded-md">
-                                  <span className="text-2xl">{course.icon}</span>
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {courses.length === 0 ? (
+                        <Card>
+                          <CardContent className="p-6 text-center">
+                            <p className="text-muted-foreground">No courses found. Add your first course to get started.</p>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        courses.map(course => (
+                          <Card key={course.id}>
+                            <CardContent className="p-6">
+                              <div className="flex justify-between items-start">
+                                <div className="flex items-start space-x-4">
+                                  {course.icon && (
+                                    <div className="flex items-center justify-center w-12 h-12 bg-secondary rounded-md">
+                                      <span className="text-2xl">{course.icon}</span>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <h3 className="text-lg font-semibold mb-1">{course.title}</h3>
+                                    <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
+                                    <div className="flex space-x-2 mb-1">
+                                      {course.badges.map((badge, index) => (
+                                        <CategoryBadge key={index} type={badge} />
+                                      ))}
+                                    </div>
+                                    {course.toolName && (
+                                      <p className="text-xs text-muted-foreground">Category: {course.toolName}</p>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
-                              <div>
-                                <h3 className="text-lg font-semibold mb-1">{course.title}</h3>
-                                <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
-                                <div className="flex space-x-2 mb-1">
-                                  {course.badges.map((badge, index) => (
-                                    <CategoryBadge key={index} type={badge} />
-                                  ))}
-                                </div>
-                                {course.toolName && (
-                                  <p className="text-xs text-muted-foreground">Category: {course.toolName}</p>
-                                )}
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEditCourse(course)}>
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => handleDeleteCourse(course.id)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash className="mr-2 h-4 w-4" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
-                            </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleEditCourse(course)}>
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleDeleteCourse(course.id)}
-                                  className="text-destructive"
-                                >
-                                  <Trash className="mr-2 h-4 w-4" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            </CardContent>
+                          </Card>
+                        ))
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="users">

@@ -8,100 +8,242 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronLeft, ChevronRight, Play, Lock, Check, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
-// Mock course content
-const mockCourseModules = [
-  {
-    id: 1,
-    title: 'Getting Started',
-    lessons: [
-      { id: 1, title: 'Introduction', duration: '5:20', completed: true, free: true },
-      { id: 2, title: 'Setting Up Your Environment', duration: '8:45', completed: true, free: true },
-      { id: 3, title: 'Understanding the Basics', duration: '12:30', completed: false, free: true }
-    ]
-  },
-  {
-    id: 2,
-    title: 'Core Concepts',
-    lessons: [
-      { id: 4, title: 'Key Features Overview', duration: '10:15', completed: false, free: false },
-      { id: 5, title: 'Working with Data', duration: '15:00', completed: false, free: false },
-      { id: 6, title: 'Advanced Techniques', duration: '18:20', completed: false, free: false }
-    ]
-  },
-  {
-    id: 3,
-    title: 'Practical Examples',
-    lessons: [
-      { id: 7, title: 'Building Your First Project', duration: '20:10', completed: false, free: false },
-      { id: 8, title: 'Troubleshooting Common Issues', duration: '14:30', completed: false, free: false },
-      { id: 9, title: 'Best Practices', duration: '16:45', completed: false, free: false }
-    ]
-  }
-];
+interface Lesson {
+  id: string;
+  title: string;
+  description: string | null;
+  order_index: number;
+  content: string | null;
+  course_id: string;
+  duration?: string;
+  completed?: boolean;
+  free?: boolean;
+}
+
+interface Module {
+  id: number;
+  title: string;
+  lessons: Lesson[];
+}
 
 const CoursePlayer = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [activeModule, setActiveModule] = useState(1);
-  const [activeLesson, setActiveLesson] = useState(1);
-  const [progress, setProgress] = useState(15); // Mock progress percentage
+  
+  const [course, setCourse] = useState<any>(null);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [activeLesson, setActiveLesson] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userProgress, setUserProgress] = useState<Record<string, boolean>>({});
   
-  // Calculate total lessons and completed lessons
-  const totalLessons = mockCourseModules.reduce((total, module) => total + module.lessons.length, 0);
-  const completedLessons = mockCourseModules.reduce((total, module) => 
-    total + module.lessons.filter(lesson => lesson.completed).length, 0);
+  // Fetch course and lessons
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!slug) return;
+      
+      setIsLoading(true);
+      try {
+        // Fetch course details
+        const { data: courseData, error: courseError } = await supabase
+          .from('courses')
+          .select('*')
+          .eq('slug', slug)
+          .single();
+        
+        if (courseError) throw courseError;
+        
+        if (!courseData) {
+          navigate('/not-found');
+          return;
+        }
+        
+        setCourse(courseData);
+        
+        // Fetch lessons for this course
+        const { data: lessonsData, error: lessonsError } = await supabase
+          .from('lessons')
+          .select('*')
+          .eq('course_id', courseData.id)
+          .order('order_index');
+        
+        if (lessonsError) throw lessonsError;
+        
+        // If user is logged in, fetch their progress
+        let userProgressData: Record<string, boolean> = {};
+        
+        if (user) {
+          const { data: progressData, error: progressError } = await supabase
+            .from('progress')
+            .select('*')
+            .eq('user_id', user.id)
+            .in('lesson_id', lessonsData.map(lesson => lesson.id));
+          
+          if (!progressError && progressData) {
+            progressData.forEach(item => {
+              userProgressData[item.lesson_id] = item.completed;
+            });
+          }
+        }
+        
+        setUserProgress(userProgressData);
+        
+        // Group lessons into mock modules for UI
+        // In a real app, you'd have a proper module table
+        // For now, we'll create mock modules
+        const groupedLessons: Module[] = [
+          {
+            id: 1,
+            title: 'Getting Started',
+            lessons: lessonsData.filter((_, index) => index < 3).map(lesson => ({
+              ...lesson,
+              duration: '10:00', // Mock duration
+              completed: userProgressData[lesson.id] || false,
+              free: true // Make first few lessons free
+            }))
+          },
+          {
+            id: 2,
+            title: 'Core Concepts',
+            lessons: lessonsData.filter((_, index) => index >= 3 && index < 6).map(lesson => ({
+              ...lesson,
+              duration: '15:00', // Mock duration
+              completed: userProgressData[lesson.id] || false,
+              free: false
+            }))
+          },
+          {
+            id: 3,
+            title: 'Advanced Topics',
+            lessons: lessonsData.filter((_, index) => index >= 6).map(lesson => ({
+              ...lesson,
+              duration: '20:00', // Mock duration
+              completed: userProgressData[lesson.id] || false,
+              free: false
+            }))
+          }
+        ];
+        
+        setModules(groupedLessons);
+        
+        // Set the first lesson as active if none is set
+        if (!activeLesson && lessonsData.length > 0) {
+          setActiveLesson(lessonsData[0].id);
+        }
+        
+        // Calculate progress
+        if (user && lessonsData.length > 0) {
+          const completedCount = Object.values(userProgressData).filter(Boolean).length;
+          const totalLessons = lessonsData.length;
+          setProgress(Math.round((completedCount / totalLessons) * 100));
+        }
+        
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load course content",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCourseData();
+  }, [slug, user, navigate, toast]);
   
-  // Check if user can access this lesson
-  const currentLesson = mockCourseModules
+  // Get total lessons and completed lessons
+  const totalLessons = modules.reduce((total, module) => total + module.lessons.length, 0);
+  const completedLessons = Object.values(userProgress).filter(Boolean).length;
+  
+  // Get current lesson
+  const currentLesson = modules
     .flatMap(module => module.lessons)
     .find(lesson => lesson.id === activeLesson);
     
-  const canAccessLesson = currentLesson?.free || user?.subscription === 'pro';
+  // Check if user can access this lesson
+  const canAccessLesson = currentLesson?.free || user?.subscription === 'pro' || (course?.is_free && user);
   
-  // Mock function to handle marking lesson as complete
-  const markAsComplete = () => {
-    // In a real app this would update the backend
-    toast({
-      title: "Progress updated",
-      description: "Lesson marked as complete",
-    });
+  // Mark lesson as complete
+  const markAsComplete = async () => {
+    if (!user || !activeLesson) return;
     
-    // Update local state to show completion
-    setProgress(Math.min(progress + (100 / totalLessons), 100));
+    try {
+      // Check if progress entry exists
+      const { data: existingProgress, error: checkError } = await supabase
+        .from('progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('lesson_id', activeLesson)
+        .maybeSingle();
+      
+      if (checkError) throw checkError;
+      
+      if (existingProgress) {
+        // Update existing progress
+        const { error: updateError } = await supabase
+          .from('progress')
+          .update({
+            completed: true,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', existingProgress.id);
+        
+        if (updateError) throw updateError;
+      } else {
+        // Insert new progress
+        const { error: insertError } = await supabase
+          .from('progress')
+          .insert({
+            user_id: user.id,
+            lesson_id: activeLesson,
+            completed: true,
+            completed_at: new Date().toISOString()
+          });
+        
+        if (insertError) throw insertError;
+      }
+      
+      // Update local state
+      setUserProgress({
+        ...userProgress,
+        [activeLesson]: true
+      });
+      
+      // Recalculate progress
+      const newCompletedCount = Object.values({...userProgress, [activeLesson]: true}).filter(Boolean).length;
+      setProgress(Math.round((newCompletedCount / totalLessons) * 100));
+      
+      toast({
+        title: "Progress updated",
+        description: "Lesson marked as complete",
+      });
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update progress",
+        variant: "destructive",
+      });
+    }
   };
   
-  // Mock function to navigate to next/previous lesson
+  // Navigate to next/previous lesson
   const navigateLesson = (direction: 'prev' | 'next') => {
-    const allLessons = mockCourseModules.flatMap(module => module.lessons);
+    const allLessons = modules.flatMap(module => module.lessons);
     const currentIndex = allLessons.findIndex(lesson => lesson.id === activeLesson);
     
     if (direction === 'next' && currentIndex < allLessons.length - 1) {
-      const nextLesson = allLessons[currentIndex + 1];
-      setActiveLesson(nextLesson.id);
-      
-      // Find which module this lesson belongs to
-      const moduleForLesson = mockCourseModules.find(module => 
-        module.lessons.some(lesson => lesson.id === nextLesson.id)
-      );
-      if (moduleForLesson) {
-        setActiveModule(moduleForLesson.id);
-      }
+      setActiveLesson(allLessons[currentIndex + 1].id);
     } else if (direction === 'prev' && currentIndex > 0) {
-      const prevLesson = allLessons[currentIndex - 1];
-      setActiveLesson(prevLesson.id);
-      
-      // Find which module this lesson belongs to
-      const moduleForLesson = mockCourseModules.find(module => 
-        module.lessons.some(lesson => lesson.id === prevLesson.id)
-      );
-      if (moduleForLesson) {
-        setActiveModule(moduleForLesson.id);
-      }
+      setActiveLesson(allLessons[currentIndex - 1].id);
     }
   };
   
@@ -135,6 +277,14 @@ const CoursePlayer = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header */}
@@ -158,9 +308,14 @@ const CoursePlayer = () => {
           </div>
           
           <div>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={markAsComplete}
+              disabled={!user || !currentLesson || userProgress[currentLesson.id]}
+            >
               <CheckCircle className="mr-2 h-4 w-4" />
-              Mark complete
+              {userProgress[currentLesson?.id || ''] ? 'Completed' : 'Mark complete'}
             </Button>
           </div>
         </div>
@@ -176,7 +331,7 @@ const CoursePlayer = () => {
           
           <ScrollArea className="h-[calc(100vh-10rem)]">
             <div className="p-4">
-              {mockCourseModules.map(module => (
+              {modules.map(module => (
                 <div key={module.id} className="mb-6">
                   <h3 className="font-semibold mb-2 text-lg">{module.title}</h3>
                   <div className="space-y-1">
@@ -191,9 +346,9 @@ const CoursePlayer = () => {
                         }`}
                       >
                         <div className="flex-shrink-0 w-5 h-5 mr-2">
-                          {lesson.completed ? (
+                          {userProgress[lesson.id] ? (
                             <CheckCircle className="h-5 w-5 text-primary" />
-                          ) : lesson.free || user?.subscription === 'pro' ? (
+                          ) : lesson.free || course?.is_free || user?.subscription === 'pro' ? (
                             <Play className="h-5 w-5" />
                           ) : (
                             <Lock className="h-5 w-5 text-muted-foreground" />
@@ -201,7 +356,7 @@ const CoursePlayer = () => {
                         </div>
                         <div className="flex-grow">
                           <div className="flex items-center justify-between">
-                            <span className={`text-sm ${!lesson.free && user?.subscription !== 'pro' ? 'text-muted-foreground' : ''}`}>
+                            <span className={`text-sm ${!lesson.free && !course?.is_free && user?.subscription !== 'pro' ? 'text-muted-foreground' : ''}`}>
                               {lesson.title}
                             </span>
                             <span className="text-xs text-muted-foreground">
@@ -271,8 +426,7 @@ const CoursePlayer = () => {
                 
                 <div className="prose dark:prose-invert max-w-none">
                   <p>
-                    This is the content for this lesson. In a real application, this would contain detailed information,
-                    code examples, images, and other learning materials related to the current lesson topic.
+                    {currentLesson?.description || 'This is the content for this lesson. In a real application, this would contain detailed information, code examples, images, and other learning materials related to the current lesson topic.'}
                   </p>
                   
                   <h2>Learning Objectives</h2>
@@ -282,6 +436,8 @@ const CoursePlayer = () => {
                     <li>Practice with the provided examples</li>
                     <li>Apply knowledge to your own projects</li>
                   </ul>
+                  
+                  <div dangerouslySetInnerHTML={{ __html: currentLesson?.content || '' }} />
                   
                   <p>
                     Continue exploring the content and make sure to complete the exercises at the end of this lesson
@@ -294,7 +450,7 @@ const CoursePlayer = () => {
                   <Button 
                     variant="outline" 
                     onClick={() => navigateLesson('prev')}
-                    disabled={activeLesson === 1}
+                    disabled={modules[0]?.lessons[0]?.id === activeLesson}
                   >
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     Previous Lesson
@@ -302,6 +458,7 @@ const CoursePlayer = () => {
                   
                   <Button 
                     onClick={() => navigateLesson('next')}
+                    disabled={modules[modules.length - 1]?.lessons[modules[modules.length - 1]?.lessons.length - 1]?.id === activeLesson}
                   >
                     Next Lesson
                     <ChevronRight className="ml-2 h-4 w-4" />
