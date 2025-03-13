@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -145,6 +146,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: "Failed to initialize authentication. Please refresh the page.",
           variant: "destructive",
         });
+        setUser(null);
         setIsLoading(false);
       }
     };
@@ -225,6 +227,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } else {
           console.log('Auth change: No session, setting user to null');
           setUser(null);
+          
+          // Force redirect to home page if on a protected route
+          const protectedRoutes = ['/courses', '/profile', '/admin', '/dashboard'];
+          const isOnProtectedRoute = protectedRoutes.some(route => 
+            window.location.pathname.startsWith(route)
+          );
+          
+          if (isOnProtectedRoute) {
+            console.log('User is on protected route, redirecting to home');
+            navigate('/', { replace: true });
+          }
+          
           setIsLoading(false);
         }
       }
@@ -345,6 +359,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Logout function with better error handling
   const logout = async () => {
     console.log('Attempting logout');
+    setIsLoading(true);
     try {
       await supabase.auth.signOut();
       setUser(null);
@@ -353,7 +368,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Logged out",
         description: "You've been successfully logged out",
       });
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
       toast({
@@ -361,6 +376,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Failed to log out",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

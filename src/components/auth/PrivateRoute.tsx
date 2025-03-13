@@ -1,14 +1,16 @@
 
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingState from '@/components/ui/LoadingState';
 
 const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <LoadingState message="Checking authentication..." />;
   }
 
+  // If user is not authenticated, redirect to login page
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
