@@ -1,58 +1,70 @@
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
-
-const featuredCourses: Course[] = [
-  {
-    id: '1',
-    title: 'Use Grok 3 DeepSearch to do product research on X',
-    description: 'How to use Grok 3\'s DeepSearch more to do detailed product research quickly.',
-    badges: ['tutorial', 'pro'],
-    slug: 'grok-3-deepsearch-product-research',
-    icon: '🔍',
-    toolName: 'Grok'
-  },
-  {
-    id: '2',
-    title: 'Build a simple to-do list app using Bolt',
-    description: 'A walkthrough building in Bolt—perfect if you\'re just starting out creating apps using AI.',
-    badges: ['tutorial', 'free'],
-    slug: 'build-todo-app-bolt',
-    icon: '📝',
-    toolName: 'Bolt'
-  },
-  {
-    id: '3',
-    title: 'Build an app with AI coding tool Bolt',
-    description: 'A walkthrough on how to build a waitlist signup web app with login functionality using Bolt.',
-    badges: ['tutorial', 'pro'],
-    slug: 'build-app-ai-coding-bolt',
-    icon: '🤖',
-    toolName: 'Bolt'
-  },
-  {
-    id: '4',
-    title: 'Upscale images for better resolution',
-    description: 'Learn how to upscale images using Topaz Lab\'s Gigapixel.',
-    badges: ['tutorial', 'pro'],
-    slug: 'upscale-images-better-resolution',
-    icon: '🖼️',
-    toolName: 'Topaz Lab'
-  },
-  {
-    id: '5',
-    title: 'Build an app with AI coding tool Create',
-    description: 'A walkthrough on how to build an app using Create',
-    badges: ['tutorial', 'pro'],
-    slug: 'build-app-ai-coding-create',
-    icon: '🧠',
-    toolName: 'Create'
-  }
-];
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 const FeaturedCourses = () => {
   const containerRef = useRef(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        // Fetch up to 5 featured courses
+        const { data, error } = await supabase
+          .from('courses')
+          .select(`
+            id, 
+            title, 
+            description, 
+            slug, 
+            icon,
+            is_pro,
+            is_free,
+            is_tutorial,
+            categories(name)
+          `)
+          .limit(5);
+        
+        if (error) throw error;
+        
+        // Transform data to match Course interface
+        const transformedCourses: Course[] = data.map(course => {
+          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
+          if (course.is_pro) badges.push('pro');
+          if (course.is_free) badges.push('free');
+          if (course.is_tutorial) badges.push('tutorial');
+          
+          return {
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            badges,
+            slug: course.slug,
+            icon: course.icon || '📚',
+            toolName: course.categories?.name
+          };
+        });
+        
+        setCourses(transformedCourses);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load featured courses",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchCourses();
+  }, [toast]);
 
   return (
     <section className="py-20 px-4" ref={containerRef}>
@@ -69,19 +81,29 @@ const FeaturedCourses = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {featuredCourses.map((course, index) => (
-            <motion.div
-              key={course.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <CourseCard course={course} />
-            </motion.div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : courses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {courses.map((course, index) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <CourseCard course={course} />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No courses found. Check back soon!</p>
+          </div>
+        )}
       </div>
     </section>
   );

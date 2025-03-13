@@ -16,6 +16,7 @@ const CourseSort = ({ onSortChange }: CourseSortProps) => {
         <option value="oldest">Oldest</option>
         <option value="az">A-Z</option>
         <option value="za">Z-A</option>
+        <option value="popular">Most Popular</option>
       </select>
     </div>
   );

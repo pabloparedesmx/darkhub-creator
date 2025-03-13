@@ -32,7 +32,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
 
   useEffect(() => {
     // Apply filters
-    let filteredCourses = coursesData;
+    let filteredCourses = [...coursesData];
 
     // Apply search term filter
     if (searchTerm) {
@@ -42,8 +42,14 @@ export const useCourseFilters = (coursesData: Course[]) => {
       );
     }
 
-    // Apply type filters (free/pro)
+    // Apply type filters (free/pro/tutorial)
     if (!filters.all) {
+      if (filters.tutorials) {
+        filteredCourses = filteredCourses.filter(course => 
+          course.badges.includes('tutorial')
+        );
+      }
+      
       if (filters.free && !filters.pro) {
         filteredCourses = filteredCourses.filter(course => 
           course.badges.includes('free')
@@ -57,18 +63,27 @@ export const useCourseFilters = (coursesData: Course[]) => {
 
     // Apply sort order
     if (sortOrder === 'newest') {
-      // Assuming id is somewhat related to the creation time for this mock data
-      filteredCourses = [...filteredCourses].sort((a, b) => Number(b.id) - Number(a.id));
+      // For database-sourced courses, we can assume the ID reflects creation time or use created_at
+      filteredCourses = [...filteredCourses].sort((a, b) => a.id > b.id ? -1 : 1);
     } else if (sortOrder === 'oldest') {
-      filteredCourses = [...filteredCourses].sort((a, b) => Number(a.id) - Number(b.id));
+      filteredCourses = [...filteredCourses].sort((a, b) => a.id < b.id ? -1 : 1);
     } else if (sortOrder === 'az') {
       filteredCourses = [...filteredCourses].sort((a, b) => a.title.localeCompare(b.title));
     } else if (sortOrder === 'za') {
       filteredCourses = [...filteredCourses].sort((a, b) => b.title.localeCompare(a.title));
+    } else if (sortOrder === 'popular') {
+      // In a real app, we'd sort by popularity metrics like enrollment count
+      // For now, we'll just use a simple alphabetical sort as a fallback
+      filteredCourses = [...filteredCourses].sort((a, b) => a.title.localeCompare(b.title));
     }
 
     setCourses(filteredCourses);
   }, [searchTerm, filters, sortOrder, coursesData]);
+
+  // Update courses when coursesData changes
+  useEffect(() => {
+    setCourses(coursesData);
+  }, [coursesData]);
 
   const clearAllFilters = () => {
     setSearchTerm('');
