@@ -17,9 +17,11 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginAttempted, setLoginAttempted] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Login form submitted with email:", email);
     
     // Basic validation
     if (!email || !password) {
@@ -31,12 +33,30 @@ const Login = () => {
       return;
     }
     
+    setLoginAttempted(true);
+    
     try {
       await login(email, password);
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error in component:", error);
+      setLoginAttempted(false);
     }
   };
+
+  // Add a safety timeout to reset loading state if stuck
+  if (loginAttempted && isLoading) {
+    setTimeout(() => {
+      if (isLoading) {
+        console.log("Login timeout reached, resetting loading state");
+        setLoginAttempted(false);
+        toast({
+          title: "Login timeout",
+          description: "Login is taking too long. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }, 10000); // 10-second timeout
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -124,6 +144,12 @@ const Login = () => {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
+                
+                {isLoading && loginAttempted && (
+                  <p className="text-xs text-center text-muted-foreground animate-pulse">
+                    Login in progress, please wait...
+                  </p>
+                )}
               </div>
             </form>
             
