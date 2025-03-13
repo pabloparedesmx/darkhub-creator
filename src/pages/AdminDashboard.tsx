@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -11,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from "@/hooks/use-toast";
 import { Course } from '@/components/ui/CourseCard';
-import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard, Check, X } from 'lucide-react';
+import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard } from 'lucide-react';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,9 +28,6 @@ type DbCourse = Database['public']['Tables']['courses']['Row'] & {
   toolName?: string;
 };
 
-// Type for user profiles
-type UserProfile = Database['public']['Tables']['profiles']['Row'];
-
 const AdminDashboard = () => {
   const { toast } = useToast();
   const { user, isAdmin } = useAuth();
@@ -37,9 +35,7 @@ const AdminDashboard = () => {
   
   const [courses, setCourses] = useState<DbCourse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [users, setUsers] = useState<UserProfile[]>([]);
   const [newCategory, setNewCategory] = useState('');
-  const [userSearchTerm, setUserSearchTerm] = useState('');
   const [newCourse, setNewCourse] = useState({
     title: '',
     description: '',
@@ -53,7 +49,6 @@ const AdminDashboard = () => {
   const [selectedCourse, setSelectedCourse] = useState<DbCourse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUserLoading, setIsUserLoading] = useState(true);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -118,35 +113,6 @@ const AdminDashboard = () => {
     };
     
     fetchData();
-  }, [toast]);
-
-  // Fetch user data
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setIsUserLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        setUsers(data || []);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load user data",
-          variant: "destructive",
-        });
-      } finally {
-        setIsUserLoading(false);
-      }
-    };
-    
-    fetchUsers();
   }, [toast]);
 
   const handleAddCategory = async () => {
@@ -395,44 +361,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Filter users based on search term
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(userSearchTerm.toLowerCase())
-  );
-
-  // Update user role
-  const handleUpdateUserRole = async (userId: string, currentRole: 'user' | 'admin') => {
-    const newRole = currentRole === 'admin' ? 'user' : 'admin';
-    
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
-      
-      if (error) throw error;
-      
-      // Update local state
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole as 'user' | 'admin' } : user
-      ));
-      
-      toast({
-        title: "Success",
-        description: `User role updated to ${newRole}`,
-      });
-    } catch (error: any) {
-      console.error('Error updating user role:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update user role",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
@@ -549,7 +477,7 @@ const AdminDashboard = () => {
               <Tabs defaultValue="content">
                 <TabsList className="mb-6">
                   <TabsTrigger value="content">Content Management</TabsTrigger>
-                  <TabsTrigger value="users">User Management</TabsTrigger>
+                  <TabsTrigger value="users">Users</TabsTrigger>
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
                 
@@ -761,81 +689,10 @@ const AdminDashboard = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle>User Management</CardTitle>
-                      <CardDescription>Manage your platform users and their roles</CardDescription>
+                      <CardDescription>Manage your platform users and their subscriptions</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex justify-between items-center mb-6">
-                        <div className="relative max-w-md w-full">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                          <Input 
-                            placeholder="Search users..." 
-                            className="pl-10" 
-                            value={userSearchTerm}
-                            onChange={(e) => setUserSearchTerm(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      
-                      {isUserLoading ? (
-                        <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                        </div>
-                      ) : (
-                        <div className="rounded-md border">
-                          <div className="grid grid-cols-12 bg-muted/50 p-4 text-sm font-medium">
-                            <div className="col-span-4">User</div>
-                            <div className="col-span-3">Email</div>
-                            <div className="col-span-2">Role</div>
-                            <div className="col-span-2">Subscription</div>
-                            <div className="col-span-1 text-right">Actions</div>
-                          </div>
-                          
-                          {filteredUsers.length === 0 ? (
-                            <div className="p-6 text-center">
-                              <p className="text-muted-foreground">No users found. Try a different search term.</p>
-                            </div>
-                          ) : (
-                            filteredUsers.map(userProfile => (
-                              <div key={userProfile.id} className="grid grid-cols-12 p-4 border-t items-center">
-                                <div className="col-span-4 font-medium truncate">{userProfile.name}</div>
-                                <div className="col-span-3 text-muted-foreground truncate">{userProfile.email}</div>
-                                <div className="col-span-2">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    userProfile.role === 'admin' 
-                                      ? 'bg-primary/20 text-primary' 
-                                      : 'bg-muted text-muted-foreground'
-                                  }`}>
-                                    {userProfile.role}
-                                  </span>
-                                </div>
-                                <div className="col-span-2">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    userProfile.subscription === 'pro' 
-                                      ? 'bg-badge-pro/20 text-badge-pro' 
-                                      : 'bg-badge-free/20 text-badge-free'
-                                  }`}>
-                                    {userProfile.subscription}
-                                  </span>
-                                </div>
-                                <div className="col-span-1 text-right">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleUpdateUserRole(userProfile.id, userProfile.role as 'user' | 'admin')}
-                                    title={userProfile.role === 'admin' ? 'Remove admin rights' : 'Make admin'}
-                                  >
-                                    {userProfile.role === 'admin' ? (
-                                      <X className="h-4 w-4 text-destructive" />
-                                    ) : (
-                                      <Check className="h-4 w-4 text-primary" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
+                      <p className="text-muted-foreground">This feature will be implemented in the next phase.</p>
                     </CardContent>
                   </Card>
                 </TabsContent>
