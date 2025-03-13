@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from '@/components/ui/checkbox';
@@ -17,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Database } from '@/lib/database.types';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 // Type for category from database
 type Category = Database['public']['Tables']['categories']['Row'];
@@ -597,12 +597,10 @@ const AdminDashboard = () => {
                           
                           <div className="space-y-2">
                             <label htmlFor="courseDescription">Description*</label>
-                            <Textarea 
-                              id="courseDescription" 
+                            <RichTextEditor 
                               value={newCourse.description} 
-                              onChange={(e) => setNewCourse({...newCourse, description: e.target.value})} 
+                              onChange={(content) => setNewCourse({...newCourse, description: content})} 
                               placeholder="Brief description of the course"
-                              rows={4}
                             />
                           </div>
                           
@@ -856,8 +854,59 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
       </div>
-    </div>
-  );
-};
 
-export default AdminDashboard;
+      {/* Course Add/Edit Dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className="hidden">Add Course</Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? 'Edit Course' : 'Add New Course'}</DialogTitle>
+            <DialogDescription>
+              {isEditing ? 'Update the course details' : 'Create a new course in your platform'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="courseTitle">Course Title*</label>
+                <Input 
+                  id="courseTitle" 
+                  value={newCourse.title} 
+                  onChange={(e) => setNewCourse({...newCourse, title: e.target.value})} 
+                  placeholder="e.g. AI Product Development"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="courseSlug">Course Slug*</label>
+                <Input 
+                  id="courseSlug" 
+                  value={newCourse.slug} 
+                  onChange={(e) => setNewCourse({...newCourse, slug: e.target.value})} 
+                  placeholder="e.g. ai-product-development"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="courseDescription">Description*</label>
+              <RichTextEditor 
+                value={newCourse.description} 
+                onChange={(content) => setNewCourse({...newCourse, description: content})} 
+                placeholder="Brief description of the course"
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label htmlFor="courseIcon">Icon (emoji)</label>
+                <Input 
+                  id="courseIcon" 
+                  value={newCourse.icon} 
+                  onChange={(e) => setNewCourse({...newCourse, icon: e.target.value})} 
+                  placeholder="e.g. 🤖"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="courseCategory">
