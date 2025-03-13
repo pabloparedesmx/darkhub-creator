@@ -17,6 +17,12 @@ const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly =
       <div 
         className="prose dark:prose-invert max-w-none"
         dangerouslySetInnerHTML={{ __html: value }}
+        style={{
+          fontFamily: '-apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif',
+          fontSize: '14px',
+          lineHeight: '1.5',
+          color: 'var(--foreground)'
+        }}
       />
     );
   }

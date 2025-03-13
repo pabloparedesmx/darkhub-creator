@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { MoreVertical, Edit, Trash, BookOpen } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import CategoryBadge from '@/components/ui/CategoryBadge';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 import { DbCourse } from '@/types/admin';
 
 interface CourseListProps {
@@ -60,9 +61,9 @@ const CourseList = ({
                                 <CategoryBadge key={index} type={badge} />
                               ))}
                             </div>
-                            <div className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                              {/* Render plain text from HTML content */}
-                              {course.description.replace(/<[^>]*>/g, '')}
+                            <div className="mb-4 line-clamp-2 text-sm text-muted-foreground">
+                              {/* Use RichTextEditor in read-only mode to display properly formatted preview */}
+                              <RichTextEditor value={course.description} onChange={() => {}} readOnly={true} />
                             </div>
                             <div className="flex items-center text-xs text-muted-foreground">
                               <BookOpen className="h-3 w-3 mr-1" />
