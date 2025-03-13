@@ -199,13 +199,13 @@ const CourseDetails = () => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink as={Link} to="/courses">
-                    <span className="flex items-center gap-1 text-muted-foreground">
+                  <BreadcrumbLink asChild>
+                    <Link to="/courses" className="flex items-center gap-1 text-muted-foreground">
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 12H19M5 12L11 6M5 12L11 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                       Catalog
-                    </span>
+                    </Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
