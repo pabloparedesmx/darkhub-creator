@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
+import { ChevronRight, CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CategoryBadge from '@/components/ui/CategoryBadge';
@@ -13,6 +13,14 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { DbCourse } from '@/types/admin';
@@ -39,6 +47,7 @@ const CourseDetails = () => {
   const { toast } = useToast();
   const [course, setCourse] = useState<CourseDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState<'not-started' | 'in-progress' | 'completed'>('not-started');
   
   // Fetch course data from Supabase
   useEffect(() => {
@@ -137,6 +146,15 @@ const CourseDetails = () => {
     });
   };
 
+  const markAsComplete = () => {
+    setProgress('completed');
+    toast({
+      title: "Marked as complete",
+      description: "Course has been marked as completed",
+      duration: 3000,
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex-col">
@@ -170,254 +188,199 @@ const CourseDetails = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
       className="min-h-screen flex flex-col"
     >
       <Navbar />
-      <main className="flex-grow pt-24 pb-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto">
-            {/* Breadcrumb */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Link to="/courses" className="flex items-center hover:text-foreground transition-colors">
-                  <span className="flex items-center gap-1">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3 5C3 3.89543 3.89543 3 5 3H9C10.1046 3 11 3.89543 11 5V9C11 10.1046 10.1046 11 9 11H5C3.89543 11 3 10.1046 3 9V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M13 5C13 3.89543 13.8954 3 15 3H19C20.1046 3 21 3.89543 21 5V9C21 10.1046 20.1046 11 19 11H15C13.8954 11 13 10.1046 13 9V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M3 15C3 13.8954 3.89543 13 5 13H9C10.1046 13 11 13.8954 11 15V19C11 20.1046 10.1046 21 9 21H5C3.89543 21 3 20.1046 3 19V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M13 15C13 13.8954 13.8954 13 15 13H19C20.1046 13 21 13.8954 21 15V19C21 20.1046 20.1046 21 19 21H15C13.8954 21 13 20.1046 13 19V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                    Catalog
-                  </span>
-                </Link>
-                <span className="mx-2 text-muted-foreground">/</span>
-                <span className="text-foreground">{course.title}</span>
-              </div>
-            </motion.div>
+      <main className="flex-grow pt-6 pb-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Breadcrumb */}
+          <div className="py-4 mb-2">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink as={Link} to="/courses">
+                    <span className="flex items-center gap-1 text-muted-foreground">
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M5 12L11 6M5 12L11 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Catalog
+                    </span>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                  <ChevronRight className="h-4 w-4" />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{course.title}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
 
-            {/* Course title and description */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="mb-8"
-            >
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
-              <div 
-                className="text-lg text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: course.description }}
-              />
-            </motion.div>
-
-            {/* Tags and metadata */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="mb-8"
-            >
-              <div className="flex flex-wrap gap-4">
-                {course.tags && (
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Main content column */}
+            <div className="flex-1">
+              {/* Course title and description */}
+              <div className="mb-8">
+                <h1 className="text-3xl md:text-4xl font-bold mb-3">{course.title}</h1>
+                <p className="text-lg text-muted-foreground mb-6">
+                  {course.content?.introduction || 'Learn how to use this powerful tool effectively.'}
+                </p>
+                
+                {/* Categories */}
+                <div className="flex flex-wrap gap-4 mb-8">
                   <div>
                     <h3 className="text-sm font-medium mb-2">Tags</h3>
                     <div className="flex flex-wrap gap-2">
-                      {course.tags.map((tag, index) => (
-                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
+                      {course.tags?.map((tag, index) => (
+                        <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary/50 text-foreground">
                           {tag}
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
-                
-                {course.tools && (
+                  
                   <div>
                     <h3 className="text-sm font-medium mb-2">Tools</h3>
                     <div className="flex flex-wrap gap-2">
-                      {course.tools.map((tool, index) => (
-                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
+                      {course.tools?.map((tool, index) => (
+                        <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary/50 text-foreground">
                           {tool}
                         </span>
                       ))}
                     </div>
                   </div>
-                )}
-                
-                {course.level && (
+                  
                   <div>
                     <h3 className="text-sm font-medium mb-2">Level</h3>
                     <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary/50 text-foreground">
                         {course.level}
                       </span>
                     </div>
                   </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Course content */}
-            {course.content && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-                className="bg-secondary/30 rounded-lg p-6 mb-8 border border-border"
-              >
-                <h2 className="text-xl font-semibold mb-4">Course Introduction</h2>
-                <p className="mb-4">{course.content.introduction}</p>
-                
-                <h3 className="text-lg font-semibold mt-6 mb-2">About {course.toolName || "This Course"}</h3>
-                <p className="mb-4">{course.content.about}</p>
-                
-                <p className="mb-6">{course.content.context}</p>
-                
-                <h3 className="text-lg font-semibold mb-4">In this tutorial you will learn how to:</h3>
-                <ul className="space-y-2 mb-6">
-                  {course.content.learningObjectives.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="inline-block mr-2 mt-1">•</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                
-                <h3 className="text-lg font-semibold mb-4">You'll need:</h3>
-                <ul className="space-y-2">
-                  {course.content.requirements.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="inline-block mr-2 mt-1">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <p className="mt-6 text-muted-foreground">Let's see how it's done.</p>
-              </motion.div>
-            )}
-
-            {/* Video player placeholder */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.4 }}
-              className="bg-secondary/10 border border-border rounded-lg aspect-video flex items-center justify-center mb-8"
-            >
-              <div className="text-center p-8">
-                <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M16.1378 10.5689L9.60498 6.30252C8.40816 5.52105 6.75 6.3764 6.75 7.83361V16.1664C6.75 17.6236 8.40816 18.479 9.60498 17.6975L16.1378 13.4311C17.2527 12.6962 17.2527 11.3038 16.1378 10.5689Z" fill="currentColor" />
-                  </svg>
                 </div>
-                <p className="text-muted-foreground">Premium content available with a Pro subscription</p>
-                <Button variant="default" size="sm" className="mt-4">
-                  Upgrade to Pro
-                </Button>
               </div>
-            </motion.div>
-          </div>
 
-          {/* Right side panel */}
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.5 }}
-              className="bg-secondary/20 rounded-lg p-6 border border-border"
-            >
-              <div className="flex items-center justify-between mb-6">
-                <span className="text-sm text-muted-foreground flex items-center">
-                  <span className="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  Not Started
-                </span>
-                <div className="flex space-x-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={saveToBookmarks}>
-                          <Bookmark className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Save</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+              {/* Course content */}
+              {course.content && (
+                <div className="space-y-8 mb-8">
+                  {/* About section */}
+                  <div>
+                    <a href="#" className="text-primary hover:underline mb-1 inline-flex items-center">
+                      {course.toolName || "Grok"} <span className="ml-1">&rarr;</span>
+                    </a>
+                    <p className="mb-4">{course.content.about}</p>
+                    <p className="mb-6">{course.content.context}</p>
+                  </div>
                   
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={() => {}}>
-                          <CheckCircle className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Mark as complete</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {/* Learning objectives */}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4">In this tutorial you will learn how to:</h3>
+                    <ul className="space-y-3 list-disc pl-5">
+                      {course.content.learningObjectives.map((item, index) => (
+                        <li key={index} className="pl-1">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {/* Requirements */}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-4">You'll need:</h3>
+                    <ul className="space-y-3 list-disc pl-5">
+                      {course.content.requirements.map((item, index) => (
+                        <li key={index} className="pl-1">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Video player or premium content */}
+              <div className="bg-secondary/10 border border-border rounded-lg aspect-video flex items-center justify-center mb-8">
+                <div className="text-center p-8">
+                  <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M16.1378 10.5689L9.60498 6.30252C8.40816 5.52105 6.75 6.3764 6.75 7.83361V16.1664C6.75 17.6236 8.40816 18.479 9.60498 17.6975L16.1378 13.4311C17.2527 12.6962 17.2527 11.3038 16.1378 10.5689Z" fill="currentColor" />
+                    </svg>
+                  </div>
+                  <p className="text-muted-foreground">Premium content available with a Pro subscription</p>
+                  <Button variant="default" size="sm" className="mt-4">
+                    Upgrade to Pro
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:w-72 space-y-6">
+              {/* Progress indicator */}
+              <div className="bg-secondary/20 rounded-lg p-6 border border-border">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className={`inline-block w-3 h-3 rounded-full ${
+                    progress === 'completed' ? 'bg-green-500' : 
+                    progress === 'in-progress' ? 'bg-primary' : 'bg-muted'
+                  }`}></span>
+                  <span className="text-sm">
+                    {progress === 'completed' ? 'Completed' : 
+                     progress === 'in-progress' ? 'In Progress' : 'Not Started'}
+                  </span>
+                </div>
+
+                {/* Action buttons */}
+                <div className="space-y-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={saveToBookmarks}
+                  >
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    Save
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={markAsComplete}
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Mark as complete
+                  </Button>
                 </div>
               </div>
 
-              <h3 className="text-lg font-medium mb-4">Share with a friend</h3>
-              <div className="mb-4">
+              {/* Share section */}
+              <div className="bg-secondary/20 rounded-lg p-6 border border-border">
+                <h3 className="text-lg font-medium mb-4">Share with a friend</h3>
                 <Button 
                   variant="outline" 
-                  className="w-full flex items-center justify-center"
+                  className="w-full mb-4 justify-center"
                   onClick={copyToClipboard}
                 >
                   <Copy className="mr-2 h-4 w-4" />
                   Copy to clipboard
                 </Button>
-              </div>
 
-              <div className="flex justify-center space-x-4">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Twitter className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on Twitter</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Facebook className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on Facebook</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full" onClick={() => {}}>
-                        <Linkedin className="h-5 w-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Share on LinkedIn</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <div className="flex justify-center space-x-4">
+                  <Button variant="outline" size="icon" className="rounded-full" onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`, '_blank')}>
+                    <Twitter className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button variant="outline" size="icon" className="rounded-full" onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank')}>
+                    <Facebook className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button variant="outline" size="icon" className="rounded-full" onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank')}>
+                    <Linkedin className="h-5 w-5" />
+                  </Button>
+                </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </main>
