@@ -13,9 +13,8 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Start typing...', heig
   const editorRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
-  // TinyMCE API key - using a free API key for development
-  // In production, you should use your own API key from TinyMCE
-  const TINYMCE_API_KEY = 'no-api-key';
+  // TinyMCE API key
+  const TINYMCE_API_KEY = '70jtps1huxsr2ysuwbmm8u9c1j2kgb5j14030vcs3pfxjjcn';
 
   useEffect(() => {
     setIsLoaded(true);
