@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, Edit, Trash, BookOpen } from 'lucide-react';
@@ -51,7 +52,9 @@ const CourseList = ({
                       <div className="flex-1 p-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                            <Link to={`/courses/${course.slug}`} className="hover:text-primary transition-colors">
+                              <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                            </Link>
                             <div className="flex flex-wrap gap-2 mb-3">
                               {course.badges.map((badge, index) => (
                                 <CategoryBadge key={index} type={badge} />
