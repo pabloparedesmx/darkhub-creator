@@ -40,7 +40,7 @@ const FAQ = () => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   return (
-    <section className="py-20 px-4 bg-secondary/10">
+    <section className="py-20 px-4 ai-section-gradient">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -49,10 +49,10 @@ const FAQ = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 ai-gradient-text">
             Preguntas frecuentes
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-blue-100/80 max-w-3xl mx-auto">
             Respuestas a las dudas más comunes
           </p>
         </motion.div>
@@ -72,12 +72,12 @@ const FAQ = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
               >
-                <AccordionItem value={`item-${index}`} className="border border-border rounded-lg overflow-hidden bg-background">
-                  <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-secondary/20">
+                <AccordionItem value={`item-${index}`} className="ai-card border-blue-500/20 overflow-hidden">
+                  <AccordionTrigger className="px-4 py-4 hover:no-underline hover:bg-blue-900/20 text-blue-100">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4 pt-2">
-                    <p className="text-muted-foreground">{faq.answer}</p>
+                    <p className="text-blue-100/70">{faq.answer}</p>
                   </AccordionContent>
                 </AccordionItem>
               </motion.div>
@@ -91,8 +91,8 @@ const FAQ = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-center mt-10"
           >
-            <p className="mb-4 text-muted-foreground">¿Tienes más preguntas?</p>
-            <Button>Contáctanos</Button>
+            <p className="mb-4 text-blue-100/60">¿Tienes más preguntas?</p>
+            <Button className="ai-button">Contáctanos</Button>
           </motion.div>
         </div>
       </div>

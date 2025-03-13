@@ -29,8 +29,9 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-20 px-4">
-      <div className="container mx-auto">
+    <section className="py-20 px-4 ai-neural-bg">
+      <div className="absolute inset-0 bg-background/70 backdrop-blur-sm"></div>
+      <div className="container mx-auto relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,10 +39,10 @@ const Testimonials = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Nuestra comunidad opina
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 ai-gradient-text">
+            Testimoniales
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-xl text-blue-100/80 max-w-3xl mx-auto">
             Más de 20,000 usuarios nos respaldan
           </p>
         </motion.div>
@@ -55,20 +56,20 @@ const Testimonials = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full border-border hover:border-primary/30 transition-colors">
+              <Card className="h-full ai-card border-blue-500/20 hover:border-blue-400/30 transition-colors">
                 <CardContent className="p-6">
                   <div className="flex flex-col h-full">
                     <div className="mb-4">
-                      <p className="text-lg">{testimonial.content}</p>
+                      <p className="text-lg text-blue-100/90">{testimonial.content}</p>
                     </div>
-                    <div className="mt-auto pt-4 border-t border-border flex items-center">
-                      <Avatar className="h-10 w-10 mr-3">
+                    <div className="mt-auto pt-4 border-t border-blue-500/20 flex items-center">
+                      <Avatar className="h-10 w-10 mr-3 border border-blue-500/30">
                         <AvatarImage src={testimonial.avatar} alt={testimonial.author} />
-                        <AvatarFallback>{testimonial.author.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-900/60">{testimonial.author.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{testimonial.author}</p>
-                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                        <p className="font-medium text-blue-100">{testimonial.author}</p>
+                        <p className="text-sm text-blue-200/60">{testimonial.role}</p>
                       </div>
                     </div>
                   </div>

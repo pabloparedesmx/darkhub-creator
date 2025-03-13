@@ -14,6 +14,8 @@ const Index = () => {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
+    // Force dark theme for the futuristic AI look
+    document.documentElement.classList.add('dark');
   }, []);
 
   return (
@@ -22,7 +24,7 @@ const Index = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex flex-col"
+      className="min-h-screen flex flex-col bg-background"
     >
       <Navbar />
       <main className="flex-grow">

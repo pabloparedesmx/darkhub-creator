@@ -67,45 +67,46 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col bg-background ai-neural-bg">
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
+      <main className="flex-grow flex items-center justify-center p-4 relative z-10">
         <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-secondary/20 backdrop-blur-sm rounded-lg border border-border shadow-sm p-8"
+            className="ai-card p-8"
           >
             <div className="flex justify-center mb-8">
               <Link to="/" className="flex items-center space-x-2">
-                <div className="relative w-10 h-10 flex items-center justify-center bg-primary rounded-sm">
-                  <span className="text-white font-bold text-sm">KB</span>
+                <div className="relative w-10 h-10 flex items-center justify-center bg-blue-600 rounded-sm">
+                  <span className="text-white font-bold text-sm">AI</span>
                 </div>
-                <span className="font-bold text-2xl text-foreground">KnowledgeBites</span>
+                <span className="font-bold text-2xl text-blue-100 ai-gradient-text">AI Makers</span>
               </Link>
             </div>
             
-            <h1 className="text-2xl font-bold mb-6 text-center">Welcome back</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Welcome back</h1>
             
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-blue-100">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-background/50"
+                    className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
                     disabled={isLoading}
                   />
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                    <Label htmlFor="password" className="text-blue-100">Password</Label>
+                    <Link to="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 hover:underline">
                       Forgot password?
                     </Link>
                   </div>
@@ -116,12 +117,12 @@ const Login = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-background/50"
+                      className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
                       disabled={isLoading}
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-400 hover:text-blue-300"
                       onClick={() => setShowPassword(!showPassword)}
                       disabled={isLoading}
                     >
@@ -140,21 +141,22 @@ const Login = () => {
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(!!checked)}
                     disabled={isLoading}
+                    className="border-blue-500/50 data-[state=checked]:bg-blue-600"
                   />
                   <label
                     htmlFor="remember"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    className="text-sm font-medium leading-none text-blue-100/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     Remember me
                   </label>
                 </div>
                 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full ai-button" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
                 
                 {isLoading && loginAttempted && (
-                  <p className="text-xs text-center text-muted-foreground animate-pulse">
+                  <p className="text-xs text-center text-blue-400 animate-pulse">
                     Login in progress, please wait...
                   </p>
                 )}
@@ -164,17 +166,17 @@ const Login = () => {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
+                  <div className="w-full border-t border-blue-500/30"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-secondary px-2 text-blue-300">Or continue with</span>
                 </div>
               </div>
               
               <div className="mt-6">
                 <Button 
                   variant="outline" 
-                  className="w-full" 
+                  className="w-full border-blue-500/30 text-blue-100 hover:bg-blue-900/30" 
                   disabled={isLoading}
                   onClick={handleGoogleSignIn}
                 >
@@ -190,9 +192,9 @@ const Login = () => {
               </div>
             </div>
             
-            <div className="mt-6 text-center text-sm">
+            <div className="mt-6 text-center text-sm text-blue-100/70">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-primary hover:underline">
+              <Link to="/signup" className="text-blue-400 hover:text-blue-300 hover:underline">
                 Sign up
               </Link>
             </div>
