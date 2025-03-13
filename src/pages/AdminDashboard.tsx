@@ -910,3 +910,4 @@ const AdminDashboard = () => {
               </div>
               <div className="space-y-2">
                 <label htmlFor="courseCategory">
+                  Category
