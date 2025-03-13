@@ -11,12 +11,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from "@/hooks/use-toast";
 import { Course } from '@/components/ui/CourseCard';
-import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard, Check, X } from 'lucide-react';
+import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard, Check, X, FileText } from 'lucide-react';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Database } from '@/lib/database.types';
+import RichTextEditor from '@/components/ui/RichTextEditor';
 
 // Type for category from database
 type Category = Database['public']['Tables']['categories']['Row'];
@@ -29,6 +30,9 @@ type DbCourse = Database['public']['Tables']['courses']['Row'] & {
 
 // Type for user profiles
 type UserProfile = Database['public']['Tables']['profiles']['Row'];
+
+// Type for lesson
+type Lesson = Database['public']['Tables']['lessons']['Row'];
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -54,6 +58,19 @@ const AdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
+  
+  // New states for lessons
+  const [showLessonsDialog, setShowLessonsDialog] = useState(false);
+  const [currentCourseLessons, setCurrentCourseLessons] = useState<Lesson[]>([]);
+  const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
+  const [newLesson, setNewLesson] = useState({
+    title: '',
+    description: '',
+    order_index: 0,
+    content: '',
+  });
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
+  const [isLessonEditing, setIsLessonEditing] = useState(false);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -433,6 +450,180 @@ const AdminDashboard = () => {
     }
   };
 
+  // New functions for lesson management
+  const handleOpenLessons = async (courseId: string) => {
+    setCurrentCourseId(courseId);
+    setShowLessonsDialog(true);
+    
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_index', { ascending: true });
+      
+      if (error) throw error;
+      
+      setCurrentCourseLessons(data || []);
+      
+      // Set the order index for the new lesson
+      const nextOrderIndex = data && data.length > 0 ? Math.max(...data.map(l => l.order_index)) + 1 : 0;
+      setNewLesson(prev => ({ ...prev, order_index: nextOrderIndex }));
+    } catch (error: any) {
+      console.error('Error fetching lessons:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load lessons",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAddLesson = async () => {
+    if (!currentCourseId) return;
+    
+    const { title, description, order_index, content } = newLesson;
+    
+    if (!title) {
+      toast({
+        title: "Error",
+        description: "Lesson title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .insert([{
+          title,
+          description,
+          order_index,
+          content,
+          course_id: currentCourseId,
+        }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setCurrentCourseLessons([...currentCourseLessons, data]);
+      
+      setNewLesson({
+        title: '',
+        description: '',
+        order_index: order_index + 1,
+        content: '',
+      });
+      
+      toast({
+        title: "Success",
+        description: "Lesson added successfully",
+      });
+    } catch (error: any) {
+      console.error('Error adding lesson:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add lesson",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteLesson = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('lessons')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setCurrentCourseLessons(currentCourseLessons.filter(lesson => lesson.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Lesson deleted successfully",
+      });
+    } catch (error: any) {
+      console.error('Error deleting lesson:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete lesson",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditLesson = (lesson: Lesson) => {
+    setEditingLesson(lesson);
+    setNewLesson({
+      title: lesson.title,
+      description: lesson.description || '',
+      order_index: lesson.order_index,
+      content: lesson.content || '',
+    });
+    setIsLessonEditing(true);
+  };
+
+  const handleUpdateLesson = async () => {
+    if (!editingLesson) return;
+    
+    const { title, description, order_index, content } = newLesson;
+    
+    if (!title) {
+      toast({
+        title: "Error",
+        description: "Lesson title is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('lessons')
+        .update({
+          title,
+          description,
+          order_index,
+          content,
+        })
+        .eq('id', editingLesson.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setCurrentCourseLessons(currentCourseLessons.map(lesson => 
+        lesson.id === editingLesson.id ? data : lesson
+      ));
+      
+      setEditingLesson(null);
+      setIsLessonEditing(false);
+      
+      setNewLesson({
+        title: '',
+        description: '',
+        order_index: Math.max(...currentCourseLessons.map(l => l.order_index)) + 1,
+        content: '',
+      });
+      
+      toast({
+        title: "Success",
+        description: "Lesson updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating lesson:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update lesson",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
@@ -728,26 +919,36 @@ const AdminDashboard = () => {
                                     )}
                                   </div>
                                 </div>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                      <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem onClick={() => handleEditCourse(course)}>
-                                      <Edit className="mr-2 h-4 w-4" />
-                                      Edit
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem 
-                                      onClick={() => handleDeleteCourse(course.id)}
-                                      className="text-destructive"
-                                    >
-                                      <Trash className="mr-2 h-4 w-4" />
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                <div className="flex space-x-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => handleOpenLessons(course.id)}
+                                  >
+                                    <FileText className="h-4 w-4 mr-1" />
+                                    Lessons
+                                  </Button>
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="sm">
+                                        <MoreVertical className="h-4 w-4" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={() => handleEditCourse(course)}>
+                                        <Edit className="mr-2 h-4 w-4" />
+                                        Edit
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        onClick={() => handleDeleteCourse(course.id)}
+                                        className="text-destructive"
+                                      >
+                                        <Trash className="mr-2 h-4 w-4" />
+                                        Delete
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
@@ -771,93 +972,4 @@ const AdminDashboard = () => {
                             placeholder="Search users..." 
                             className="pl-10" 
                             value={userSearchTerm}
-                            onChange={(e) => setUserSearchTerm(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      
-                      {isUserLoading ? (
-                        <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-                        </div>
-                      ) : (
-                        <div className="rounded-md border">
-                          <div className="grid grid-cols-12 bg-muted/50 p-4 text-sm font-medium">
-                            <div className="col-span-4">User</div>
-                            <div className="col-span-3">Email</div>
-                            <div className="col-span-2">Role</div>
-                            <div className="col-span-2">Subscription</div>
-                            <div className="col-span-1 text-right">Actions</div>
-                          </div>
-                          
-                          {filteredUsers.length === 0 ? (
-                            <div className="p-6 text-center">
-                              <p className="text-muted-foreground">No users found. Try a different search term.</p>
-                            </div>
-                          ) : (
-                            filteredUsers.map(userProfile => (
-                              <div key={userProfile.id} className="grid grid-cols-12 p-4 border-t items-center">
-                                <div className="col-span-4 font-medium truncate">{userProfile.name}</div>
-                                <div className="col-span-3 text-muted-foreground truncate">{userProfile.email}</div>
-                                <div className="col-span-2">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    userProfile.role === 'admin' 
-                                      ? 'bg-primary/20 text-primary' 
-                                      : 'bg-muted text-muted-foreground'
-                                  }`}>
-                                    {userProfile.role}
-                                  </span>
-                                </div>
-                                <div className="col-span-2">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                    userProfile.subscription === 'pro' 
-                                      ? 'bg-badge-pro/20 text-badge-pro' 
-                                      : 'bg-badge-free/20 text-badge-free'
-                                  }`}>
-                                    {userProfile.subscription}
-                                  </span>
-                                </div>
-                                <div className="col-span-1 text-right">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleUpdateUserRole(userProfile.id, userProfile.role as 'user' | 'admin')}
-                                    title={userProfile.role === 'admin' ? 'Remove admin rights' : 'Make admin'}
-                                  >
-                                    {userProfile.role === 'admin' ? (
-                                      <X className="h-4 w-4 text-destructive" />
-                                    ) : (
-                                      <Check className="h-4 w-4 text-primary" />
-                                    )}
-                                  </Button>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="analytics">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Analytics Dashboard</CardTitle>
-                      <CardDescription>View performance metrics for your platform</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">Analytics dashboard will be implemented in the next phase.</p>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </div>
-  );
-};
-
-export default AdminDashboard;
+                            onChange
