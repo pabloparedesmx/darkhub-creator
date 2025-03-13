@@ -38,8 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Get profile data from Supabase
   const getProfile = async (userId: string) => {
     try {
-      console.log('Fetching profile for user ID:', userId);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -47,12 +45,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
         throw error;
       }
 
       if (data) {
-        console.log('Profile data retrieved:', data);
         return {
           id: data.id,
           email: data.email,
@@ -62,7 +58,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } as User;
       }
       
-      console.warn('No profile data found for user:', userId);
       return null;
     } catch (error) {
       console.error('Error getting profile', error);
@@ -75,34 +70,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const initializeAuth = async () => {
       setIsLoading(true);
       
-      try {
-        console.log('Initializing auth state...');
-        // Get current session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-          setIsLoading(false);
-          return;
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        const profile = await getProfile(session.user.id);
+        if (profile) {
+          setUser(profile);
         }
-        
-        if (session) {
-          console.log('Session found:', session.user.id);
-          const profile = await getProfile(session.user.id);
-          if (profile) {
-            console.log('Setting user from session:', profile);
-            setUser(profile);
-          } else {
-            console.warn('No profile found for session user');
-          }
-        } else {
-          console.log('No active session found');
-        }
-      } catch (error) {
-        console.error('Error during auth initialization:', error);
-      } finally {
-        setIsLoading(false);
       }
+      
+      setIsLoading(false);
     };
     
     initializeAuth();
@@ -110,19 +88,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
         if (session && session.user) {
           const profile = await getProfile(session.user.id);
-          if (profile) {
-            console.log('Profile set after auth change:', profile);
-            setUser(profile);
-          } else {
-            console.warn('No profile found after auth change');
-            setUser(null);
-          }
+          setUser(profile);
         } else {
-          console.log('No session in auth change, clearing user');
           setUser(null);
         }
         
@@ -141,76 +110,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
-      console.log('Attempting login for email:', email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) {
-        console.error('Login error from Supabase:', error);
         throw error;
       }
       
       if (data.user) {
-        console.log('User authenticated successfully:', data.user.id);
+        const profile = await getProfile(data.user.id);
         
-        // Set a timeout to prevent hanging if profile fetch fails
-        const loginTimeout = setTimeout(() => {
-          console.log('Login timeout reached, continuing anyway');
+        if (profile) {
           toast({
             title: "Login successful",
-            description: "Welcome back!",
+            description: `Welcome back, ${profile.name}!`,
           });
-          navigate('/courses');
-          setIsLoading(false);
-        }, 5000);
-        
-        try {
-          const profile = await getProfile(data.user.id);
           
-          // Clear the timeout since we got a response
-          clearTimeout(loginTimeout);
-          
-          if (profile) {
-            console.log('Login successful with profile:', profile);
-            setUser(profile);
-            
-            toast({
-              title: "Login successful",
-              description: `Welcome back, ${profile.name}!`,
-            });
-            
-            // Redirect to courses page instead of dashboard
-            if (profile.role === 'admin') {
-              console.log('Redirecting admin to /admin');
-              navigate('/admin');
-            } else {
-              console.log('Redirecting user to /courses');
-              navigate('/courses');
-            }
+          // Redirect to courses page instead of dashboard
+          if (profile.role === 'admin') {
+            navigate('/admin');
           } else {
-            console.warn('No profile found after login, redirecting anyway');
-            toast({
-              title: "Login successful",
-              description: "Welcome back!",
-            });
             navigate('/courses');
           }
-        } catch (profileError) {
-          console.error('Error fetching profile after login:', profileError);
-          // Clear the timeout and continue with login
-          clearTimeout(loginTimeout);
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-          navigate('/courses');
         }
-      } else {
-        console.error('No user data returned from login');
-        throw new Error('Login failed: No user data returned');
       }
     } catch (error: any) {
       console.error('Login failed:', error);
