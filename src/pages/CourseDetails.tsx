@@ -3,10 +3,18 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
+import { CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import CategoryBadge from '@/components/ui/CategoryBadge';
+import RichTextEditor from '@/components/ui/RichTextEditor';
+import { 
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { 
   Tooltip,
   TooltipContent,
@@ -184,21 +192,19 @@ const CourseDetails = () => {
               transition={{ duration: 0.3 }}
               className="mb-8"
             >
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Link to="/courses" className="flex items-center hover:text-foreground transition-colors">
-                  <span className="flex items-center gap-1">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M3 5C3 3.89543 3.89543 3 5 3H9C10.1046 3 11 3.89543 11 5V9C11 10.1046 10.1046 11 9 11H5C3.89543 11 3 10.1046 3 9V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M13 5C13 3.89543 13.8954 3 15 3H19C20.1046 3 21 3.89543 21 5V9C21 10.1046 20.1046 11 19 11H15C13.8954 11 13 10.1046 13 9V5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M3 15C3 13.8954 3.89543 13 5 13H9C10.1046 13 11 13.8954 11 15V19C11 20.1046 10.1046 21 9 21H5C3.89543 21 3 20.1046 3 19V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M13 15C13 13.8954 13.8954 13 15 13H19C20.1046 13 21 13.8954 21 15V19C21 20.1046 20.1046 21 19 21H15C13.8954 21 13 20.1046 13 19V15Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                    Catalog
-                  </span>
-                </Link>
-                <span className="mx-2 text-muted-foreground">/</span>
-                <span className="text-foreground">{course.title}</span>
-              </div>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link to="/courses">Catalog</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{course.title}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
             </motion.div>
 
             {/* Course title and description */}
@@ -209,10 +215,8 @@ const CourseDetails = () => {
               className="mb-8"
             >
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
-              <div 
-                className="text-lg text-muted-foreground"
-                dangerouslySetInnerHTML={{ __html: course.description }}
-              />
+              {/* Use the RichTextEditor in read-only mode to display formatted content */}
+              <RichTextEditor value={course.description} onChange={() => {}} readOnly={true} />
             </motion.div>
 
             {/* Tags and metadata */}

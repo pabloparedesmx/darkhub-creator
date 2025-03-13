@@ -7,9 +7,20 @@ interface RichTextEditorProps {
   onChange: (content: string) => void;
   height?: number;
   placeholder?: string;
+  readOnly?: boolean;
 }
 
-const RichTextEditor = ({ value, onChange, height = 300, placeholder }: RichTextEditorProps) => {
+const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly = false }: RichTextEditorProps) => {
+  // For read-only mode, we render a div with the HTML content
+  if (readOnly) {
+    return (
+      <div 
+        className="prose dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: value }}
+      />
+    );
+  }
+  
   return (
     <Editor
       apiKey="70jtps1huxsr2ysuwbmm8u9c1j2kgb5j14030vcs3pfxjjcn"
