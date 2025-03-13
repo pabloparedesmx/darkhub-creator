@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
@@ -314,6 +314,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Google Sign In function
+  const signInWithGoogle = async () => {
+    console.log('Attempting to sign in with Google');
+    setIsLoading(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/courses`
+        }
+      });
+      
+      if (error) {
+        console.error('Google sign-in error:', error);
+        throw error;
+      }
+      
+      console.log('Google sign-in initiated successfully');
+      toast({
+        title: "Google sign-in initiated",
+        description: "You'll be redirected to Google for authentication",
+      });
+      
+      // No need to navigate or set user here as Supabase will handle the redirect
+      // and the onAuthStateChange listener will handle the session
+    } catch (error: any) {
+      console.error('Google sign-in process failed:', error);
+      toast({
+        title: "Google sign-in failed",
+        description: error.message || "Could not sign in with Google",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Signup function with better error handling
   const signup = async (name: string, email: string, password: string) => {
     console.log(`Attempting signup for email: ${email}`);
@@ -385,6 +423,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     isLoading,
     login,
+    signInWithGoogle,
     signup,
     logout,
     isAuthenticated: !!user,
