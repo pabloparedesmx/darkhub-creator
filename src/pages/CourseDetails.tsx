@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Share2, Bookmark, Copy, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import RichTextEditor from '@/components/ui/RichTextEditor';
+import RichTextContent from '@/components/ui/RichTextContent';
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -215,8 +214,8 @@ const CourseDetails = () => {
               className="mb-8"
             >
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
-              {/* Use the RichTextEditor in read-only mode to display formatted content */}
-              <RichTextEditor value={course.description} onChange={() => {}} readOnly={true} />
+              {/* Use the new RichTextContent component */}
+              <RichTextContent content={course.description} />
             </motion.div>
 
             {/* Tags and metadata */}
