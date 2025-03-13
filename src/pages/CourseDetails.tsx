@@ -88,7 +88,8 @@ const CourseDetails = () => {
           badges,
           slug: courseData.slug,
           icon: courseData.icon,
-          category: courseData.categories ? { name: courseData.categories.name } : undefined,
+          // Fix: Handle categories as an array properly
+          category: courseData.categories && courseData.categories.length > 0 ? { name: courseData.categories[0].name } : undefined,
           lessons: lessonsData || []
         });
         
