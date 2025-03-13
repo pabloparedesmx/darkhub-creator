@@ -46,7 +46,8 @@ const FeaturedCourses = () => {
             badges,
             slug: course.slug,
             icon: course.icon || '📚',
-            toolName: course.categories?.name
+            // Fix: Access the first item's name in the categories array, if it exists
+            toolName: course.categories && course.categories[0] ? course.categories[0].name : undefined
           };
         });
         
