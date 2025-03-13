@@ -40,11 +40,12 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="relative w-8 h-8 flex items-center justify-center bg-primary rounded-sm">
-            <span className="text-white font-bold text-xs">KB</span>
-          </div>
-          <span className="font-bold text-xl text-foreground">KnowledgeBites</span>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" 
+            alt="AI Makers" 
+            className="h-10"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1">

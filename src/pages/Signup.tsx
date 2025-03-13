@@ -68,11 +68,12 @@ const Signup = () => {
             className="ai-card p-8"
           >
             <div className="flex justify-center mb-8">
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="relative w-10 h-10 flex items-center justify-center bg-blue-600 rounded-sm">
-                  <span className="text-white font-bold text-sm">AI</span>
-                </div>
-                <span className="font-bold text-2xl text-blue-100 ai-gradient-text">AI Makers</span>
+              <Link to="/" className="flex items-center">
+                <img 
+                  src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" 
+                  alt="AI Makers" 
+                  className="h-12" 
+                />
               </Link>
             </div>
             

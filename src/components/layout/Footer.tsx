@@ -9,11 +9,12 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="relative w-8 h-8 flex items-center justify-center bg-primary rounded-sm">
-                <span className="text-white font-bold text-xs">KB</span>
-              </div>
-              <span className="font-bold text-xl text-foreground">KnowledgeBites</span>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" 
+                alt="AI Makers" 
+                className="h-10" 
+              />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
               Learn, build and master AI tools with our bite-sized courses and vibrant community.
@@ -106,7 +107,7 @@ const Footer = () => {
 
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} KnowledgeBites. All rights reserved.
+            © {currentYear} AI Makers. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
