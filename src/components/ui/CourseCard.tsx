@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import CategoryBadge from './CategoryBadge';
 import { motion } from 'framer-motion';
+import { BookOpen } from 'lucide-react';
 
 export type Course = {
   id: string;
@@ -22,46 +23,54 @@ interface CourseCardProps {
 const CourseCard = ({ course }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
+  // Remove HTML tags from description for clean display
+  const plainDescription = course.description.replace(/<[^>]*>/g, '');
+  
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
-        className="h-full overflow-hidden transition-all duration-300 bg-secondary/30 hover:bg-secondary/50 border-border hover:border-border/80 backdrop-blur-sm"
+        className="h-full overflow-hidden transition-all duration-300 hover:shadow-md border-border hover:border-primary/20 backdrop-blur-sm"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <CardContent className="p-5">
+        <CardContent className="p-0">
           <div className="flex flex-col h-full">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex space-x-1.5">
+            {/* Card header with icon */}
+            <div className="flex items-center p-4 bg-secondary/30 border-b border-border/50">
+              <div className="flex items-center justify-center w-10 h-10 bg-background rounded-md border border-border mr-3">
+                <span className="text-lg">{course.icon || '📚'}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
                 {course.badges.map((badge, index) => (
                   <CategoryBadge key={index} type={badge} />
                 ))}
               </div>
-              
-              {course.icon && (
-                <div className="flex items-center justify-center w-8 h-8 bg-background rounded-md border border-border">
-                  <span className="text-sm">{course.icon}</span>
-                </div>
-              )}
             </div>
             
-            <motion.h3 
-              className="text-lg font-semibold mb-2 text-foreground"
-              animate={{ 
-                color: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--foreground))'
-              }}
-              transition={{ duration: 0.2 }}
-            >
-              {course.title}
-            </motion.h3>
+            {/* Card content */}
+            <div className="p-4 flex-grow">
+              <motion.h3 
+                className="text-lg font-semibold mb-2"
+                animate={{ 
+                  color: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--foreground))'
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                {course.title}
+              </motion.h3>
+              
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                {plainDescription}
+              </p>
+            </div>
             
-            <p className="text-sm text-muted-foreground mb-4 flex-grow">
-              {course.description}
-            </p>
-            
-            {course.toolName && (
-              <div className="text-xs text-muted-foreground/80 pt-3 border-t border-border">
-                {course.toolName}
+            {/* Card footer */}
+            {(course.toolName || course.slug) && (
+              <div className="px-4 py-3 text-xs text-muted-foreground border-t border-border/50 bg-muted/20 flex items-center">
+                <BookOpen className="h-3 w-3 mr-1" />
+                <span className="truncate">
+                  {course.toolName ? course.toolName : `/${course.slug}`}
+                </span>
               </div>
             )}
           </div>

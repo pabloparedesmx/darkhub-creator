@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Edit, Trash } from 'lucide-react';
+import { MoreVertical, Edit, Trash, BookOpen } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { DbCourse } from '@/types/admin';
@@ -35,53 +35,68 @@ const CourseList = ({
               </CardContent>
             </Card>
           ) : (
-            courses.map(course => (
-              <Card key={course.id}>
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-start space-x-4">
-                      {course.icon && (
-                        <div className="flex items-center justify-center w-12 h-12 bg-secondary rounded-md">
-                          <span className="text-2xl">{course.icon}</span>
+            <div className="grid grid-cols-1 gap-4">
+              {courses.map(course => (
+                <Card key={course.id} className="overflow-hidden border border-border hover:border-border/80 transition-all">
+                  <CardContent className="p-0">
+                    <div className="flex flex-col md:flex-row">
+                      {/* Course icon column */}
+                      <div className="flex items-center justify-center p-6 bg-secondary/30 md:w-24 md:h-auto">
+                        <div className="flex items-center justify-center w-16 h-16 text-3xl bg-background rounded-full border border-border shadow-sm">
+                          {course.icon || '📚'}
                         </div>
-                      )}
-                      <div>
-                        <h3 className="text-lg font-semibold mb-1">{course.title}</h3>
-                        <p className="text-sm text-muted-foreground mb-2">{course.description}</p>
-                        <div className="flex space-x-2 mb-1">
-                          {course.badges.map((badge, index) => (
-                            <CategoryBadge key={index} type={badge} />
-                          ))}
+                      </div>
+                      
+                      {/* Course content column */}
+                      <div className="flex-1 p-6">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {course.badges.map((badge, index) => (
+                                <CategoryBadge key={index} type={badge} />
+                              ))}
+                            </div>
+                            <div className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                              {/* Render plain text from HTML content */}
+                              {course.description.replace(/<[^>]*>/g, '')}
+                            </div>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <BookOpen className="h-3 w-3 mr-1" />
+                              <span>Slug: {course.slug}</span>
+                              {course.toolName && (
+                                <span className="ml-3">Category: {course.toolName}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditCourse(course)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteCourse(course.id)}
+                                className="text-destructive"
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
-                        {course.toolName && (
-                          <p className="text-xs text-muted-foreground">Category: {course.toolName}</p>
-                        )}
                       </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditCourse(course)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeleteCourse(course.id)}
-                          className="text-destructive"
-                        >
-                          <Trash className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </>
       )}
