@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -12,13 +11,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from "@/hooks/use-toast";
 import { Course } from '@/components/ui/CourseCard';
-import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard, Check, X, FileText } from 'lucide-react';
+import { MoreVertical, PlusCircle, Search, Trash, Edit, Users, DollarSign, ShoppingCart, Book, LayoutDashboard, Check, X } from 'lucide-react';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Database } from '@/lib/database.types';
-import RichTextEditor from '@/components/ui/RichTextEditor';
 
 // Type for category from database
 type Category = Database['public']['Tables']['categories']['Row'];
@@ -31,9 +29,6 @@ type DbCourse = Database['public']['Tables']['courses']['Row'] & {
 
 // Type for user profiles
 type UserProfile = Database['public']['Tables']['profiles']['Row'];
-
-// Type for lesson
-type Lesson = Database['public']['Tables']['lessons']['Row'];
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -59,19 +54,6 @@ const AdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
-  
-  // New states for lessons
-  const [showLessonsDialog, setShowLessonsDialog] = useState(false);
-  const [currentCourseLessons, setCurrentCourseLessons] = useState<Lesson[]>([]);
-  const [currentCourseId, setCurrentCourseId] = useState<string | null>(null);
-  const [newLesson, setNewLesson] = useState({
-    title: '',
-    description: '',
-    order_index: 0,
-    content: '',
-  });
-  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null);
-  const [isLessonEditing, setIsLessonEditing] = useState(false);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -451,180 +433,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // New functions for lesson management
-  const handleOpenLessons = async (courseId: string) => {
-    setCurrentCourseId(courseId);
-    setShowLessonsDialog(true);
-    
-    try {
-      const { data, error } = await supabase
-        .from('lessons')
-        .select('*')
-        .eq('course_id', courseId)
-        .order('order_index', { ascending: true });
-      
-      if (error) throw error;
-      
-      setCurrentCourseLessons(data || []);
-      
-      // Set the order index for the new lesson
-      const nextOrderIndex = data && data.length > 0 ? Math.max(...data.map(l => l.order_index)) + 1 : 0;
-      setNewLesson(prev => ({ ...prev, order_index: nextOrderIndex }));
-    } catch (error: any) {
-      console.error('Error fetching lessons:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load lessons",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAddLesson = async () => {
-    if (!currentCourseId) return;
-    
-    const { title, description, order_index, content } = newLesson;
-    
-    if (!title) {
-      toast({
-        title: "Error",
-        description: "Lesson title is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('lessons')
-        .insert([{
-          title,
-          description,
-          order_index,
-          content,
-          course_id: currentCourseId,
-        }])
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      setCurrentCourseLessons([...currentCourseLessons, data]);
-      
-      setNewLesson({
-        title: '',
-        description: '',
-        order_index: order_index + 1,
-        content: '',
-      });
-      
-      toast({
-        title: "Success",
-        description: "Lesson added successfully",
-      });
-    } catch (error: any) {
-      console.error('Error adding lesson:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to add lesson",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteLesson = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('lessons')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
-      
-      setCurrentCourseLessons(currentCourseLessons.filter(lesson => lesson.id !== id));
-      
-      toast({
-        title: "Success",
-        description: "Lesson deleted successfully",
-      });
-    } catch (error: any) {
-      console.error('Error deleting lesson:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete lesson",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditLesson = (lesson: Lesson) => {
-    setEditingLesson(lesson);
-    setNewLesson({
-      title: lesson.title,
-      description: lesson.description || '',
-      order_index: lesson.order_index,
-      content: lesson.content || '',
-    });
-    setIsLessonEditing(true);
-  };
-
-  const handleUpdateLesson = async () => {
-    if (!editingLesson) return;
-    
-    const { title, description, order_index, content } = newLesson;
-    
-    if (!title) {
-      toast({
-        title: "Error",
-        description: "Lesson title is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('lessons')
-        .update({
-          title,
-          description,
-          order_index,
-          content,
-        })
-        .eq('id', editingLesson.id)
-        .select()
-        .single();
-      
-      if (error) throw error;
-      
-      setCurrentCourseLessons(currentCourseLessons.map(lesson => 
-        lesson.id === editingLesson.id ? data : lesson
-      ));
-      
-      setEditingLesson(null);
-      setIsLessonEditing(false);
-      
-      setNewLesson({
-        title: '',
-        description: '',
-        order_index: Math.max(...currentCourseLessons.map(l => l.order_index)) + 1,
-        content: '',
-      });
-      
-      toast({
-        title: "Success",
-        description: "Lesson updated successfully",
-      });
-    } catch (error: any) {
-      console.error('Error updating lesson:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update lesson",
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
@@ -920,36 +728,26 @@ const AdminDashboard = () => {
                                     )}
                                   </div>
                                 </div>
-                                <div className="flex space-x-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm" 
-                                    onClick={() => handleOpenLessons(course.id)}
-                                  >
-                                    <FileText className="h-4 w-4 mr-1" />
-                                    Lessons
-                                  </Button>
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="sm">
-                                        <MoreVertical className="h-4 w-4" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuItem onClick={() => handleEditCourse(course)}>
-                                        <Edit className="mr-2 h-4 w-4" />
-                                        Edit
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem 
-                                        onClick={() => handleDeleteCourse(course.id)}
-                                        className="text-destructive"
-                                      >
-                                        <Trash className="mr-2 h-4 w-4" />
-                                        Delete
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </div>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEditCourse(course)}>
+                                      <Edit className="mr-2 h-4 w-4" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem 
+                                      onClick={() => handleDeleteCourse(course.id)}
+                                      className="text-destructive"
+                                    >
+                                      <Trash className="mr-2 h-4 w-4" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </CardContent>
                           </Card>
@@ -983,49 +781,59 @@ const AdminDashboard = () => {
                           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                         </div>
                       ) : (
-                        <div className="border rounded-md">
-                          <table className="w-full">
-                            <thead>
-                              <tr className="border-b">
-                                <th className="text-left py-3 px-4 font-medium">Name</th>
-                                <th className="text-left py-3 px-4 font-medium">Email</th>
-                                <th className="text-left py-3 px-4 font-medium">Role</th>
-                                <th className="text-left py-3 px-4 font-medium">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {filteredUsers.length === 0 ? (
-                                <tr>
-                                  <td colSpan={4} className="text-center py-4 text-muted-foreground">
-                                    No users found
-                                  </td>
-                                </tr>
-                              ) : (
-                                filteredUsers.map(user => (
-                                  <tr key={user.id} className="border-b last:border-0 hover:bg-secondary/20">
-                                    <td className="py-3 px-4">{user.name}</td>
-                                    <td className="py-3 px-4">{user.email}</td>
-                                    <td className="py-3 px-4">
-                                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                                        user.role === 'admin' ? 'bg-primary/20 text-primary' : 'bg-secondary text-secondary-foreground'
-                                      }`}>
-                                        {user.role}
-                                      </span>
-                                    </td>
-                                    <td className="py-3 px-4">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleUpdateUserRole(user.id, user.role)}
-                                      >
-                                        {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                                      </Button>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
+                        <div className="rounded-md border">
+                          <div className="grid grid-cols-12 bg-muted/50 p-4 text-sm font-medium">
+                            <div className="col-span-4">User</div>
+                            <div className="col-span-3">Email</div>
+                            <div className="col-span-2">Role</div>
+                            <div className="col-span-2">Subscription</div>
+                            <div className="col-span-1 text-right">Actions</div>
+                          </div>
+                          
+                          {filteredUsers.length === 0 ? (
+                            <div className="p-6 text-center">
+                              <p className="text-muted-foreground">No users found. Try a different search term.</p>
+                            </div>
+                          ) : (
+                            filteredUsers.map(userProfile => (
+                              <div key={userProfile.id} className="grid grid-cols-12 p-4 border-t items-center">
+                                <div className="col-span-4 font-medium truncate">{userProfile.name}</div>
+                                <div className="col-span-3 text-muted-foreground truncate">{userProfile.email}</div>
+                                <div className="col-span-2">
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    userProfile.role === 'admin' 
+                                      ? 'bg-primary/20 text-primary' 
+                                      : 'bg-muted text-muted-foreground'
+                                  }`}>
+                                    {userProfile.role}
+                                  </span>
+                                </div>
+                                <div className="col-span-2">
+                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                    userProfile.subscription === 'pro' 
+                                      ? 'bg-badge-pro/20 text-badge-pro' 
+                                      : 'bg-badge-free/20 text-badge-free'
+                                  }`}>
+                                    {userProfile.subscription}
+                                  </span>
+                                </div>
+                                <div className="col-span-1 text-right">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleUpdateUserRole(userProfile.id, userProfile.role as 'user' | 'admin')}
+                                    title={userProfile.role === 'admin' ? 'Remove admin rights' : 'Make admin'}
+                                  >
+                                    {userProfile.role === 'admin' ? (
+                                      <X className="h-4 w-4 text-destructive" />
+                                    ) : (
+                                      <Check className="h-4 w-4 text-primary" />
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       )}
                     </CardContent>
@@ -1036,12 +844,10 @@ const AdminDashboard = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle>Analytics Dashboard</CardTitle>
-                      <CardDescription>View your platform metrics and analytics</CardDescription>
+                      <CardDescription>View performance metrics for your platform</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-center justify-center py-12">
-                        <p className="text-muted-foreground">Analytics coming soon</p>
-                      </div>
+                      <p className="text-muted-foreground">Analytics dashboard will be implemented in the next phase.</p>
                     </CardContent>
                   </Card>
                 </TabsContent>
@@ -1050,127 +856,6 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
       </div>
-      
-      {/* Lessons Management Dialog */}
-      <Dialog open={showLessonsDialog} onOpenChange={(open) => !open && setShowLessonsDialog(false)}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Course Lessons</DialogTitle>
-            <DialogDescription>
-              Manage lessons for this course
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 py-4">
-            <div className="border rounded-md p-4">
-              <h3 className="text-lg font-medium mb-4">Lessons</h3>
-              {currentCourseLessons.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">No lessons found. Add your first lesson below.</p>
-              ) : (
-                <div className="space-y-2">
-                  {currentCourseLessons.map((lesson, index) => (
-                    <div key={lesson.id} className="flex justify-between items-center p-3 border rounded-md">
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-primary/20 text-primary text-sm font-medium">
-                            {index + 1}
-                          </span>
-                          <h4 className="font-medium">{lesson.title}</h4>
-                        </div>
-                        {lesson.description && (
-                          <p className="text-sm text-muted-foreground ml-8 mt-1">{lesson.description}</p>
-                        )}
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditLesson(lesson)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteLesson(lesson.id)}>
-                          <Trash className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div className="border rounded-md p-4">
-              <h3 className="text-lg font-medium mb-4">
-                {isLessonEditing ? 'Edit Lesson' : 'Add New Lesson'}
-              </h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label htmlFor="lessonTitle">Lesson Title*</label>
-                    <Input 
-                      id="lessonTitle" 
-                      value={newLesson.title} 
-                      onChange={(e) => setNewLesson({...newLesson, title: e.target.value})} 
-                      placeholder="e.g. Introduction to AI"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="lessonOrder">Order Index</label>
-                    <Input 
-                      id="lessonOrder" 
-                      type="number"
-                      value={newLesson.order_index} 
-                      onChange={(e) => setNewLesson({...newLesson, order_index: parseInt(e.target.value) || 0})} 
-                      placeholder="e.g. 1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="lessonDescription">Description (optional)</label>
-                  <Textarea 
-                    id="lessonDescription" 
-                    value={newLesson.description} 
-                    onChange={(e) => setNewLesson({...newLesson, description: e.target.value})} 
-                    placeholder="Brief description of the lesson"
-                    rows={2}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label htmlFor="lessonContent">Lesson Content*</label>
-                  <RichTextEditor
-                    value={newLesson.content}
-                    onChange={(content) => setNewLesson({...newLesson, content})}
-                    height={400}
-                  />
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-2 mt-4">
-                {isLessonEditing ? (
-                  <>
-                    <Button variant="outline" onClick={() => {
-                      setIsLessonEditing(false);
-                      setEditingLesson(null);
-                      setNewLesson({
-                        title: '',
-                        description: '',
-                        order_index: Math.max(...currentCourseLessons.map(l => l.order_index), 0) + 1,
-                        content: '',
-                      });
-                    }}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleUpdateLesson}>
-                      Update Lesson
-                    </Button>
-                  </>
-                ) : (
-                  <Button onClick={handleAddLesson}>
-                    Add Lesson
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
