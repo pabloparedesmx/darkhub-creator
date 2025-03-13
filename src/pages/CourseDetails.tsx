@@ -144,6 +144,12 @@ const CourseDetails = () => {
     );
   }
 
+  const difficultyColors = {
+    beginner: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+    intermediate: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    advanced: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -185,7 +191,14 @@ const CourseDetails = () => {
               transition={{ duration: 0.3, delay: 0.1 }}
               className="mb-8"
             >
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-bold">{course.title}</h1>
+                {course.difficulty && (
+                  <span className={`text-xs rounded-full px-2 py-0.5 ${difficultyColors[course.difficulty as keyof typeof difficultyColors]}`}>
+                    {course.difficulty}
+                  </span>
+                )}
+              </div>
               <RichTextContent content={course.description} />
             </motion.div>
           </div>

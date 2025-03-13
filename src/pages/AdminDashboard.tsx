@@ -34,6 +34,7 @@ const AdminDashboard = () => {
     isPro: false,
     isFree: false,
     isTutorial: false,
+    difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
   const [selectedCourse, setSelectedCourse] = useState<DbCourse | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -196,7 +197,7 @@ const AdminDashboard = () => {
   };
 
   const handleAddCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial } = newCourse;
+    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -219,6 +220,7 @@ const AdminDashboard = () => {
           is_pro: isPro,
           is_free: isFree,
           is_tutorial: isTutorial,
+          difficulty: difficulty,
           author_id: user?.id
         }])
         .select('*, categories(name)')
@@ -248,6 +250,7 @@ const AdminDashboard = () => {
         isPro: false,
         isFree: false,
         isTutorial: false,
+        difficulty: 'beginner'
       });
       
       toast({
@@ -300,6 +303,7 @@ const AdminDashboard = () => {
       isPro: course.is_pro,
       isFree: course.is_free,
       isTutorial: course.is_tutorial,
+      difficulty: course.difficulty || 'beginner'
     });
     setIsEditing(true);
   };
@@ -307,7 +311,7 @@ const AdminDashboard = () => {
   const handleUpdateCourse = async () => {
     if (!selectedCourse) return;
     
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial } = newCourse;
+    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -329,7 +333,8 @@ const AdminDashboard = () => {
           category_id: category_id || null,
           is_pro: isPro,
           is_free: isFree,
-          is_tutorial: isTutorial
+          is_tutorial: isTutorial,
+          difficulty
         })
         .eq('id', selectedCourse.id)
         .select('*, categories(name)')
@@ -364,6 +369,7 @@ const AdminDashboard = () => {
         isPro: false,
         isFree: false,
         isTutorial: false,
+        difficulty: 'beginner'
       });
       
       toast({

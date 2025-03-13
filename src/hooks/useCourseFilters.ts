@@ -61,6 +61,17 @@ export const useCourseFilters = (coursesData: Course[]) => {
       }
     }
 
+    // Apply difficulty filters
+    const selectedDifficulties = Object.entries(difficulties)
+      .filter(([_, isSelected]) => isSelected)
+      .map(([difficulty]) => difficulty);
+    
+    if (selectedDifficulties.length > 0) {
+      filteredCourses = filteredCourses.filter(course => 
+        course.difficulty && selectedDifficulties.includes(course.difficulty)
+      );
+    }
+
     // Apply sort order
     if (sortOrder === 'newest') {
       // For database-sourced courses, we can assume the ID reflects creation time or use created_at
@@ -78,7 +89,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
     }
 
     setCourses(filteredCourses);
-  }, [searchTerm, filters, sortOrder, coursesData]);
+  }, [searchTerm, filters, difficulties, sortOrder, coursesData]);
 
   // Update courses when coursesData changes
   useEffect(() => {

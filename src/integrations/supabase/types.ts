@@ -39,6 +39,7 @@ export type Database = {
           category_id: string | null
           created_at: string
           description: string
+          difficulty: string | null
           icon: string | null
           id: string
           is_free: boolean
@@ -53,6 +54,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           description: string
+          difficulty?: string | null
           icon?: string | null
           id?: string
           is_free?: boolean
@@ -67,6 +69,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string
           description?: string
+          difficulty?: string | null
           icon?: string | null
           id?: string
           is_free?: boolean

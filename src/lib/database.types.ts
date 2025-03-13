@@ -73,6 +73,7 @@ export interface Database {
           is_pro: boolean
           is_free: boolean
           is_tutorial: boolean
+          difficulty: 'beginner' | 'intermediate' | 'advanced'
           author_id: string | null
           created_at: string
           updated_at: string
@@ -87,6 +88,7 @@ export interface Database {
           is_pro?: boolean
           is_free?: boolean
           is_tutorial?: boolean
+          difficulty?: 'beginner' | 'intermediate' | 'advanced'
           author_id?: string | null
           created_at?: string
           updated_at?: string
@@ -101,6 +103,7 @@ export interface Database {
           is_pro?: boolean
           is_free?: boolean
           is_tutorial?: boolean
+          difficulty?: 'beginner' | 'intermediate' | 'advanced'
           author_id?: string | null
           created_at?: string
           updated_at?: string

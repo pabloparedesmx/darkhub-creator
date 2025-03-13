@@ -4,6 +4,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DialogFooter } from '@/components/ui/dialog';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Category } from '@/types/admin';
 
@@ -17,6 +24,7 @@ interface CourseFormProps {
     isPro: boolean;
     isFree: boolean;
     isTutorial: boolean;
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
   };
   setNewCourse: (course: any) => void;
   isEditing: boolean;
@@ -90,6 +98,25 @@ const CourseForm = ({
               </option>
             ))}
           </select>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label htmlFor="courseDifficulty">Difficulty</label>
+          <Select
+            value={newCourse.difficulty || 'beginner'}
+            onValueChange={(value) => setNewCourse({...newCourse, difficulty: value})}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a difficulty level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beginner">Beginner</SelectItem>
+              <SelectItem value="intermediate">Intermediate</SelectItem>
+              <SelectItem value="advanced">Advanced</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       

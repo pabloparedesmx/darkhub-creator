@@ -32,6 +32,7 @@ const Courses = () => {
             is_pro,
             is_free,
             is_tutorial,
+            difficulty,
             categories(name)
           `)
           .order('created_at', { ascending: false });
@@ -52,7 +53,7 @@ const Courses = () => {
             badges,
             slug: course.slug,
             icon: course.icon || '📚',
-            // Fix: Access the first item's name in the categories array, if it exists
+            difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
             toolName: course.categories && course.categories[0] ? course.categories[0].name : undefined
           };
         });

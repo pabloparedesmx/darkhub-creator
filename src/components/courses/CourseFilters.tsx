@@ -46,7 +46,7 @@ const CourseFilters = ({
   clearAllFilters
 }: CourseFiltersProps) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isDifficultyOpen, setIsDifficultyOpen] = useState(false);
+  const [isDifficultyOpen, setIsDifficultyOpen] = useState(true);  // Open by default now
 
   return (
     <div className="w-full lg:w-64 space-y-6">
