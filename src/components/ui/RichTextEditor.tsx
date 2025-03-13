@@ -13,6 +13,10 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Start typing...', heig
   const editorRef = useRef<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
+  // TinyMCE API key - using a free API key for development
+  // In production, you should use your own API key from TinyMCE
+  const TINYMCE_API_KEY = 'no-api-key';
+
   useEffect(() => {
     setIsLoaded(true);
   }, []);
@@ -29,6 +33,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Start typing...', heig
 
   return (
     <Editor
+      apiKey={TINYMCE_API_KEY}
       onInit={(evt, editor) => editorRef.current = editor}
       value={value}
       onEditorChange={onChange}
@@ -47,8 +52,6 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Start typing...', heig
         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
         placeholder,
         branding: false,
-        promotion: false,
-        statusbar: false,
       }}
     />
   );
