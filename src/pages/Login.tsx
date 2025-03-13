@@ -8,18 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Github, Twitter } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const { toast } = useToast();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Demo validation
+    // Basic validation
     if (!email || !password) {
       toast({
         title: "Error",
@@ -29,15 +31,11 @@ const Login = () => {
       return;
     }
     
-    toast({
-      title: "Success",
-      description: "You've been logged in successfully!",
-    });
-    
-    // For demo purpose just navigate user to dashboard after 1 second
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1000);
+    try {
+      await login(email, password);
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   };
 
   return (
@@ -72,6 +70,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-background/50"
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -90,11 +89,13 @@ const Login = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="bg-background/50"
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -110,6 +111,7 @@ const Login = () => {
                     id="remember" 
                     checked={rememberMe}
                     onCheckedChange={(checked) => setRememberMe(!!checked)}
+                    disabled={isLoading}
                   />
                   <label
                     htmlFor="remember"
@@ -119,8 +121,8 @@ const Login = () => {
                   </label>
                 </div>
                 
-                <Button type="submit" className="w-full">
-                  Login
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </div>
             </form>
@@ -136,11 +138,11 @@ const Login = () => {
               </div>
               
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" disabled={isLoading}>
                   <Github className="mr-2 h-4 w-4" />
                   Github
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" disabled={isLoading}>
                   <Twitter className="mr-2 h-4 w-4" />
                   Twitter
                 </Button>

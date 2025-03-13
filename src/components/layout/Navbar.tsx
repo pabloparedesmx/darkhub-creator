@@ -2,15 +2,20 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, ChevronDown } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Menu, X, ChevronDown, Bell, LogOut, User, Settings, CreditCard } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -82,18 +87,83 @@ const Navbar = () => {
               className="pl-10 pr-4 py-2 w-64 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all"
             />
           </div>
-          <div className="flex items-center space-x-2 ml-4">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="text-sm">
-                Log in
+          
+          {isAuthenticated ? (
+            // User is logged in
+            <div className="flex items-center ml-4 space-x-2">
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
               </Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="default" size="sm" className="text-sm">
-                Sign up
-              </Button>
-            </Link>
-          </div>
+              
+              {/* User menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="" alt={user?.name} />
+                      <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/subscription" className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Subscription
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            // User is not logged in
+            <div className="flex items-center space-x-2 ml-4">
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  Log in
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="default" size="sm" className="text-sm">
+                  Sign up
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         <button 
@@ -145,18 +215,47 @@ const Navbar = () => {
                   className="w-full pl-10 pr-4 py-2 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all"
                 />
               </div>
-              <div className="flex space-x-2 mt-2">
-                <Link to="/login" className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full">
-                    Log in
-                  </Button>
-                </Link>
-                <Link to="/signup" className="flex-1">
-                  <Button variant="default" size="sm" className="w-full">
-                    Sign up
-                  </Button>
-                </Link>
-              </div>
+              
+              {isAuthenticated ? (
+                // Mobile logged in user options
+                <div className="space-y-2 mt-2">
+                  <Link to="/dashboard" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                    <User className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                      <Settings className="h-4 w-4" />
+                      <span>Admin Panel</span>
+                    </Link>
+                  )}
+                  <Link to="/settings" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                  <button 
+                    onClick={logout}
+                    className="flex items-center space-x-2 p-2 w-full text-left hover:bg-secondary/50 rounded-md"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
+                </div>
+              ) : (
+                // Mobile login/signup
+                <div className="flex space-x-2 mt-2">
+                  <Link to="/login" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link to="/signup" className="flex-1">
+                    <Button variant="default" size="sm" className="w-full">
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

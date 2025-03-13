@@ -8,19 +8,21 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Github, Twitter } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const { toast } = useToast();
+  const { signup, isLoading } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Demo validation
+    // Basic validation
     if (!fullName || !email || !password) {
       toast({
         title: "Error",
@@ -39,15 +41,11 @@ const Signup = () => {
       return;
     }
     
-    toast({
-      title: "Success",
-      description: "Your account has been created!",
-    });
-    
-    // For demo purpose just navigate user to dashboard after 1 second
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1000);
+    try {
+      await signup(fullName, email, password);
+    } catch (error) {
+      console.error("Signup error:", error);
+    }
   };
 
   return (
@@ -82,6 +80,7 @@ const Signup = () => {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="bg-background/50"
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -94,6 +93,7 @@ const Signup = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-background/50"
+                    disabled={isLoading}
                   />
                 </div>
                 
@@ -107,11 +107,13 @@ const Signup = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="bg-background/50"
+                      disabled={isLoading}
                     />
                     <button
                       type="button"
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                       onClick={() => setShowPassword(!showPassword)}
+                      disabled={isLoading}
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -127,6 +129,7 @@ const Signup = () => {
                     id="terms" 
                     checked={agreeTerms}
                     onCheckedChange={(checked) => setAgreeTerms(!!checked)}
+                    disabled={isLoading}
                   />
                   <label
                     htmlFor="terms"
@@ -136,8 +139,8 @@ const Signup = () => {
                   </label>
                 </div>
                 
-                <Button type="submit" className="w-full">
-                  Sign up
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Creating account..." : "Sign up"}
                 </Button>
               </div>
             </form>
@@ -153,11 +156,11 @@ const Signup = () => {
               </div>
               
               <div className="mt-6 grid grid-cols-2 gap-3">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" disabled={isLoading}>
                   <Github className="mr-2 h-4 w-4" />
                   Github
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" disabled={isLoading}>
                   <Twitter className="mr-2 h-4 w-4" />
                   Twitter
                 </Button>
