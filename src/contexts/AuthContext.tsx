@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // Using maybeSingle instead of single to avoid error if profile doesn't exist
 
       if (error) {
         console.error('Error fetching profile:', error);
@@ -65,13 +65,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       console.warn('No profile found for user ID:', userId);
       
-      // Fallback: Create a basic user object if profile doesn't exist
-      return {
+      // Create a profile if it doesn't exist
+      console.log('Attempting to create a profile for user ID:', userId);
+      const authUserResponse = await supabase.auth.getUser();
+      const authUser = authUserResponse.data.user;
+      
+      if (!authUser) {
+        console.error('No auth user found for profile creation');
+        return null;
+      }
+      
+      const newProfile = {
         id: userId,
-        email: 'user@example.com', // This will be overwritten by auth user email
-        name: 'User',
-        role: 'user'
-      } as User;
+        email: authUser.email || 'user@example.com',
+        name: authUser.user_metadata?.name || 'User',
+        role: 'user',
+        subscription: 'free'
+      };
+      
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([newProfile]);
+        
+      if (insertError) {
+        console.error('Error creating profile:', insertError);
+        // Still return the profile even if insert fails
+      } else {
+        console.log('Created new profile successfully');
+      }
+      
+      return newProfile as User;
     } catch (error) {
       console.error('Failed to get profile, using fallback:', error);
       // Return a fallback user object
@@ -110,31 +133,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (session) {
           console.log('Session found, user is logged in:', session.user.id);
-          try {
-            let profile = await getProfile(session.user.id);
-            
-            // If profile is using fallback values, try to update the email
-            if (profile && profile.email === 'user@example.com') {
-              profile = await updateUserEmailFromSession(session.user.id, profile);
-            }
-            
-            if (profile) {
-              console.log('Setting user state with profile:', profile);
-              setUser(profile);
-            } else {
-              console.warn('No profile returned, user will be null');
-            }
-          } catch (error) {
-            console.error('Error during profile initialization:', error);
-            toast({
-              title: "Authentication Error",
-              description: "Failed to load user profile. Please try logging in again.",
-              variant: "destructive",
-            });
-          }
+          handleUserSession(session.user.id);
         } else {
           console.log('No session found, user is not logged in');
           setUser(null);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error during auth initialization:', error);
@@ -143,9 +146,71 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: "Failed to initialize authentication. Please refresh the page.",
           variant: "destructive",
         });
-      } finally {
-        console.log('Auth initialization completed');
         setIsLoading(false);
+      }
+    };
+    
+    // Helper function to handle user session to reduce duplication
+    const handleUserSession = async (userId: string) => {
+      // Set a timeout to prevent getting stuck
+      const timeoutId = setTimeout(() => {
+        console.warn('Profile fetch timeout, continuing with basic user');
+        setIsLoading(false);
+        
+        // Create a basic user object if timed out
+        const basicUser = {
+          id: userId,
+          email: 'user@example.com',
+          name: 'User',
+          role: 'user'
+        };
+        
+        setUser(basicUser);
+        
+        // Navigate to courses if needed
+        if (window.location.pathname === '/login') {
+          navigate('/courses');
+        }
+      }, 3000); // 3 second timeout
+      
+      try {
+        let profile = await getProfile(userId);
+        
+        // Clear timeout as we got the profile or error
+        clearTimeout(timeoutId);
+        
+        // If profile is using fallback values, try to update the email
+        if (profile && profile.email === 'user@example.com') {
+          profile = await updateUserEmailFromSession(userId, profile);
+        }
+        
+        console.log('Setting user state with profile:', profile);
+        setUser(profile);
+      } catch (error) {
+        // Clear timeout as we got an error
+        clearTimeout(timeoutId);
+        
+        console.error('Error during profile handling:', error);
+        toast({
+          title: "Profile Error",
+          description: "Failed to load user profile, using basic data.",
+          variant: "destructive",
+        });
+        
+        // Still set a basic user to prevent being stuck
+        setUser({
+          id: userId,
+          email: 'user@example.com',
+          name: 'User',
+          role: 'user'
+        });
+      } finally {
+        setIsLoading(false);
+        
+        // Force navigation if on login page
+        if (window.location.pathname === '/login') {
+          navigate('/courses');
+        }
       }
     };
     
@@ -157,27 +222,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log(`Auth state changed: ${event}`, session ? 'Session exists' : 'No session');
         
         if (session && session.user) {
-          try {
-            let profile = await getProfile(session.user.id);
-            
-            // If profile is using fallback values, try to update the email
-            if (profile && profile.email === 'user@example.com') {
-              profile = await updateUserEmailFromSession(session.user.id, profile);
-            }
-            
-            console.log('Auth change: Setting user with profile:', profile);
-            setUser(profile);
-          } catch (error) {
-            console.error('Error handling auth state change:', error);
-            // Still set user to null on error to avoid being stuck
-            setUser(null);
-          }
+          handleUserSession(session.user.id);
         } else {
           console.log('Auth change: No session, setting user to null');
           setUser(null);
+          setIsLoading(false);
         }
-        
-        setIsLoading(false);
       }
     );
     
@@ -186,12 +236,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Cleaning up auth subscription');
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   // Login function with timeout and better error handling
   const login = async (email: string, password: string) => {
     console.log(`Attempting login for email: ${email}`);
     setIsLoading(true);
+    
+    // Set a global timeout for the entire login process
+    const loginTimeout = setTimeout(() => {
+      console.warn('Login process timeout, resetting loading state');
+      setIsLoading(false);
+      toast({
+        title: "Login Timeout",
+        description: "Login process took too long. Please try again.",
+        variant: "destructive",
+      });
+    }, 5000); // 5 second timeout for entire login process
     
     try {
       // First, try to sign in
@@ -199,6 +260,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email,
         password,
       });
+      
+      // Clear the login timeout since we got a response
+      clearTimeout(loginTimeout);
       
       if (error) {
         console.error('Login error:', error);
@@ -208,64 +272,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data.user) {
         console.log('Sign in successful, getting profile for:', data.user.id);
         
-        // Set a timeout to avoid getting stuck
-        const profileTimeout = setTimeout(() => {
-          console.warn('Profile fetch timeout, continuing with navigation');
-          setIsLoading(false);
-          toast({
-            title: "Partial Login Successful",
-            description: "Profile data couldn't be loaded in time, but you're logged in.",
-          });
-          
-          // Force navigation even if profile fetch is slow
-          if (data.user) {
-            navigate('/courses');
-          }
-        }, 3000); // 3 second timeout
+        // Navigate to courses immediately after successful sign-in
+        // We don't need to wait for profile fetch to complete
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
         
-        try {
-          // Try to get the profile
-          const profile = await getProfile(data.user.id);
-          
-          // Clear timeout as we got the profile
-          clearTimeout(profileTimeout);
-          
-          if (profile) {
-            console.log('Login successful with profile:', profile);
-            toast({
-              title: "Login successful",
-              description: `Welcome back, ${profile.name || 'User'}!`,
-            });
-            
-            // Redirect to appropriate page
-            if (profile.role === 'admin') {
-              navigate('/admin');
-            } else {
-              navigate('/courses');
-            }
-          } else {
-            console.warn('No profile found after login, navigating anyway');
-            toast({
-              title: "Login successful",
-              description: "Welcome back!",
-            });
-            navigate('/courses');
-          }
-        } catch (profileError) {
-          // Clear timeout as we got an error
-          clearTimeout(profileTimeout);
-          
-          console.error('Error getting profile after login:', profileError);
-          toast({
-            title: "Login partially successful",
-            description: "Logged in, but could not load your profile data.",
-          });
-          
-          // Still navigate to courses page
-          navigate('/courses');
-        }
+        // Force navigation to courses page
+        navigate('/courses');
+        
+        // The profile fetch will continue in the background
+        // Profile will be set by the auth state change listener
       }
     } catch (error: any) {
+      // Clear the login timeout since we got an error
+      clearTimeout(loginTimeout);
+      
       console.error('Login process failed:', error);
       toast({
         title: "Login failed",
