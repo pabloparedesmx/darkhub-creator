@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -24,20 +25,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { DbCourse } from '@/types/admin';
 
-interface CourseContent {
-  introduction: string;
-  about: string;
-  context: string;
-  learningObjectives: string[];
-  requirements: string[];
-}
-
 interface CourseDetailData extends Omit<DbCourse, 'badges'> {
   badges: Array<'tutorial' | 'pro' | 'free'>;
-  content?: CourseContent;
-  tags?: string[];
-  tools?: string[];
-  level?: string;
 }
 
 const CourseDetails = () => {
@@ -85,28 +74,11 @@ const CourseDetails = () => {
         // Parse description for any HTML content
         const description = data.description || '';
         
-        // For now, we'll create some mock content for the course
-        // In a real application, you would have this stored in the database as well
         const courseData: CourseDetailData = {
           ...data,
           badges,
           description,
           toolName: data.categories ? (data.categories as any).name : undefined,
-          content: {
-            introduction: 'Grok 3\'s release came with DeepSearch mode, a tool that dives deep into a wide range of sources to produce detailed research for you.',
-            about: 'Grok is built by X/Twitter, and while other AI companies have released similar tools, Grok has one unique advantage: access to the entire archive of tweets.',
-            context: 'As you may know, X is a place where people go to discuss, complain and brainstorm—and you can now tap directly into that for your research.',
-            learningObjectives: [
-              'Come up with a research subject and prompt',
-              'Get Grok to do deep research on X posts/tweets',
-              'Review the output report',
-              'Get Grok to distill its research'
-            ],
-            requirements: ['Grok account (with the free plan, you only get a small number of DeepSearch messages per day)'],
-          },
-          tags: ['Research', 'Product'],
-          tools: ['Grok'],
-          level: 'Beginner'
         };
         
         setCourse(courseData);
@@ -214,96 +186,8 @@ const CourseDetails = () => {
               className="mb-8"
             >
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
-              {/* Use the new RichTextContent component */}
               <RichTextContent content={course.description} />
             </motion.div>
-
-            {/* Tags and metadata */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
-              className="mb-8"
-            >
-              <div className="flex flex-wrap gap-4">
-                {course.tags && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Tags</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {course.tags.map((tag, index) => (
-                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {course.tools && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Tools</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {course.tools.map((tool, index) => (
-                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                {course.level && (
-                  <div>
-                    <h3 className="text-sm font-medium mb-2">Level</h3>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary text-foreground">
-                        {course.level}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-
-            {/* Course content */}
-            {course.content && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.3 }}
-                className="bg-secondary/30 rounded-lg p-6 mb-8 border border-border"
-              >
-                <h2 className="text-xl font-semibold mb-4">Course Introduction</h2>
-                <p className="mb-4">{course.content.introduction}</p>
-                
-                <h3 className="text-lg font-semibold mt-6 mb-2">About {course.toolName || "This Course"}</h3>
-                <p className="mb-4">{course.content.about}</p>
-                
-                <p className="mb-6">{course.content.context}</p>
-                
-                <h3 className="text-lg font-semibold mb-4">In this tutorial you will learn how to:</h3>
-                <ul className="space-y-2 mb-6">
-                  {course.content.learningObjectives.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="inline-block mr-2 mt-1">•</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                
-                <h3 className="text-lg font-semibold mb-4">You'll need:</h3>
-                <ul className="space-y-2">
-                  {course.content.requirements.map((item, index) => (
-                    <li key={index} className="flex items-start">
-                      <span className="inline-block mr-2 mt-1">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <p className="mt-6 text-muted-foreground">Let's see how it's done.</p>
-              </motion.div>
-            )}
 
             {/* Video player placeholder */}
             <motion.div
