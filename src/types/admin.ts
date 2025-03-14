@@ -12,3 +12,9 @@ export type DbCourse = Database['public']['Tables']['courses']['Row'] & {
 
 // Type for user profiles
 export type UserProfile = Database['public']['Tables']['profiles']['Row'];
+
+// Type for tools
+export type Tool = Database['public']['Tables']['tools']['Row'];
+
+// Type for course-tools relationships
+export type CourseTool = Database['public']['Tables']['course_tools']['Row'];

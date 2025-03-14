@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,13 +6,14 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Category, DbCourse, UserProfile } from '@/types/admin';
+import { Category, DbCourse, UserProfile, Tool } from '@/types/admin';
 
 // Import refactored components
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import UserManagement from '@/components/admin/UserManagement';
 import CourseManagement from '@/components/admin/CourseManagement';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
+import ToolManagement from '@/components/admin/ToolManagement';
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -22,6 +22,7 @@ const AdminDashboard = () => {
   
   const [courses, setCourses] = useState<DbCourse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -36,10 +37,23 @@ const AdminDashboard = () => {
     isTutorial: false,
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
+  
+  const [newTool, setNewTool] = useState({
+    name: '',
+    url: '',
+    description: '',
+    favicon: '',
+    has_pro_perk: false
+  });
+  
   const [selectedCourse, setSelectedCourse] = useState<DbCourse | null>(null);
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isToolEditing, setIsToolEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isToolLoading, setIsToolLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('content');
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -104,6 +118,35 @@ const AdminDashboard = () => {
     };
     
     fetchData();
+  }, [toast]);
+
+  // Fetch tools data
+  useEffect(() => {
+    const fetchTools = async () => {
+      setIsToolLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('tools')
+          .select('*')
+          .order('name');
+        
+        if (error) throw error;
+        
+        setTools(data || []);
+      } catch (error) {
+        console.error('Error fetching tools:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tools data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsToolLoading(false);
+      }
+    };
+    
+    fetchTools();
   }, [toast]);
 
   // Fetch user data
@@ -386,6 +429,154 @@ const AdminDashboard = () => {
     }
   };
 
+  // Tool management functions
+  const handleAddTool = async () => {
+    const { name, url, description, favicon, has_pro_perk } = newTool;
+    
+    if (!name || !url || !description) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('tools')
+        .insert([{
+          name,
+          url,
+          description,
+          favicon: favicon || '🔧',
+          has_pro_perk
+        }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setTools([...tools, data]);
+      
+      setNewTool({
+        name: '',
+        url: '',
+        description: '',
+        favicon: '',
+        has_pro_perk: false
+      });
+      
+      toast({
+        title: "Success",
+        description: "Tool added successfully",
+      });
+    } catch (error: any) {
+      console.error('Error adding tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add tool",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTool = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tools')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setTools(tools.filter(tool => tool.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Tool deleted successfully",
+      });
+    } catch (error: any) {
+      console.error('Error deleting tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete tool",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditTool = (tool: Tool) => {
+    setSelectedTool(tool);
+    setNewTool({
+      name: tool.name,
+      url: tool.url,
+      description: tool.description,
+      favicon: tool.favicon || '',
+      has_pro_perk: tool.has_pro_perk
+    });
+    setIsToolEditing(true);
+  };
+
+  const handleUpdateTool = async () => {
+    if (!selectedTool) return;
+    
+    const { name, url, description, favicon, has_pro_perk } = newTool;
+    
+    if (!name || !url || !description) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('tools')
+        .update({
+          name,
+          url,
+          description,
+          favicon: favicon || '🔧',
+          has_pro_perk
+        })
+        .eq('id', selectedTool.id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setTools(tools.map(tool => 
+        tool.id === selectedTool.id ? data : tool
+      ));
+      
+      setSelectedTool(null);
+      setIsToolEditing(false);
+      
+      setNewTool({
+        name: '',
+        url: '',
+        description: '',
+        favicon: '',
+        has_pro_perk: false
+      });
+      
+      toast({
+        title: "Success",
+        description: "Tool updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update tool",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Update user role
   const handleUpdateUserRole = async (userId: string, currentRole: 'user' | 'admin') => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
@@ -440,9 +631,14 @@ const AdminDashboard = () => {
             
             {/* Main Content */}
             <div className="md:col-span-9">
-              <Tabs defaultValue="content">
+              <Tabs 
+                defaultValue="content" 
+                value={activeTab}
+                onValueChange={setActiveTab}
+              >
                 <TabsList className="mb-6">
                   <TabsTrigger value="content">Content Management</TabsTrigger>
+                  <TabsTrigger value="tools">Tools Management</TabsTrigger>
                   <TabsTrigger value="users">User Management</TabsTrigger>
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
@@ -459,6 +655,20 @@ const AdminDashboard = () => {
                     handleUpdateCourse={handleUpdateCourse}
                     handleEditCourse={handleEditCourse}
                     handleDeleteCourse={handleDeleteCourse}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="tools">
+                  <ToolManagement
+                    tools={tools}
+                    isLoading={isToolLoading}
+                    newTool={newTool}
+                    setNewTool={setNewTool}
+                    isEditing={isToolEditing}
+                    handleAddTool={handleAddTool}
+                    handleUpdateTool={handleUpdateTool}
+                    handleEditTool={handleEditTool}
+                    handleDeleteTool={handleDeleteTool}
                   />
                 </TabsContent>
                 
