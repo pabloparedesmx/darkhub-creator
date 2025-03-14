@@ -70,9 +70,7 @@ const CategoryFilters = ({
       </button>
       
       {isOpen && <div className="space-y-2 mt-2">
-          {selectedCategories.length > 0 && <Button variant="ghost" size="sm" onClick={clearCategoryFilters} className="h-7 px-2 text-xs">
-              Clear categories
-            </Button>}
+          {selectedCategories.length > 0 && <Button variant="ghost" size="sm" onClick={clearCategoryFilters} className="h-7 px-2 text-xs text-slate-950 bg-zinc-300 hover:bg-zinc-200">Borrar Filtros</Button>}
           
           {categories.length > 5 && <div className="relative mb-3">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
