@@ -4,6 +4,7 @@ import { Tool } from '@/types/admin';
 import { supabase } from '@/lib/supabase';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface CourseToolsProps {
   courseId: string;
@@ -56,6 +57,24 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
     }
   }, [courseId]);
 
+  // Function to render favicon (either as emoji or image)
+  const renderFavicon = (favicon: string) => {
+    // Check if the favicon is a URL (starts with http:// or https:// or has image extensions)
+    const isUrl = /^(https?:\/\/|www\.)|(\.(png|jpg|jpeg|svg|webp|ico)$)/i.test(favicon);
+    
+    if (isUrl) {
+      return (
+        <Avatar className="h-8 w-8 mr-3">
+          <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
+          <AvatarFallback>🔧</AvatarFallback>
+        </Avatar>
+      );
+    }
+    
+    // If not a URL, render as emoji
+    return <div className="mr-3 text-2xl">{favicon || '🔧'}</div>;
+  };
+
   if (isLoading) {
     return (
       <div className="mt-8 animate-pulse">
@@ -81,7 +100,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
             key={tool.id} 
             className="p-4 border border-border rounded-lg bg-muted/30 flex items-start"
           >
-            <div className="mr-3 text-2xl">{tool.favicon || '🔧'}</div>
+            {renderFavicon(tool.favicon)}
             <div className="flex-1">
               <h4 className="font-medium">{tool.name}</h4>
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{tool.description}</p>

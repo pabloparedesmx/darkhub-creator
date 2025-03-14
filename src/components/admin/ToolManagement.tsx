@@ -23,6 +23,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Search, PlusCircle, Pencil, Trash } from 'lucide-react';
 import { Tool } from '@/types/admin';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface ToolManagementProps {
   tools: Tool[];
@@ -88,6 +89,24 @@ const ToolManagement = ({
     setSelectedTool(null);
     setIsEditDialogOpen(false);
   };
+  
+  // Function to render favicon (either as emoji or image)
+  const renderFavicon = (favicon: string) => {
+    // Check if the favicon is a URL (starts with http:// or https:// or has image extensions)
+    const isUrl = /^(https?:\/\/|www\.)|(\.(png|jpg|jpeg|svg|webp|ico)$)/i.test(favicon);
+    
+    if (isUrl) {
+      return (
+        <Avatar className="h-8 w-8">
+          <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
+          <AvatarFallback>🔧</AvatarFallback>
+        </Avatar>
+      );
+    }
+    
+    // If not a URL, render as emoji
+    return <span className="text-xl">{favicon || '🔧'}</span>;
+  };
 
   return (
     <div>
@@ -145,13 +164,16 @@ const ToolManagement = ({
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="toolFavicon">Favicon/Emoji</label>
+                <label htmlFor="toolFavicon">Favicon Image URL or Emoji</label>
                 <Input 
                   id="toolFavicon" 
                   value={newTool.favicon} 
                   onChange={(e) => setNewTool({...newTool, favicon: e.target.value})} 
-                  placeholder="e.g. 🤖 or URL to image"
+                  placeholder="e.g. https://example.com/favicon.ico or 🤖"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter an emoji or full URL to an image (PNG, JPG, SVG, ICO)
+                </p>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox 
@@ -200,7 +222,7 @@ const ToolManagement = ({
                   <TableRow key={tool.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <span className="text-xl">{tool.favicon || '🔧'}</span>
+                        {renderFavicon(tool.favicon)}
                         <span className="font-medium">{tool.name}</span>
                       </div>
                     </TableCell>
@@ -266,12 +288,15 @@ const ToolManagement = ({
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="editToolFavicon">Favicon/Emoji</label>
+                <label htmlFor="editToolFavicon">Favicon Image URL or Emoji</label>
                 <Input 
                   id="editToolFavicon" 
                   value={selectedTool.favicon} 
                   onChange={(e) => setSelectedTool({...selectedTool, favicon: e.target.value})} 
                 />
+                <p className="text-xs text-muted-foreground">
+                  Enter an emoji or full URL to an image (PNG, JPG, SVG, ICO)
+                </p>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox 

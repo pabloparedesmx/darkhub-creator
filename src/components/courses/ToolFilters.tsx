@@ -6,6 +6,7 @@ import { ChevronDown, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tool } from '@/types/admin';
 import { supabase } from '@/lib/supabase';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface ToolFiltersProps {
   selectedTools: string[];
@@ -55,6 +56,24 @@ const ToolFilters = ({ selectedTools, setSelectedTools }: ToolFiltersProps) => {
 
   const clearToolFilters = () => {
     setSelectedTools([]);
+  };
+
+  // Function to render favicon (either as emoji or image)
+  const renderFavicon = (favicon: string) => {
+    // Check if the favicon is a URL (starts with http:// or https:// or has image extensions)
+    const isUrl = /^(https?:\/\/|www\.)|(\.(png|jpg|jpeg|svg|webp|ico)$)/i.test(favicon);
+    
+    if (isUrl) {
+      return (
+        <Avatar className="h-5 w-5 mr-1">
+          <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
+          <AvatarFallback>🔧</AvatarFallback>
+        </Avatar>
+      );
+    }
+    
+    // If not a URL, render as emoji
+    return <span className="mr-1">{favicon}</span>;
   };
 
   if (isLoading) {
@@ -125,7 +144,7 @@ const ToolFilters = ({ selectedTools, setSelectedTools }: ToolFiltersProps) => {
                   onCheckedChange={() => handleToolToggle(tool.id)}
                 />
                 <label htmlFor={`tool-${tool.id}`} className="text-sm cursor-pointer flex items-center">
-                  {tool.favicon && <span className="mr-1">{tool.favicon}</span>}
+                  {tool.favicon && renderFavicon(tool.favicon)}
                   {tool.name}
                 </label>
               </div>
