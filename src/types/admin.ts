@@ -8,6 +8,7 @@ export type Category = Database['public']['Tables']['categories']['Row'];
 export type DbCourse = Database['public']['Tables']['courses']['Row'] & {
   badges: Array<'tutorial'>;
   toolName?: string;
+  toolIcon?: string;
 };
 
 // Type for user profiles
@@ -20,6 +21,7 @@ export type Tool = {
   url: string;
   description: string;
   favicon: string;
+  icon?: string;
   has_pro_perk: boolean;
   created_at: string;
   updated_at: string;

@@ -263,6 +263,7 @@ export type Database = {
           description: string
           favicon: string | null
           has_pro_perk: boolean
+          icon: string | null
           id: string
           name: string
           updated_at: string
@@ -273,6 +274,7 @@ export type Database = {
           description: string
           favicon?: string | null
           has_pro_perk?: boolean
+          icon?: string | null
           id?: string
           name: string
           updated_at?: string
@@ -283,6 +285,7 @@ export type Database = {
           description?: string
           favicon?: string | null
           has_pro_perk?: boolean
+          icon?: string | null
           id?: string
           name?: string
           updated_at?: string

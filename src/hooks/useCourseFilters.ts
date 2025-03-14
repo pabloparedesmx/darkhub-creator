@@ -8,17 +8,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
   const [courses, setCourses] = useState<Course[]>(coursesData);
   const [filters, setFilters] = useState({
     all: true,
-    courses: false,
     tutorials: false
-  });
-
-  // Filter category options
-  const [categories, setCategories] = useState({
-    aiTools: false,
-    writing: false,
-    coding: false,
-    dataAnalysis: false,
-    contentCreation: false
   });
 
   // Add selected tools filter
@@ -98,15 +88,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
     setSearchTerm('');
     setFilters({
       all: true,
-      courses: false,
       tutorials: false
-    });
-    setCategories({
-      aiTools: false,
-      writing: false,
-      coding: false,
-      dataAnalysis: false,
-      contentCreation: false
     });
     setDifficulties({
       beginner: false,
@@ -123,8 +105,6 @@ export const useCourseFilters = (coursesData: Course[]) => {
     courses,
     filters,
     setFilters,
-    categories,
-    setCategories,
     difficulties,
     setDifficulties,
     selectedTools,

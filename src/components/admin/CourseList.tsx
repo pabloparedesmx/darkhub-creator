@@ -5,9 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, Edit, Trash, BookOpen, Wrench } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import CategoryBadge from '@/components/ui/CategoryBadge';
-import RichTextContent from '@/components/ui/RichTextContent';
 import { DbCourse } from '@/types/admin';
+import RichTextContent from '@/components/ui/RichTextContent';
 import CourseToolAssociation from './CourseToolAssociation';
 
 interface CourseListProps {
@@ -29,6 +28,21 @@ const CourseList = ({
   const handleManageTools = (courseId: string) => {
     setSelectedCourseId(courseId);
     setIsToolDialogOpen(true);
+  };
+
+  // Function to render tool icon (emoji or image)
+  const renderToolIcon = (icon?: string) => {
+    if (!icon) return '📚';
+    
+    // Check if the icon is a URL
+    const isUrl = /^(https?:\/\/|www\.)|(\.(png|jpg|jpeg|svg|webp|ico)$)/i.test(icon);
+    
+    if (isUrl) {
+      return <img src={icon} alt="Tool" className="h-full w-full object-contain" />;
+    }
+    
+    // If not a URL, render as emoji
+    return icon;
   };
 
   return (
@@ -54,7 +68,7 @@ const CourseList = ({
                       {/* Course icon column */}
                       <div className="flex items-center justify-center p-6 bg-secondary/30 md:w-24 md:h-auto">
                         <div className="flex items-center justify-center w-16 h-16 text-3xl bg-background rounded-full border border-border shadow-sm">
-                          {course.icon || '📚'}
+                          {renderToolIcon(course.icon)}
                         </div>
                       </div>
                       
@@ -65,11 +79,11 @@ const CourseList = ({
                             <Link to={`/courses/${course.slug}`} className="hover:text-primary transition-colors">
                               <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                             </Link>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              {course.badges && course.badges.includes('tutorial') && (
-                                <CategoryBadge key="tutorial" type="tutorial" />
-                              )}
-                            </div>
+                            {course.badges && course.badges.includes('tutorial') && (
+                              <div className="inline-block bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded-full text-xs mb-3">
+                                Tutorial
+                              </div>
+                            )}
                             <div className="mb-4">
                               <RichTextContent 
                                 content={course.description} 
@@ -79,8 +93,8 @@ const CourseList = ({
                             <div className="flex items-center text-xs text-muted-foreground">
                               <BookOpen className="h-3 w-3 mr-1" />
                               <span>Slug: {course.slug}</span>
-                              {course.toolName && (
-                                <span className="ml-3">Category: {course.toolName}</span>
+                              {course.difficulty && (
+                                <span className="ml-3">Difficulty: {course.difficulty}</span>
                               )}
                             </div>
                           </div>

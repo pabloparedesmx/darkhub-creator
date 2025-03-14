@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
@@ -30,8 +31,7 @@ const Courses = () => {
             slug, 
             icon,
             is_tutorial,
-            difficulty,
-            categories(name)
+            difficulty
           `)
           .order('created_at', { ascending: false });
         
@@ -40,17 +40,28 @@ const Courses = () => {
         // Then fetch course-tool relationships
         const { data: courseToolsData, error: courseToolsError } = await supabase
           .from('course_tools')
-          .select('course_id, tool_id');
+          .select('course_id, tool_id, tools(id, name, favicon)');
         
         if (courseToolsError) throw courseToolsError;
         
-        // Create a map of course IDs to tool IDs
+        // Create a map of course IDs to tool IDs and tool data
         const courseToolsMap: Record<string, string[]> = {};
+        const courseToolInfoMap: Record<string, { name?: string, icon?: string }> = {};
+        
         courseToolsData.forEach(item => {
+          // Add tool ID to the course's tool IDs array
           if (!courseToolsMap[item.course_id]) {
             courseToolsMap[item.course_id] = [];
           }
           courseToolsMap[item.course_id].push(item.tool_id);
+          
+          // Set the first tool's info as the course's tool info if not already set
+          if (!courseToolInfoMap[item.course_id] && item.tools) {
+            courseToolInfoMap[item.course_id] = {
+              name: item.tools.name,
+              icon: item.tools.favicon
+            };
+          }
         });
         
         // Transform data to match Course interface
@@ -58,16 +69,8 @@ const Courses = () => {
           const badges: Array<'tutorial'> = [];
           if (course.is_tutorial) badges.push('tutorial');
           
-          // Fix for the categories object - ensure we get the name correctly
-          let categoryName: string | undefined;
-          if (course.categories) {
-            // Handle both cases: if categories is an object with a name property or a Record type
-            categoryName = typeof course.categories === 'object' && course.categories !== null
-              ? 'name' in course.categories
-                ? (course.categories as { name: string }).name
-                : undefined
-              : undefined;
-          }
+          // Get the tool info for this course, if any
+          const toolInfo = courseToolInfoMap[course.id] || {};
           
           return {
             id: course.id,
@@ -77,8 +80,9 @@ const Courses = () => {
             slug: course.slug,
             icon: course.icon || '📚',
             difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
-            toolName: categoryName,
-            toolIds: courseToolsMap[course.id] || [] // Add tool IDs for filtering
+            toolName: toolInfo.name,
+            toolIcon: toolInfo.icon,
+            toolIds: courseToolsMap[course.id] || []
           };
         });
         
@@ -104,8 +108,6 @@ const Courses = () => {
     courses,
     filters,
     setFilters,
-    categories,
-    setCategories,
     difficulties,
     setDifficulties,
     selectedTools,
@@ -148,8 +150,6 @@ const Courses = () => {
               <CourseFilters 
                 filters={filters}
                 setFilters={setFilters}
-                categories={categories}
-                setCategories={setCategories}
                 difficulties={difficulties}
                 setDifficulties={setDifficulties}
                 selectedTools={selectedTools}

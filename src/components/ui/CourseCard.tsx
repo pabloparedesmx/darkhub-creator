@@ -8,7 +8,7 @@ export type Course = {
   id: string;
   title: string;
   description: string;
-  badges: Array<'tutorial' | 'pro' | 'free'>;
+  badges: Array<'tutorial'>;
   slug: string;
   icon?: string;
   toolName?: string;
@@ -63,13 +63,9 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
               {course.badges.map((badge, index) => (
                 <span 
                   key={index} 
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    badge === 'tutorial' 
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' 
-                      : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
-                  }`}
+                  className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                 >
-                  {badge === 'tutorial' ? 'Tutorial' : 'Pro'}
+                  {badge === 'tutorial' ? 'Tutorial' : badge}
                 </span>
               ))}
             </div>
