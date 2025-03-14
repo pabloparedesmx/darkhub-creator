@@ -5,13 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Category, DbCourse, UserProfile, Tool } from '@/types/admin';
+import { Category, DbCourse, UserProfile, Tool, Workshop } from '@/types/admin';
 
 // Import refactored components
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import UserManagement from '@/components/admin/UserManagement';
 import CourseManagement from '@/components/admin/CourseManagement';
 import ToolManagement from '@/components/admin/ToolManagement';
+import WorkshopsManagement from '@/components/admin/WorkshopsManagement';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 
 const AdminDashboard = () => {
@@ -22,6 +23,7 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState<DbCourse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
+  const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -41,6 +43,7 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isToolsLoading, setIsToolsLoading] = useState(true);
+  const [isWorkshopsLoading, setIsWorkshopsLoading] = useState(true);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -133,6 +136,35 @@ const AdminDashboard = () => {
     };
     
     fetchTools();
+  }, [toast]);
+
+  // Fetch workshops
+  useEffect(() => {
+    const fetchWorkshops = async () => {
+      setIsWorkshopsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('workshops')
+          .select('*')
+          .order('date', { ascending: false });
+        
+        if (error) throw error;
+        
+        setWorkshops(data as Workshop[]);
+      } catch (error) {
+        console.error('Error fetching workshops:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load workshops",
+          variant: "destructive",
+        });
+      } finally {
+        setIsWorkshopsLoading(false);
+      }
+    };
+    
+    fetchWorkshops();
   }, [toast]);
 
   // Fetch user data
@@ -562,6 +594,29 @@ const AdminDashboard = () => {
     }
   };
 
+  const refreshWorkshops = async () => {
+    setIsWorkshopsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('workshops')
+        .select('*')
+        .order('date', { ascending: false });
+      
+      if (error) throw error;
+      
+      setWorkshops(data as Workshop[]);
+    } catch (error) {
+      console.error('Error refreshing workshops:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh workshops",
+        variant: "destructive",
+      });
+    } finally {
+      setIsWorkshopsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
@@ -590,6 +645,7 @@ const AdminDashboard = () => {
                 <TabsList className="mb-6">
                   <TabsTrigger value="content">Content Management</TabsTrigger>
                   <TabsTrigger value="tools">Tools Management</TabsTrigger>
+                  <TabsTrigger value="workshops">Workshops</TabsTrigger>
                   <TabsTrigger value="users">User Management</TabsTrigger>
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
@@ -616,6 +672,14 @@ const AdminDashboard = () => {
                     handleAddTool={handleAddTool}
                     handleUpdateTool={handleUpdateTool}
                     handleDeleteTool={handleDeleteTool}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="workshops">
+                  <WorkshopsManagement
+                    workshops={workshops}
+                    isLoading={isWorkshopsLoading}
+                    onRefresh={refreshWorkshops}
                   />
                 </TabsContent>
                 

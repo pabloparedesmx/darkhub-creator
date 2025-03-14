@@ -112,6 +112,47 @@ export interface Database {
           updated_at?: string
         }
       }
+      workshops: {
+        Row: {
+          id: string
+          title: string
+          description: string | null
+          expert_name: string
+          expert_profile_image: string | null
+          date: string
+          registration_url: string
+          timezone: string
+          is_recorded: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description?: string | null
+          expert_name: string
+          expert_profile_image?: string | null
+          date: string
+          registration_url: string
+          timezone?: string
+          is_recorded?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string | null
+          expert_name?: string
+          expert_profile_image?: string | null
+          date?: string
+          registration_url?: string
+          timezone?: string
+          is_recorded?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       lessons: {
         Row: {
           id: string

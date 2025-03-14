@@ -27,3 +27,18 @@ export type Tool = {
   created_at: string;
   updated_at: string;
 };
+
+// Type for workshops
+export type Workshop = {
+  id: string;
+  title: string;
+  description: string | null;
+  expert_name: string;
+  expert_profile_image: string | null;
+  date: string;
+  registration_url: string;
+  timezone: string;
+  is_recorded: boolean;
+  created_at: string;
+  updated_at: string;
+};
