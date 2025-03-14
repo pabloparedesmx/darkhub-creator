@@ -37,14 +37,15 @@ export function ThemeProvider({
     // First remove both classes
     root.classList.remove('light', 'dark');
     
-    // Then add the current theme class
+    // Add the current theme class
     root.classList.add(theme);
     
-    // Add a special class for dashboard pages
+    // Check if we're in a dashboard area
     if (window.location.pathname.match(/^\/(dashboard|courses|profile|admin)/)) {
       root.classList.add('dashboard-area');
+      // In dashboard area, use the selected theme (light or dark)
     } else {
-      // Force dark mode for non-dashboard pages
+      // For non-dashboard pages, force dark mode regardless of theme setting
       if (theme === 'light') {
         root.classList.remove('light');
         root.classList.add('dark');
