@@ -15,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -38,8 +37,6 @@ const CourseEditor = () => {
     slug: '',
     icon: '',
     category_id: '',
-    isPro: false,
-    isFree: false,
     isTutorial: false,
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
@@ -72,8 +69,6 @@ const CourseEditor = () => {
             slug: courseData.slug,
             icon: courseData.icon || '',
             category_id: courseData.category_id || '',
-            isPro: courseData.is_pro,
-            isFree: courseData.is_free,
             isTutorial: courseData.is_tutorial,
             difficulty: courseData.difficulty || 'beginner'
           });
@@ -94,7 +89,7 @@ const CourseEditor = () => {
   }, [courseId, isNewCourse, toast]);
 
   const handleSaveCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = course;
+    const { title, description, slug, icon, category_id, isTutorial, difficulty } = course;
     
     if (!title || !description || !slug) {
       toast({
@@ -117,8 +112,6 @@ const CourseEditor = () => {
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
-            is_pro: isPro,
-            is_free: isFree,
             is_tutorial: isTutorial,
             difficulty: difficulty,
             author_id: user?.id
@@ -139,8 +132,6 @@ const CourseEditor = () => {
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
-            is_pro: isPro,
-            is_free: isFree,
             is_tutorial: isTutorial,
             difficulty
           })
@@ -339,40 +330,6 @@ const CourseEditor = () => {
                       <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                
-                <Separator className="my-4" />
-                
-                <div className="space-y-4">
-                  <label className="text-sm font-medium">Access Settings</label>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="isPro"
-                      checked={course.isPro}
-                      onCheckedChange={(checked) => handleInputChange('isPro', !!checked)}
-                    />
-                    <label
-                      htmlFor="isPro"
-                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Pro Content
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="isFree"
-                      checked={course.isFree}
-                      onCheckedChange={(checked) => handleInputChange('isFree', !!checked)}
-                    />
-                    <label
-                      htmlFor="isFree"
-                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Free Content
-                    </label>
-                  </div>
                 </div>
                 
                 <Separator className="my-4" />

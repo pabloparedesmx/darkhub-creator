@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
@@ -30,8 +29,6 @@ const Courses = () => {
             description, 
             slug, 
             icon,
-            is_pro,
-            is_free,
             is_tutorial,
             difficulty,
             categories(name)
@@ -58,9 +55,7 @@ const Courses = () => {
         
         // Transform data to match Course interface
         const transformedCourses: Course[] = coursesData.map(course => {
-          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-          if (course.is_pro) badges.push('pro');
-          if (course.is_free) badges.push('free');
+          const badges: Array<'tutorial'> = [];
           if (course.is_tutorial) badges.push('tutorial');
           
           // Fix for the categories object - ensure we get the name correctly

@@ -9,8 +9,6 @@ type FiltersState = {
   all: boolean;
   courses: boolean;
   tutorials: boolean;
-  free: boolean;
-  pro: boolean;
 };
 
 type CategoriesState = {
@@ -79,9 +77,7 @@ const CourseFilters = ({
                   setFilters({
                     all: true,
                     courses: false,
-                    tutorials: false,
-                    free: false,
-                    pro: false
+                    tutorials: false
                   });
                 }
               }}
@@ -121,42 +117,6 @@ const CourseFilters = ({
             <label htmlFor="tutorials" className="text-sm font-medium cursor-pointer">
               Tutorials
             </label>
-          </div>
-
-          {/* Price type */}
-          <div className="flex items-center mt-2">
-            <div className="flex items-center mr-4 space-x-2">
-              <Checkbox 
-                id="free" 
-                checked={filters.free}
-                onCheckedChange={(checked) => {
-                  setFilters({
-                    ...filters,
-                    all: false,
-                    free: !!checked
-                  });
-                }}
-              />
-              <label htmlFor="free" className="text-sm font-medium cursor-pointer">
-                Free
-              </label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="pro" 
-                checked={filters.pro}
-                onCheckedChange={(checked) => {
-                  setFilters({
-                    ...filters,
-                    all: false,
-                    pro: !!checked
-                  });
-                }}
-              />
-              <label htmlFor="pro" className="text-sm font-medium cursor-pointer">
-                Pro
-              </label>
-            </div>
           </div>
         </div>
 

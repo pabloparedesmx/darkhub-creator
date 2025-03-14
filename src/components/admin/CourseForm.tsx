@@ -2,7 +2,6 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { DialogFooter } from '@/components/ui/dialog';
 import { 
   Select,
@@ -21,8 +20,6 @@ interface CourseFormProps {
     slug: string;
     icon: string;
     category_id: string;
-    isPro: boolean;
-    isFree: boolean;
     isTutorial: boolean;
     difficulty?: 'beginner' | 'intermediate' | 'advanced';
   };
@@ -117,41 +114,6 @@ const CourseForm = ({
               <SelectItem value="advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-      </div>
-      
-      <div className="space-y-2">
-        <label className="font-medium">Access Settings</label>
-        <div className="flex flex-wrap gap-4 mt-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="isPro" 
-              checked={newCourse.isPro}
-              onCheckedChange={(checked) => setNewCourse({...newCourse, isPro: !!checked})}
-            />
-            <label
-              htmlFor="isPro"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Pro Content
-            </label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="isFree" 
-              checked={newCourse.isFree}
-              onCheckedChange={(checked) => setNewCourse({...newCourse, isFree: !!checked})}
-            />
-            <label
-              htmlFor="isFree"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Free Content
-            </label>
-          </div>
-          
-          {/* Tutorial checkbox removed as it's not an access setting */}
         </div>
       </div>
       

@@ -6,7 +6,7 @@ export type Category = Database['public']['Tables']['categories']['Row'];
 
 // Type for course from database with badges
 export type DbCourse = Database['public']['Tables']['courses']['Row'] & {
-  badges: Array<'pro' | 'free' | 'tutorial'>;
+  badges: Array<'tutorial'>;
   toolName?: string;
 };
 

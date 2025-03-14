@@ -66,9 +66,9 @@ const CourseList = ({
                               <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                             </Link>
                             <div className="flex flex-wrap gap-2 mb-3">
-                              {course.badges.map((badge, index) => (
-                                <CategoryBadge key={index} type={badge} />
-                              ))}
+                              {course.badges && course.badges.includes('tutorial') && (
+                                <CategoryBadge key="tutorial" type="tutorial" />
+                              )}
                             </div>
                             <div className="mb-4">
                               <RichTextContent 

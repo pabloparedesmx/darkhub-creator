@@ -9,9 +9,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
   const [filters, setFilters] = useState({
     all: true,
     courses: false,
-    tutorials: false,
-    free: false,
-    pro: false
+    tutorials: false
   });
 
   // Filter category options
@@ -45,21 +43,11 @@ export const useCourseFilters = (coursesData: Course[]) => {
       );
     }
 
-    // Apply type filters (free/pro/tutorial)
+    // Apply type filters (tutorial)
     if (!filters.all) {
       if (filters.tutorials) {
         filteredCourses = filteredCourses.filter(course => 
           course.badges.includes('tutorial')
-        );
-      }
-      
-      if (filters.free && !filters.pro) {
-        filteredCourses = filteredCourses.filter(course => 
-          course.badges.includes('free')
-        );
-      } else if (filters.pro && !filters.free) {
-        filteredCourses = filteredCourses.filter(course => 
-          course.badges.includes('pro')
         );
       }
     }
@@ -111,9 +99,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
     setFilters({
       all: true,
       courses: false,
-      tutorials: false,
-      free: false,
-      pro: false
+      tutorials: false
     });
     setCategories({
       aiTools: false,

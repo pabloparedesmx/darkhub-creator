@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,8 +31,6 @@ const AdminDashboard = () => {
     slug: '',
     icon: '',
     category_id: '',
-    isPro: false,
-    isFree: false,
     isTutorial: false,
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
@@ -79,9 +76,7 @@ const AdminDashboard = () => {
         
         // Map courses to the expected format
         const formattedCourses = coursesData.map(course => {
-          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-          if (course.is_pro) badges.push('pro');
-          if (course.is_free) badges.push('free');
+          const badges: Array<'tutorial'> = [];
           if (course.is_tutorial) badges.push('tutorial');
           
           return {
@@ -228,7 +223,7 @@ const AdminDashboard = () => {
   };
 
   const handleAddCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = newCourse;
+    const { title, description, slug, icon, category_id, isTutorial, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -248,8 +243,6 @@ const AdminDashboard = () => {
           slug,
           icon: icon || '📚',
           category_id: category_id || null,
-          is_pro: isPro,
-          is_free: isFree,
           is_tutorial: isTutorial,
           difficulty: difficulty,
           author_id: user?.id
@@ -259,9 +252,7 @@ const AdminDashboard = () => {
       
       if (error) throw error;
       
-      const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-      if (isPro) badges.push('pro');
-      if (isFree) badges.push('free');
+      const badges: Array<'tutorial'> = [];
       if (isTutorial) badges.push('tutorial');
       
       const newCourseItem: DbCourse = {
@@ -278,8 +269,6 @@ const AdminDashboard = () => {
         slug: '',
         icon: '',
         category_id: '',
-        isPro: false,
-        isFree: false,
         isTutorial: false,
         difficulty: 'beginner'
       });
@@ -331,8 +320,6 @@ const AdminDashboard = () => {
       slug: course.slug,
       icon: course.icon || '',
       category_id: course.category_id || '',
-      isPro: course.is_pro,
-      isFree: course.is_free,
       isTutorial: course.is_tutorial,
       difficulty: course.difficulty || 'beginner'
     });
@@ -342,7 +329,7 @@ const AdminDashboard = () => {
   const handleUpdateCourse = async () => {
     if (!selectedCourse) return;
     
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = newCourse;
+    const { title, description, slug, icon, category_id, isTutorial, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -362,8 +349,6 @@ const AdminDashboard = () => {
           slug,
           icon: icon || '📚',
           category_id: category_id || null,
-          is_pro: isPro,
-          is_free: isFree,
           is_tutorial: isTutorial,
           difficulty
         })
@@ -373,9 +358,7 @@ const AdminDashboard = () => {
       
       if (error) throw error;
       
-      const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-      if (isPro) badges.push('pro');
-      if (isFree) badges.push('free');
+      const badges: Array<'tutorial'> = [];
       if (isTutorial) badges.push('tutorial');
       
       const updatedCourse: DbCourse = {
@@ -397,8 +380,6 @@ const AdminDashboard = () => {
         slug: '',
         icon: '',
         category_id: '',
-        isPro: false,
-        isFree: false,
         isTutorial: false,
         difficulty: 'beginner'
       });
