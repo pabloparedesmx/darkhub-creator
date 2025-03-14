@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -222,7 +221,6 @@ const ToolManagement = ({
                   <TableRow key={tool.id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {renderFavicon(tool.favicon)}
                         <span className="font-medium">{tool.name}</span>
                       </div>
                     </TableCell>

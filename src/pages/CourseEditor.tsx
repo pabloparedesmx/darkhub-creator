@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -416,9 +415,8 @@ const CourseEditor = () => {
                           />
                           <label 
                             htmlFor={`tool-${tool.id}`} 
-                            className="text-sm cursor-pointer flex items-center"
+                            className="text-sm cursor-pointer"
                           >
-                            {tool.favicon && <span className="mr-2">{tool.favicon}</span>}
                             {tool.name}
                           </label>
                         </div>

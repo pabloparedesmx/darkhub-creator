@@ -239,7 +239,6 @@ const CourseForm = ({
                   />
                   <div className="flex-1">
                     <label htmlFor={`tool-${tool.id}`} className="flex items-center cursor-pointer text-sm">
-                      {tool.favicon && <span className="mr-2">{tool.favicon}</span>}
                       {tool.name}
                     </label>
                   </div>
