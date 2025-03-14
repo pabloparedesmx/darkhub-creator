@@ -17,7 +17,7 @@ const FeaturedCourses = () => {
     const fetchCourses = async () => {
       try {
         // Fetch up to 5 featured courses
-        const { data: coursesData, error: coursesError } = await supabase
+        const { data, error } = await supabase
           .from('courses')
           .select(`
             id, 
@@ -31,28 +31,10 @@ const FeaturedCourses = () => {
           `)
           .limit(5);
         
-        if (coursesError) throw coursesError;
-        
-        // Fetch course-tool relationships
-        const courseIds = coursesData.map(course => course.id);
-        const { data: courseToolsData, error: toolsError } = await supabase
-          .from('course_tools')
-          .select('course_id, tool_id')
-          .in('course_id', courseIds);
-          
-        if (toolsError) throw toolsError;
-        
-        // Create a map of courseId to toolIds
-        const courseToolsMap: Record<string, string[]> = {};
-        courseToolsData.forEach(relation => {
-          if (!courseToolsMap[relation.course_id]) {
-            courseToolsMap[relation.course_id] = [];
-          }
-          courseToolsMap[relation.course_id].push(relation.tool_id);
-        });
+        if (error) throw error;
         
         // Transform data to match Course interface
-        const transformedCourses: Course[] = coursesData.map(course => {
+        const transformedCourses: Course[] = data.map(course => {
           const badges: Array<'pro' | 'free'> = [];
           if (course.is_pro) badges.push('pro');
           if (course.is_free) badges.push('free');
@@ -65,8 +47,7 @@ const FeaturedCourses = () => {
             slug: course.slug,
             icon: course.icon || '📚',
             // Fix: Access the first item's name in the categories array, if it exists
-            toolName: course.categories && course.categories[0] ? course.categories[0].name : undefined,
-            toolIds: courseToolsMap[course.id] || []
+            toolName: course.categories && course.categories[0] ? course.categories[0].name : undefined
           };
         });
         

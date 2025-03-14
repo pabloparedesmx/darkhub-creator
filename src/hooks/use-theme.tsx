@@ -15,7 +15,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: 'light',
+  theme: 'dark',
   setTheme: () => null,
 };
 
@@ -23,7 +23,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'light',
+  defaultTheme = 'dark',
   storageKey = 'dashboard-theme',
   ...props
 }: ThemeProviderProps) {
@@ -37,15 +37,14 @@ export function ThemeProvider({
     // First remove both classes
     root.classList.remove('light', 'dark');
     
-    // Add the current theme class
+    // Then add the current theme class
     root.classList.add(theme);
     
-    // Check if we're in a dashboard area
+    // Add a special class for dashboard pages
     if (window.location.pathname.match(/^\/(dashboard|courses|profile|admin)/)) {
       root.classList.add('dashboard-area');
-      // In dashboard area, use the selected theme (light or dark)
     } else {
-      // For non-dashboard pages, force dark mode regardless of theme setting
+      // Force dark mode for non-dashboard pages
       if (theme === 'light') {
         root.classList.remove('light');
         root.classList.add('dark');

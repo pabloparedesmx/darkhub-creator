@@ -1,9 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from 'framer-motion';
-import { supabase } from "@/lib/supabase";
 
 export type Course = {
   id: string;
@@ -25,55 +24,12 @@ interface CourseCardProps {
   featured?: boolean;
 }
 
-type ToolInfo = {
-  id: string;
-  name: string;
-  icon: string | null;
-};
-
 const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [courseTools, setCourseTools] = useState<ToolInfo[]>([]);
   
   // Remove HTML tags from description for clean display
   const plainDescription = course.description.replace(/<[^>]*>/g, '');
   const summary = course.summary || plainDescription;
-  
-  // Fetch all tools associated with this course if toolIds are available
-  useEffect(() => {
-    const fetchCourseTools = async () => {
-      if (!course.toolIds || course.toolIds.length === 0) {
-        // If no tool IDs, but we have a single tool info, use that
-        if (course.toolName && course.toolIcon) {
-          setCourseTools([{
-            id: 'default',
-            name: course.toolName,
-            icon: course.toolIcon
-          }]);
-        }
-        return;
-      }
-      
-      try {
-        const { data, error } = await supabase
-          .from('tools')
-          .select('id, name, favicon, icon')
-          .in('id', course.toolIds);
-          
-        if (error) throw error;
-        
-        setCourseTools(data.map(tool => ({
-          id: tool.id,
-          name: tool.name,
-          icon: tool.favicon || tool.icon || null
-        })));
-      } catch (error) {
-        console.error('Error fetching course tools:', error);
-      }
-    };
-    
-    fetchCourseTools();
-  }, [course.toolIds, course.toolName, course.toolIcon]);
   
   // Function to render tool icon (either as emoji or image)
   const renderToolIcon = (icon?: string) => {
@@ -84,53 +40,14 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     
     if (isUrl) {
       return (
-        <div className="flex-shrink-0 w-6 h-6 rounded-md overflow-hidden">
+        <div className="flex-shrink-0 w-6 h-6 rounded-md overflow-hidden mr-1">
           <img src={icon} alt="Tool" className="h-full w-full object-contain" />
         </div>
       );
     }
     
     // If not a URL, render as emoji
-    return <span className="text-lg">{icon}</span>;
-  };
-  
-  // Render multiple tool icons
-  const renderMultipleToolIcons = () => {
-    // Determine if we should show only icons (when there are multiple tools)
-    const showOnlyIcons = courseTools.length > 1;
-    
-    if (courseTools.length === 0) {
-      // Fallback to course icon if no tools
-      return (
-        <span className="text-xs text-muted-foreground truncate">
-          {renderToolIcon(course.icon)}
-          {course.slug}
-        </span>
-      );
-    } else if (courseTools.length === 1) {
-      // Only one tool - show icon and name
-      return (
-        <span className="text-xs text-muted-foreground flex items-center">
-          {renderToolIcon(courseTools[0].icon)}
-          <span className="ml-1 truncate">{courseTools[0].name}</span>
-        </span>
-      );
-    } else {
-      // Multiple tools - show icons only with a flex layout
-      return (
-        <div className="flex items-center flex-wrap gap-2">
-          {courseTools.map((tool) => (
-            <div 
-              key={tool.id}
-              className="flex-shrink-0 tooltip-container" 
-              data-tooltip={tool.name}
-            >
-              {renderToolIcon(tool.icon)}
-            </div>
-          ))}
-        </div>
-      );
-    }
+    return <span className="mr-1 text-lg">{icon}</span>;
   };
   
   return (
@@ -171,9 +88,12 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
               </p>
             </div>
             
-            {/* Tool icons at the bottom */}
+            {/* Tool icon at the bottom */}
             <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center">
-              {renderMultipleToolIcons()}
+              {renderToolIcon(course.toolIcon || course.icon)}
+              <span className="text-xs text-muted-foreground truncate">
+                {course.toolName || course.slug}
+              </span>
             </div>
           </div>
         </CardContent>

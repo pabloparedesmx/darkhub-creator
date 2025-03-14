@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { useTheme } from '@/hooks/use-theme';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
@@ -22,7 +21,6 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isDashboardArea = location.pathname.match(/^\/(dashboard|courses|profile|admin)/);
-  const { theme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,7 +44,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img 
-            src={theme === 'light' && isDashboardArea ? "/lovable-uploads/9d7533f3-0728-446f-8b61-00a49090d2fe.png" : "/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png"} 
+            src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" 
             alt="AI Makers" 
             className="h-10"
           />
