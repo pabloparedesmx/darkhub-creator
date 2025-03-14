@@ -12,6 +12,7 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
+  systemTheme?: Theme;
 };
 
 const initialState: ThemeProviderState = {
@@ -30,6 +31,25 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
+
+  // Get the current path from window.location
+  const currentPath = window.location.pathname;
+  
+  // Detect if we're on a public route (homepage, login, signup)
+  const isPublicRoute = 
+    currentPath === '/' || 
+    currentPath === '/login' || 
+    currentPath === '/signup';
+
+  // Set the appropriate default theme based on route
+  const routeBasedDefaultTheme = isPublicRoute ? 'dark' : 'light';
+
+  useEffect(() => {
+    // Apply the default theme based on route only if user hasn't set a preference yet
+    if (!localStorage.getItem(storageKey)) {
+      setTheme(routeBasedDefaultTheme);
+    }
+  }, [currentPath, routeBasedDefaultTheme, storageKey]);
 
   useEffect(() => {
     const root = window.document.documentElement;

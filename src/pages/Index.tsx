@@ -18,8 +18,14 @@ const Index = () => {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Force dark theme for the futuristic AI look on landing page
-    setTheme('dark');
+    
+    // Check if user has set a theme preference
+    const storedTheme = localStorage.getItem('dashboard-theme');
+    
+    // Only force dark theme if no user preference exists
+    if (!storedTheme) {
+      setTheme('dark');
+    }
   }, [setTheme]);
 
   return (
