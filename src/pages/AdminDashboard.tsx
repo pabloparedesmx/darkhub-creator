@@ -6,12 +6,14 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Category, DbCourse, UserProfile, Tool } from '@/types/admin';
+import { PromptWithCategory } from '@/types/prompt';
 
 // Import refactored components
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import UserManagement from '@/components/admin/UserManagement';
 import CourseManagement from '@/components/admin/CourseManagement';
 import ToolManagement from '@/components/admin/ToolManagement';
+import PromptManagement from '@/components/admin/PromptManagement';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 
 const AdminDashboard = () => {
@@ -22,6 +24,7 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState<DbCourse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
+  const [prompts, setPrompts] = useState<PromptWithCategory[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -41,6 +44,7 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
   const [isToolsLoading, setIsToolsLoading] = useState(true);
+  const [isPromptsLoading, setIsPromptsLoading] = useState(true);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -163,6 +167,65 @@ const AdminDashboard = () => {
     
     fetchUsers();
   }, [toast]);
+
+  // Fetch prompts
+  useEffect(() => {
+    const fetchPrompts = async () => {
+      setIsPromptsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('prompts')
+          .select(`
+            *,
+            categories (
+              name
+            )
+          `)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        setPrompts(data as PromptWithCategory[]);
+      } catch (error) {
+        console.error('Error fetching prompts:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load prompts",
+          variant: "destructive",
+        });
+      } finally {
+        setIsPromptsLoading(false);
+      }
+    };
+    
+    fetchPrompts();
+  }, [toast]);
+
+  // Function to refetch prompts after changes
+  const refetchPrompts = async () => {
+    setIsPromptsLoading(true);
+    
+    try {
+      const { data, error } = await supabase
+        .from('prompts')
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      setPrompts(data as PromptWithCategory[]);
+    } catch (error) {
+      console.error('Error refetching prompts:', error);
+    } finally {
+      setIsPromptsLoading(false);
+    }
+  };
 
   const handleAddCategory = async () => {
     if (!newCategory.trim()) {
@@ -590,6 +653,7 @@ const AdminDashboard = () => {
                 <TabsList className="mb-6">
                   <TabsTrigger value="content">Content Management</TabsTrigger>
                   <TabsTrigger value="tools">Tools Management</TabsTrigger>
+                  <TabsTrigger value="prompts">Prompts Management</TabsTrigger>
                   <TabsTrigger value="users">User Management</TabsTrigger>
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
@@ -616,6 +680,15 @@ const AdminDashboard = () => {
                     handleAddTool={handleAddTool}
                     handleUpdateTool={handleUpdateTool}
                     handleDeleteTool={handleDeleteTool}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="prompts">
+                  <PromptManagement
+                    prompts={prompts}
+                    categories={categories}
+                    isLoading={isPromptsLoading}
+                    refetchPrompts={refetchPrompts}
                   />
                 </TabsContent>
                 

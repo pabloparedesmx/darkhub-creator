@@ -16,6 +16,8 @@ import CourseDetails from "./pages/CourseDetails";
 import NotFound from "./pages/NotFound";
 import CoursePlayer from "./pages/CoursePlayer";
 import CourseEditor from "./pages/CourseEditor";
+import Prompts from "./pages/Prompts";
+import PromptDetail from "./pages/PromptDetail";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -45,6 +47,10 @@ const App = () => (
                 <Route path="/admin/courses/new" element={<CourseEditor />} />
                 <Route path="/admin/courses/edit/:courseId" element={<CourseEditor />} />
               </Route>
+              
+              {/* Prompts routes */}
+              <Route path="/prompts" element={<Prompts />} />
+              <Route path="/prompts/:id" element={<PromptDetail />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>
