@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Search, Menu, X, ChevronDown, Bell, LogOut, User, Settings, CreditCard 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+
 const Navbar = () => {
   const {
     user,
@@ -17,6 +19,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isDashboardArea = location.pathname.match(/^\/(dashboard|courses|profile|admin)/);
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -24,9 +27,11 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
+  
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
@@ -35,33 +40,14 @@ const Navbar = () => {
 
         <nav className="hidden md:flex items-center space-x-1">
           <Link to="/courses" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-            Course catalog
+            Catálogo de cursos
           </Link>
           <Link to="/workshops" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-            Workshops
+            Talleres
           </Link>
-          <Link to="/blog" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-            Blog
+          <Link to="/prompts" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Prompts
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground">
-                Community
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 glass-morphism">
-              <DropdownMenuItem asChild>
-                <Link to="/community/forums" className="cursor-pointer">Forums</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/community/events" className="cursor-pointer">Events</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/community/discord" className="cursor-pointer">Discord</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </nav>
 
         <div className="hidden md:flex items-center space-x-2">
@@ -103,31 +89,31 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
-                      Dashboard
+                      Panel de control
                     </Link>
                   </DropdownMenuItem>
                   {isAdmin && <DropdownMenuItem asChild>
                       <Link to="/admin" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        Admin Panel
+                        Panel de administrador
                       </Link>
                     </DropdownMenuItem>}
                   <DropdownMenuItem asChild>
                     <Link to="/settings" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
-                      Settings
+                      Configuración
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/subscription" className="cursor-pointer">
                       <CreditCard className="mr-2 h-4 w-4" />
-                      Subscription
+                      Suscripción
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
+                    <span>Cerrar sesión</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -136,12 +122,12 @@ const Navbar = () => {
         <div className="flex items-center space-x-2 ml-4">
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-sm">
-                  Log in
+                  Iniciar sesión
                 </Button>
               </Link>
               <Link to="/signup">
                 <Button variant="default" size="sm" className="text-sm">
-                  Sign up
+                  Registrarse
                 </Button>
               </Link>
             </div>}
@@ -157,42 +143,25 @@ const Navbar = () => {
           <div className="container mx-auto px-4 py-2">
             <div className="flex flex-col space-y-2 pb-2">
               <Link to="/courses" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
-                Course catalog
+                Catálogo de cursos
               </Link>
               <Link to="/workshops" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
-                Workshops
+                Talleres
               </Link>
-              <Link to="/blog" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
-                Blog
+              <Link to="/prompts" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
+                Prompts
               </Link>
-              <details className="group">
-                <summary className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md list-none flex justify-between items-center cursor-pointer">
-                  Community
-                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="ml-4 mt-1 flex flex-col space-y-1">
-                  <Link to="/community/forums" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
-                    Forums
-                  </Link>
-                  <Link to="/community/events" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
-                    Events
-                  </Link>
-                  <Link to="/community/discord" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
-                    Discord
-                  </Link>
-                </div>
-              </details>
             </div>
             <div className="pt-2 border-t border-border">
               {/* Add theme toggle to mobile menu if in dashboard area */}
               {isDashboardArea && <div className="flex items-center justify-between py-2 px-3">
-                  <span className="text-sm">Theme</span>
+                  <span className="text-sm">Tema</span>
                   <ThemeToggle />
                 </div>}
               
               <div className="relative my-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input type="text" placeholder="Search KnowledgeBites" className="w-full pl-10 pr-4 py-2 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all" />
+                <input type="text" placeholder="Buscar KnowledgeBites" className="w-full pl-10 pr-4 py-2 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all" />
               </div>
               
               {isAuthenticated ?
@@ -200,31 +169,31 @@ const Navbar = () => {
           <div className="space-y-2 mt-2">
                   <Link to="/dashboard" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
                     <User className="h-4 w-4" />
-                    <span>Dashboard</span>
+                    <span>Panel de control</span>
                   </Link>
                   {isAdmin && <Link to="/admin" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
                       <Settings className="h-4 w-4" />
-                      <span>Admin Panel</span>
+                      <span>Panel de administrador</span>
                     </Link>}
                   <Link to="/settings" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
                     <Settings className="h-4 w-4" />
-                    <span>Settings</span>
+                    <span>Configuración</span>
                   </Link>
                   <button onClick={logout} className="flex items-center space-x-2 p-2 w-full text-left hover:bg-secondary/50 rounded-md">
                     <LogOut className="h-4 w-4" />
-                    <span>Log out</span>
+                    <span>Cerrar sesión</span>
                   </button>
                 </div> :
           // Mobile login/signup
           <div className="flex space-x-2 mt-2">
                   <Link to="/login" className="flex-1">
                     <Button variant="outline" size="sm" className="w-full">
-                      Log in
+                      Iniciar sesión
                     </Button>
                   </Link>
                   <Link to="/signup" className="flex-1">
                     <Button variant="default" size="sm" className="w-full">
-                      Sign up
+                      Registrarse
                     </Button>
                   </Link>
                 </div>}
@@ -233,4 +202,5 @@ const Navbar = () => {
         </div>}
     </header>;
 };
+
 export default Navbar;
