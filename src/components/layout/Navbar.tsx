@@ -1,232 +1,279 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Search, Menu, X, ChevronDown, Bell, LogOut, User, Settings, CreditCard } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Moon, Sun } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from '@/contexts/AuthContext';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const Navbar = () => {
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
-  const { toast } = useToast();
-  const { theme, setTheme } = useTheme();
+  const location = useLocation();
+  const isDashboardArea = location.pathname.match(/^\/(dashboard|courses|profile|admin)/);
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
 
-  // Helper function to get avatar URL or fallback
-  const getAvatarUrl = () => {
-    return user?.user_metadata?.avatar_url || '';
-  };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  // Helper function to get user name or fallback
-  const getUserName = () => {
-    return user?.user_metadata?.full_name || user?.name || 'User';
-  };
-
-  // Helper function to get user initials
-  const getUserInitials = () => {
-    const name = getUserName();
-    return name.charAt(0).toUpperCase();
-  };
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   return (
-    <header className="w-full fixed top-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 flex justify-between items-center h-16">
-        {/* Logo */}
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-4'
+      }`}
+    >
+      <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <span className="font-bold text-xl">AI Camp</span>
+          <img 
+            src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" 
+            alt="AI Makers" 
+            className="h-10"
+          />
         </Link>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          <Link 
-            to="/courses" 
-            className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent"
-          >
-            Courses
+          <Link to="/courses" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Course catalog
           </Link>
-          <Link 
-            to="/tools" 
-            className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent"
-          >
-            Tools
+          <Link to="/workshops" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Workshops
           </Link>
-          {user ? (
-            <>
-              <Link
-                to="/dashboard"
-                className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent"
-              >
-                Dashboard
-              </Link>
+          <Link to="/blog" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Blog
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground">
+                Community
+                <ChevronDown className="ml-1 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 glass-morphism">
+              <DropdownMenuItem asChild>
+                <Link to="/community/forums" className="cursor-pointer">Forums</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/community/events" className="cursor-pointer">Events</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/community/discord" className="cursor-pointer">Discord</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </nav>
+
+        <div className="hidden md:flex items-center space-x-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search KnowledgeBites"
+              className="pl-10 pr-4 py-2 w-64 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all"
+            />
+          </div>
+          
+          {isAuthenticated ? (
+            // User is logged in
+            <div className="flex items-center ml-4 space-x-2">
+              {/* Theme Toggle - Only show in dashboard area */}
+              {isDashboardArea && <ThemeToggle />}
+              
+              {/* Notifications */}
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+              </Button>
+              
+              {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
+                  <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={getAvatarUrl()} alt={getUserName()} />
-                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
+                      <AvatarImage src="" alt={user?.name} />
+                      <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuItem className="px-4 py-2 text-sm" asChild>
-                    <Link to="/profile">Profile</Link>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.name}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/subscription" className="cursor-pointer">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Subscription
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut}>Logout</DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            </>
+            </div>
           ) : (
-            <>
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm font-medium rounded-md hover:bg-accent"
-              >
-                Log In
+            // User is not logged in
+            <div className="flex items-center space-x-2 ml-4">
+              <Link to="/login">
+                <Button variant="ghost" size="sm" className="text-sm">
+                  Log in
+                </Button>
               </Link>
-              <Link
-                to="/signup"
-                className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-              >
-                Sign Up
+              <Link to="/signup">
+                <Button variant="default" size="sm" className="text-sm">
+                  Sign up
+                </Button>
               </Link>
-            </>
+            </div>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
-        </nav>
+        </div>
 
-        {/* Mobile Navigation Button */}
-        <button
-          className="md:hidden"
+        <button 
+          className="md:hidden flex items-center justify-center" 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          </svg>
+          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
+      </div>
 
-        {/* Mobile Navigation Menu */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-background border-b border-border md:hidden">
-            <div className="container mx-auto px-4 py-2 flex flex-col">
-              <Link
-                to="/courses"
-                className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Courses
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-background/95 backdrop-blur-md shadow-lg animate-slide-down">
+          <div className="container mx-auto px-4 py-2">
+            <div className="flex flex-col space-y-2 pb-2">
+              <Link to="/courses" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
+                Course catalog
               </Link>
-              <Link
-                to="/tools"
-                className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Tools
+              <Link to="/workshops" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
+                Workshops
               </Link>
-              {user ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Dashboard
+              <Link to="/blog" className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md">
+                Blog
+              </Link>
+              <details className="group">
+                <summary className="px-3 py-2 text-sm font-medium hover:bg-secondary/50 rounded-md list-none flex justify-between items-center cursor-pointer">
+                  Community
+                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="ml-4 mt-1 flex flex-col space-y-1">
+                  <Link to="/community/forums" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
+                    Forums
                   </Link>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={getAvatarUrl()} alt={getUserName()} />
-                      <AvatarFallback>{getUserInitials()}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                  <Link
-                    to="/profile"
-                    className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Profile
+                  <Link to="/community/events" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
+                    Events
                   </Link>
-                  <Button
-                    onClick={handleSignOut}
-                    className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                  >
-                    Logout
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 text-sm font-medium hover:bg-accent rounded-md"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Log In
+                  <Link to="/community/discord" className="px-3 py-2 text-sm hover:bg-secondary/50 rounded-md">
+                    Discord
                   </Link>
-                  <Link
-                    to="/signup"
-                    className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
-                </>
+                </div>
+              </details>
+            </div>
+            <div className="pt-2 border-t border-border">
+              {/* Add theme toggle to mobile menu if in dashboard area */}
+              {isDashboardArea && (
+                <div className="flex items-center justify-between py-2 px-3">
+                  <span className="text-sm">Theme</span>
+                  <ThemeToggle />
+                </div>
               )}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
+              
+              <div className="relative my-2">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search KnowledgeBites"
+                  className="w-full pl-10 pr-4 py-2 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary focus:ring-1 focus:ring-primary/50 rounded-full text-sm text-foreground placeholder:text-muted-foreground transition-all"
+                />
+              </div>
+              
+              {isAuthenticated ? (
+                // Mobile logged in user options
+                <div className="space-y-2 mt-2">
+                  <Link to="/dashboard" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                    <User className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  {isAdmin && (
+                    <Link to="/admin" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                      <Settings className="h-4 w-4" />
+                      <span>Admin Panel</span>
+                    </Link>
+                  )}
+                  <Link to="/settings" className="flex items-center space-x-2 p-2 hover:bg-secondary/50 rounded-md">
+                    <Settings className="h-4 w-4" />
+                    <span>Settings</span>
+                  </Link>
+                  <button 
+                    onClick={logout}
+                    className="flex items-center space-x-2 p-2 w-full text-left hover:bg-secondary/50 rounded-md"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
+                </div>
+              ) : (
+                // Mobile login/signup
+                <div className="flex space-x-2 mt-2">
+                  <Link to="/login" className="flex-1">
+                    <Button variant="outline" size="sm" className="w-full">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link to="/signup" className="flex-1">
+                    <Button variant="default" size="sm" className="w-full">
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </header>
   );
 };

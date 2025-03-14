@@ -9,7 +9,6 @@ import { DbCourse } from '@/types/admin';
 import { useToast } from "@/hooks/use-toast";
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseSharePanel from '@/components/course/CourseSharePanel';
-import CourseTools from '@/components/course/CourseTools';
 import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
 
@@ -109,9 +108,6 @@ const CourseDetails = () => {
           <div className="max-w-4xl mx-auto">
             {/* Course Header with title, breadcrumbs, and description */}
             <CourseHeader course={course} />
-            
-            {/* Related Tools */}
-            <CourseTools courseId={course.id} />
           </div>
 
           {/* Right side panel for sharing */}

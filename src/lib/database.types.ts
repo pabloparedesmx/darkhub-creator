@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -187,58 +188,6 @@ export interface Database {
           completed_at?: string | null
           created_at?: string
           updated_at?: string
-        }
-      }
-      tools: {
-        Row: {
-          id: string
-          name: string
-          url: string
-          description: string
-          favicon: string | null
-          has_pro_perk: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          url: string
-          description: string
-          favicon?: string | null
-          has_pro_perk?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          url?: string
-          description?: string
-          favicon?: string | null
-          has_pro_perk?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      course_tools: {
-        Row: {
-          id: string
-          course_id: string
-          tool_id: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          course_id: string
-          tool_id: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          course_id?: string
-          tool_id?: string
-          created_at?: string
         }
       }
     }
