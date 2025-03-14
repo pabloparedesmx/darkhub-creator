@@ -101,12 +101,15 @@ const CourseForm = ({
             if (courseToolsError) throw courseToolsError;
             
             if (courseToolsData && courseToolsData.length > 0) {
-              // Properly map the nested tools data
+              // Extract tools from the response data - correctly typed now
               const toolsList = courseToolsData.map(item => {
-                // Access the tools property which contains the actual tool data
-                const toolData = item.tools as Tool;
-                return toolData;
-              });
+                // Access the nested tool object
+                if (item.tools && typeof item.tools === 'object' && !Array.isArray(item.tools)) {
+                  return item.tools as Tool;
+                }
+                console.error('Unexpected tool data format:', item.tools);
+                return null;
+              }).filter((tool): tool is Tool => tool !== null); // Filter out any null values
               
               setSelectedTools(toolsList);
             }

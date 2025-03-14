@@ -28,12 +28,15 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
         if (error) throw error;
         
         if (data) {
-          // Map the nested tools data properly
+          // Extract tools from the response data - correctly typed now
           const toolsList = data.map(item => {
-            // Access the tools property which contains the actual tool data
-            const toolData = item.tools as Tool;
-            return toolData;
-          });
+            // Access the nested tool object
+            if (item.tools && typeof item.tools === 'object' && !Array.isArray(item.tools)) {
+              return item.tools as Tool;
+            }
+            console.error('Unexpected tool data format:', item.tools);
+            return null;
+          }).filter((tool): tool is Tool => tool !== null); // Filter out any null values
           
           setTools(toolsList);
         }
