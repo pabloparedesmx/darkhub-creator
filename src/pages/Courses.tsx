@@ -17,6 +17,8 @@ const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const [tools, setTools] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<Record<string, string>>({});
 
   // Fetch all courses from Supabase
   useEffect(() => {
@@ -108,6 +110,47 @@ const Courses = () => {
     fetchCourses();
   }, [toast]);
 
+  // Fetch tools and categories for filter tag display
+  useEffect(() => {
+    const fetchToolsAndCategories = async () => {
+      try {
+        // Fetch all tools
+        const { data: toolsData, error: toolsError } = await supabase
+          .from('tools')
+          .select('id, name');
+        
+        if (toolsError) throw toolsError;
+        
+        // Create a map of tool IDs to names
+        const toolsMap: Record<string, string> = {};
+        toolsData.forEach(tool => {
+          toolsMap[tool.id] = tool.name;
+        });
+        
+        setTools(toolsMap);
+        
+        // Fetch all categories
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('categories')
+          .select('id, name');
+        
+        if (categoriesError) throw categoriesError;
+        
+        // Create a map of category IDs to names
+        const categoriesMap: Record<string, string> = {};
+        categoriesData.forEach(category => {
+          categoriesMap[category.id] = category.name;
+        });
+        
+        setCategories(categoriesMap);
+      } catch (error) {
+        console.error('Error fetching tools and categories:', error);
+      }
+    };
+    
+    fetchToolsAndCategories();
+  }, []);
+
   const {
     searchTerm,
     setSearchTerm,
@@ -157,8 +200,8 @@ const Courses = () => {
     
     // Add tool filters
     selectedTools.forEach(toolId => {
-      // Find the tool name from toolId
-      const toolName = "Tool"; // This would be replaced with actual tool name lookup
+      // Get the tool name from our tools map
+      const toolName = tools[toolId] || `Tool ${toolId.substring(0, 4)}`;
       filters.push({
         id: `tool-${toolId}`,
         label: toolName,
@@ -170,8 +213,8 @@ const Courses = () => {
     
     // Add category filters  
     selectedCategories.forEach(categoryId => {
-      // Find the category name from categoryId
-      const categoryName = "Category"; // This would be replaced with actual category name lookup
+      // Get the category name from our categories map
+      const categoryName = categories[categoryId] || `Category ${categoryId.substring(0, 4)}`;
       filters.push({
         id: `category-${categoryId}`,
         label: categoryName,
