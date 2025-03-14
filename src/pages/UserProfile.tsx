@@ -14,24 +14,24 @@ const UserProfile = () => {
       <main className="flex-grow container mx-auto px-4 py-8">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
-            <CardTitle>Profile Settings</CardTitle>
+            <CardTitle>Configuración de Perfil</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Name</label>
+              <label className="text-sm font-medium">Nombre</label>
               <p className="text-lg">{user?.name}</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Email</label>
+              <label className="text-sm font-medium">Correo Electrónico</label>
               <p className="text-lg">{user?.email}</p>
             </div>
             <div>
-              <label className="text-sm font-medium">Subscription</label>
-              <p className="text-lg capitalize">{user?.subscription || 'Free'}</p>
+              <label className="text-sm font-medium">Suscripción</label>
+              <p className="text-lg capitalize">{user?.subscription || 'Gratis'}</p>
             </div>
             {user?.subscription === 'free' && (
               <Button variant="default" className="w-full">
-                Upgrade to Pro
+                Actualizar a Pro
               </Button>
             )}
           </CardContent>

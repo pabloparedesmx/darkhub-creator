@@ -37,14 +37,14 @@ const CourseFilters = ({
     <div className="w-full lg:w-64 space-y-6">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium">Filters</h3>
+          <h3 className="text-lg font-medium">Filtros</h3>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={clearAllFilters}
             className="h-8 px-2 text-xs"
           >
-            Clear all
+            Limpiar todo
           </Button>
         </div>
 
@@ -66,7 +66,7 @@ const CourseFilters = ({
             className="flex justify-between items-center w-full text-left mb-2"
             onClick={() => setIsDifficultyOpen(!isDifficultyOpen)}
           >
-            <span className="text-sm font-medium">Difficulty</span>
+            <span className="text-sm font-medium">Dificultad</span>
             <ChevronDown 
               className={`h-4 w-4 transition-transform ${isDifficultyOpen ? 'rotate-180' : ''}`} 
             />
@@ -86,7 +86,7 @@ const CourseFilters = ({
                   }}
                 />
                 <label htmlFor="beginner" className="text-sm cursor-pointer">
-                  Beginner
+                  Principiante
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -101,7 +101,7 @@ const CourseFilters = ({
                   }}
                 />
                 <label htmlFor="intermediate" className="text-sm cursor-pointer">
-                  Intermediate
+                  Intermedio
                 </label>
               </div>
               <div className="flex items-center space-x-2">
@@ -116,7 +116,7 @@ const CourseFilters = ({
                   }}
                 />
                 <label htmlFor="advanced" className="text-sm cursor-pointer">
-                  Advanced
+                  Avanzado
                 </label>
               </div>
             </div>

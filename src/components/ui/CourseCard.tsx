@@ -42,7 +42,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     if (isUrl) {
       return (
         <div className="flex-shrink-0 w-6 h-6 rounded-md overflow-hidden mr-1">
-          <img src={icon} alt="Tool" className="h-full w-full object-contain" />
+          <img src={icon} alt="Herramienta" className="h-full w-full object-contain" />
         </div>
       );
     }
@@ -67,7 +67,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                   key={index} 
                   className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                 >
-                  {badge === 'pro' ? 'Pro' : 'Free'}
+                  {badge === 'pro' ? 'Pro' : 'Gratis'}
                 </span>
               ))}
             </div>

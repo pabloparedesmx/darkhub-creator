@@ -13,7 +13,7 @@ const CourseSearch = ({ searchTerm, setSearchTerm }: CourseSearchProps) => {
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         type="text"
-        placeholder="Search tutorials and courses"
+        placeholder="Buscar tutoriales y cursos"
         className="pl-10 pr-8 py-2 w-full sm:w-80 bg-secondary/50 hover:bg-secondary/80 focus:bg-secondary"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -22,7 +22,7 @@ const CourseSearch = ({ searchTerm, setSearchTerm }: CourseSearchProps) => {
         <button 
           className="absolute right-3 top-1/2 transform -translate-y-1/2"
           onClick={() => setSearchTerm('')}
-          aria-label="Clear search"
+          aria-label="Limpiar búsqueda"
         >
           <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
         </button>

@@ -46,8 +46,8 @@ const CourseDetails = () => {
         if (!data) {
           navigate('/courses');
           toast({
-            title: "Course not found",
-            description: "The course you're looking for doesn't exist",
+            title: "Curso no encontrado",
+            description: "El curso que estás buscando no existe",
             variant: "destructive",
           });
           return;
@@ -74,7 +74,7 @@ const CourseDetails = () => {
         console.error('Error fetching course:', error);
         toast({
           title: "Error",
-          description: "Could not load course details",
+          description: "No se pudieron cargar los detalles del curso",
           variant: "destructive",
         });
       } finally {
@@ -92,7 +92,7 @@ const CourseDetails = () => {
   }
 
   if (!course) {
-    return <ErrorState title="Course Not Found" message="The course you're looking for doesn't exist or has been removed." />;
+    return <ErrorState title="Curso No Encontrado" message="El curso que estás buscando no existe o ha sido eliminado." />;
   }
 
   return (

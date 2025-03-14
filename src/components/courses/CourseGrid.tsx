@@ -14,7 +14,7 @@ const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }:
   return (
     <>
       <div className="text-sm text-muted-foreground mb-6">
-        Showing {courses.length} of {coursesData.length}
+        Mostrando {courses.length} de {coursesData.length}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -35,13 +35,13 @@ const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }:
 
       {courses.length === 0 && (
         <div className="text-center py-10">
-          <p className="text-muted-foreground">No courses match your filters. Try adjusting your search criteria.</p>
+          <p className="text-muted-foreground">No hay cursos que coincidan con tus filtros. Intenta ajustar tus criterios de búsqueda.</p>
           <Button 
             variant="outline" 
             onClick={clearAllFilters}
             className="mt-4"
           >
-            Clear all filters
+            Limpiar todos los filtros
           </Button>
         </div>
       )}
