@@ -10,14 +10,17 @@ import Education from '@/components/home/Education';
 import FAQ from '@/components/home/FAQ';
 import Pricing from '@/components/home/Pricing';
 import { motion } from 'framer-motion';
+import { useTheme } from '@/hooks/use-theme';
 
 const Index = () => {
+  const { setTheme } = useTheme();
+  
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Force dark theme for the futuristic AI look
-    document.documentElement.classList.add('dark');
-  }, []);
+    // Force dark theme for the futuristic AI look on landing page
+    setTheme('dark');
+  }, [setTheme]);
 
   return (
     <motion.div

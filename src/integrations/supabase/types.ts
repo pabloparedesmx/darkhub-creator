@@ -299,6 +299,48 @@ export type Database = {
         }
         Relationships: []
       }
+      workshops: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          expert_name: string
+          expert_profile_image: string | null
+          id: string
+          is_recorded: boolean | null
+          registration_url: string
+          timezone: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          expert_name: string
+          expert_profile_image?: string | null
+          id?: string
+          is_recorded?: boolean | null
+          registration_url: string
+          timezone?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          expert_name?: string
+          expert_profile_image?: string | null
+          id?: string
+          is_recorded?: boolean | null
+          registration_url?: string
+          timezone?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

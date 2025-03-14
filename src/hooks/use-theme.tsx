@@ -34,33 +34,20 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     
-    // First remove both classes
+    // Remove both classes first
     root.classList.remove('light', 'dark');
     
-    // Then add the current theme class
+    // Add the current theme class
     root.classList.add(theme);
     
-    // Add a special class for dashboard pages
-    if (window.location.pathname.match(/^\/(dashboard|courses|profile|admin)/)) {
-      root.classList.add('dashboard-area');
-    } else {
-      // Force dark mode for non-dashboard pages
-      if (theme === 'light') {
-        root.classList.remove('light');
-        root.classList.add('dark');
-      }
-    }
-    
+    // Store the current theme
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      // Only allow theme switching on dashboard pages
-      if (window.location.pathname.match(/^\/(dashboard|courses|profile|admin)/)) {
-        setTheme(theme);
-      }
+      setTheme(theme);
     },
   };
 
