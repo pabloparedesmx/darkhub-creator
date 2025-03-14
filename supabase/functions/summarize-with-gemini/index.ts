@@ -40,6 +40,8 @@ serve(async (req) => {
     5. Evita repeticiones y contenido irrelevante.
     `;
 
+    console.log("Calling Gemini API with prompt:", prompt.substring(0, 100) + "...");
+
     // Call Gemini API
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
       method: "POST",
@@ -64,7 +66,23 @@ serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
+    // First check if the response is ok
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API HTTP error:", response.status, errorText);
+      throw new Error(`HTTP error from Gemini API: ${response.status} ${errorText}`);
+    }
+
+    // Try to parse the JSON response
+    let data;
+    try {
+      data = await response.json();
+      console.log("Gemini API response received:", JSON.stringify(data).substring(0, 200) + "...");
+    } catch (parseError) {
+      const responseText = await response.text();
+      console.error("Failed to parse Gemini API response:", responseText);
+      throw new Error(`Failed to parse Gemini API response: ${parseError.message}`);
+    }
     
     // Check for errors in Gemini response
     if (data.error) {
@@ -72,9 +90,21 @@ serve(async (req) => {
       throw new Error(`Error from Gemini API: ${data.error.message}`);
     }
     
+    // Validate the response structure
+    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
+      console.error("Unexpected Gemini API response structure:", data);
+      throw new Error("Unexpected response structure from Gemini API");
+    }
+    
     // Extract the summary text
     const summary = data.candidates[0].content.parts[0].text;
+    
+    if (!summary) {
+      console.error("No summary text in Gemini API response:", data);
+      throw new Error("No summary text in Gemini API response");
+    }
 
+    console.log("Successfully generated summary, returning response");
     return new Response(JSON.stringify({ summary }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

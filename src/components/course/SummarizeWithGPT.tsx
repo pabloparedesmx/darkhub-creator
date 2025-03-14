@@ -25,6 +25,8 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     setError(null);
     
     try {
+      console.log("Requesting summary for course:", courseTitle);
+      
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/summarize-with-gemini`, {
         method: 'POST',
         headers: {
@@ -37,12 +39,46 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
       });
       
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Error al generar el resumen');
+        let errorMessage = 'Error al generar el resumen';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          // If parsing fails, try to get the text
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+          console.error("Failed to parse error response:", errorText);
+        }
+        throw new Error(errorMessage);
       }
       
-      const data = await response.json();
+      // Try to parse the response JSON
+      let data;
+      try {
+        const responseText = await response.text();
+        console.log("Received response:", responseText);
+        
+        if (!responseText || responseText.trim() === '') {
+          throw new Error('Empty response from server');
+        }
+        
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        throw new Error(`Error al procesar la respuesta: ${parseError.message}`);
+      }
+      
+      if (!data.summary) {
+        console.error("No summary in response:", data);
+        throw new Error('No se recibió ningún resumen del servidor');
+      }
+      
       setSummary(data.summary);
+      toast({
+        title: "Resumen generado",
+        description: "Se ha generado un resumen del curso correctamente",
+        duration: 3000
+      });
     } catch (err) {
       console.error('Error generating summary:', err);
       setError(err instanceof Error ? err.message : 'Error al generar el resumen');
