@@ -101,8 +101,13 @@ const CourseForm = ({
             if (courseToolsError) throw courseToolsError;
             
             if (courseToolsData && courseToolsData.length > 0) {
-              // Properly type and map the tools data
-              const toolsList = courseToolsData.map(item => item.tools as Tool);
+              // Properly map the nested tools data
+              const toolsList = courseToolsData.map(item => {
+                // Access the tools property which contains the actual tool data
+                const toolData = item.tools as Tool;
+                return toolData;
+              });
+              
               setSelectedTools(toolsList);
             }
           }

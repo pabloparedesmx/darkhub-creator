@@ -28,8 +28,13 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
         if (error) throw error;
         
         if (data) {
-          // Properly type and map the tools data
-          const toolsList = data.map(item => item.tools as Tool);
+          // Map the nested tools data properly
+          const toolsList = data.map(item => {
+            // Access the tools property which contains the actual tool data
+            const toolData = item.tools as Tool;
+            return toolData;
+          });
+          
           setTools(toolsList);
         }
       } catch (error) {
