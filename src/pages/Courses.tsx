@@ -238,7 +238,7 @@ const Courses = () => {
     duration: 0.5
   }} className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-24 pb-20 px-4">
+      <main className="flex-grow pt-24 pb-20 px-4 py-[100px] my-[30px]">
         <div className="container mx-auto">
           <motion.div initial={{
           opacity: 0,
