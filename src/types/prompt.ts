@@ -1,5 +1,6 @@
 
-import { Database } from '@/lib/database.types';
+// Import the Database type from the correct location
+import { Database } from '@/integrations/supabase/types';
 
 // Type for prompt from database
 export type Prompt = Database['public']['Tables']['prompts']['Row'];
