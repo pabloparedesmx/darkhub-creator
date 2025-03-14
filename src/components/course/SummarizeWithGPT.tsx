@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Copy, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface SummarizeWithGPTProps {
   courseTitle: string;
@@ -27,11 +28,8 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     try {
       console.log("Requesting summary for course:", courseTitle);
       
-      // Make sure to use the complete URL from the import.meta.env
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      if (!supabaseUrl) {
-        throw new Error('VITE_SUPABASE_URL environment variable is not defined');
-      }
+      // Use the Supabase URL from the supabase client instead of environment variable
+      const supabaseUrl = 'https://knrpakvzbpvpfuzlyoxj.supabase.co';
       
       const response = await fetch(`${supabaseUrl}/functions/v1/summarize-with-gemini`, {
         method: 'POST',
