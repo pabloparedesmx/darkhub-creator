@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +19,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from "@/components/ui/checkbox";
 
 const CourseEditor = () => {
   const { toast } = useToast();
@@ -29,6 +31,8 @@ const CourseEditor = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [tools, setTools] = useState<any[]>([]);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   
   const [course, setCourse] = useState({
     title: '',
@@ -46,6 +50,7 @@ const CourseEditor = () => {
       setIsLoading(true);
       
       try {
+        // Fetch categories
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('categories')
           .select('*')
@@ -54,7 +59,17 @@ const CourseEditor = () => {
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData);
         
+        // Fetch tools
+        const { data: toolsData, error: toolsError } = await supabase
+          .from('tools')
+          .select('*')
+          .order('name');
+        
+        if (toolsError) throw toolsError;
+        setTools(toolsData);
+        
         if (!isNewCourse && courseId) {
+          // Fetch course data
           const { data: courseData, error: courseError } = await supabase
             .from('courses')
             .select('*')
@@ -73,6 +88,16 @@ const CourseEditor = () => {
             isFree: courseData.is_free || true,
             difficulty: courseData.difficulty || 'beginner'
           });
+          
+          // Fetch associated tools
+          const { data: courseToolsData, error: courseToolsError } = await supabase
+            .from('course_tools')
+            .select('tool_id')
+            .eq('course_id', courseId);
+          
+          if (courseToolsError) throw courseToolsError;
+          
+          setSelectedTools(courseToolsData.map(tool => tool.tool_id));
         }
       } catch (error: any) {
         console.error('Error fetching data:', error);
@@ -104,8 +129,11 @@ const CourseEditor = () => {
     setIsSaving(true);
     
     try {
+      let courseIdToUse = courseId;
+      
       if (isNewCourse) {
-        const { error } = await supabase
+        // Create new course
+        const { data, error } = await supabase
           .from('courses')
           .insert([{
             title,
@@ -117,15 +145,18 @@ const CourseEditor = () => {
             is_free: isFree,
             difficulty: difficulty,
             author_id: user?.id
-          }]);
+          }])
+          .select();
         
         if (error) throw error;
+        courseIdToUse = data[0].id;
         
         toast({
           title: "Success",
           description: "Course added successfully",
         });
       } else {
+        // Update existing course
         const { error } = await supabase
           .from('courses')
           .update({
@@ -148,6 +179,31 @@ const CourseEditor = () => {
         });
       }
       
+      // Save tool associations
+      if (courseIdToUse) {
+        // First delete existing associations
+        const { error: deleteError } = await supabase
+          .from('course_tools')
+          .delete()
+          .eq('course_id', courseIdToUse);
+        
+        if (deleteError) throw deleteError;
+        
+        // Then insert new associations
+        if (selectedTools.length > 0) {
+          const toolAssociations = selectedTools.map(toolId => ({
+            course_id: courseIdToUse,
+            tool_id: toolId
+          }));
+          
+          const { error: insertError } = await supabase
+            .from('course_tools')
+            .insert(toolAssociations);
+          
+          if (insertError) throw insertError;
+        }
+      }
+      
       navigate('/admin');
     } catch (error: any) {
       console.error('Error saving course:', error);
@@ -163,6 +219,16 @@ const CourseEditor = () => {
 
   const handleInputChange = (field: string, value: any) => {
     setCourse(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleToggleTool = (toolId: string) => {
+    setSelectedTools(prev => {
+      if (prev.includes(toolId)) {
+        return prev.filter(id => id !== toolId);
+      } else {
+        return [...prev, toolId];
+      }
+    });
   };
 
   const generateSlugFromTitle = () => {
@@ -333,6 +399,35 @@ const CourseEditor = () => {
                       <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Tools & Technologies</label>
+                  <div className="max-h-40 overflow-y-auto border rounded-md p-2">
+                    {tools.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-2">No tools available</p>
+                    ) : (
+                      tools.map((tool) => (
+                        <div key={tool.id} className="flex items-center space-x-2 py-1.5">
+                          <Checkbox 
+                            id={`tool-${tool.id}`}
+                            checked={selectedTools.includes(tool.id)}
+                            onCheckedChange={() => handleToggleTool(tool.id)}
+                          />
+                          <label 
+                            htmlFor={`tool-${tool.id}`} 
+                            className="text-sm cursor-pointer flex items-center"
+                          >
+                            {tool.favicon && <span className="mr-2">{tool.favicon}</span>}
+                            {tool.name}
+                          </label>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Select the tools and technologies used in this course
+                  </p>
                 </div>
                 
                 <div className="space-y-2">
