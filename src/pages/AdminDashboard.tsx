@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -221,6 +220,45 @@ const AdminDashboard = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to delete category",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Add new function to update category name
+  const handleUpdateCategory = async (id: string, name: string) => {
+    if (!name.trim()) {
+      toast({
+        title: "Error",
+        description: "Category name cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .update({ name })
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setCategories(categories.map(category => 
+        category.id === id ? data : category
+      ));
+      
+      toast({
+        title: "Success",
+        description: "Category updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating category:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update category",
         variant: "destructive",
       });
     }
@@ -542,6 +580,7 @@ const AdminDashboard = () => {
               setNewCategory={setNewCategory}
               handleAddCategory={handleAddCategory}
               handleDeleteCategory={handleDeleteCategory}
+              handleUpdateCategory={handleUpdateCategory}
               isLoading={isLoading}
             />
             

@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Book, Users, DollarSign, ShoppingCart, PlusCircle, Trash } from 'lucide-react';
+import { LayoutDashboard, Book, Users, DollarSign, ShoppingCart, PlusCircle, Trash, Pencil, Check, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Category } from '@/types/admin';
@@ -13,6 +13,7 @@ interface AdminSidebarProps {
   setNewCategory: (value: string) => void;
   handleAddCategory: () => void;
   handleDeleteCategory: (id: string) => void;
+  handleUpdateCategory?: (id: string, name: string) => void;
   isLoading: boolean;
 }
 
@@ -22,8 +23,29 @@ const AdminSidebar = ({
   setNewCategory,
   handleAddCategory,
   handleDeleteCategory,
+  handleUpdateCategory,
   isLoading
 }: AdminSidebarProps) => {
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState<string>('');
+
+  const startEditing = (id: string, name: string) => {
+    setEditingCategoryId(id);
+    setEditingCategoryName(name);
+  };
+
+  const cancelEditing = () => {
+    setEditingCategoryId(null);
+    setEditingCategoryName('');
+  };
+
+  const saveEditing = (id: string) => {
+    if (handleUpdateCategory && editingCategoryName.trim()) {
+      handleUpdateCategory(id, editingCategoryName);
+    }
+    setEditingCategoryId(null);
+  };
+
   return (
     <div className="md:col-span-3">
       <Card className="bg-secondary/30 backdrop-blur-sm mb-6">
@@ -104,17 +126,59 @@ const AdminSidebar = ({
             <div className="space-y-2 mt-2">
               {categories.map(category => (
                 <div key={category.id} className="flex justify-between items-center p-2 rounded-md hover:bg-secondary/50">
-                  <div>
-                    <span className="text-sm font-medium">{category.name}</span>
-                    <span className="ml-2 text-xs text-muted-foreground">({category.count})</span>
-                  </div>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={() => handleDeleteCategory(category.id)}
-                  >
-                    <Trash className="h-4 w-4 text-destructive" />
-                  </Button>
+                  {editingCategoryId === category.id ? (
+                    <div className="flex items-center space-x-2 w-full">
+                      <Input 
+                        value={editingCategoryName}
+                        onChange={(e) => setEditingCategoryName(e.target.value)}
+                        className="text-sm h-8"
+                        autoFocus
+                      />
+                      <div className="flex space-x-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => saveEditing(category.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Check className="h-4 w-4 text-green-500" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={cancelEditing}
+                          className="h-8 w-8 p-0"
+                        >
+                          <X className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <span className="text-sm font-medium">{category.name}</span>
+                        <span className="ml-2 text-xs text-muted-foreground">({category.count})</span>
+                      </div>
+                      <div className="flex space-x-1">
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => startEditing(category.id, category.name)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Trash className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
