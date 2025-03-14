@@ -16,9 +16,8 @@ interface CourseManagementProps {
     slug: string;
     icon: string;
     category_id: string;
-    isPro: boolean;
-    isFree: boolean;
     isTutorial: boolean;
+    difficulty?: 'beginner' | 'intermediate' | 'advanced';
   };
   setNewCourse: (course: any) => void;
   isEditing: boolean;
