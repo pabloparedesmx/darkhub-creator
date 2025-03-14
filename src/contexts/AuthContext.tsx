@@ -12,6 +12,11 @@ export interface User {
   name: string;
   role: 'user' | 'admin';
   subscription?: 'free' | 'pro';
+  user_metadata?: {
+    avatar_url?: string;
+    full_name?: string;
+    name?: string;
+  };
 }
 
 // Define context type
@@ -22,8 +27,10 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  signOut: () => Promise<void>; // Alias for logout
   isAuthenticated: boolean;
   isAdmin: boolean;
+  checkAuth: () => Promise<void>;
 }
 
 // Create the context
@@ -59,7 +66,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: data.email,
           name: data.name,
           role: data.role as 'user' | 'admin', // Add type assertion here
-          subscription: data.subscription as 'free' | 'pro' | undefined
+          subscription: data.subscription as 'free' | 'pro' | undefined,
+          user_metadata: {
+            avatar_url: data.avatar_url as string,
+            full_name: data.full_name as string,
+            name: data.name as string,
+          }
         } as User;
       }
       
@@ -119,6 +131,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Error getting auth user email:', error);
     }
     return userObj;
+  };
+
+  // Check authentication status - new function
+  const checkAuth = async (): Promise<void> => {
+    setIsLoading(true);
+    console.log('Checking auth status...');
+    
+    try {
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        console.log('Session found, user is logged in:', session.user.id);
+        const profile = await getProfile(session.user.id);
+        
+        // Add user_metadata from auth user if available
+        if (profile) {
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          if (authUser) {
+            profile.user_metadata = {
+              avatar_url: authUser.user_metadata?.avatar_url as string,
+              full_name: authUser.user_metadata?.full_name as string,
+              name: authUser.user_metadata?.name as string,
+            };
+          }
+          
+          setUser(profile);
+        } else {
+          setUser(null);
+        }
+      } else {
+        console.log('No session found, user is not logged in');
+        setUser(null);
+      }
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Initialize authentication state
@@ -419,6 +471,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signOut = async () => {
+    return logout();
+  };
+
   const value = {
     user,
     isLoading,
@@ -426,8 +482,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signInWithGoogle,
     signup,
     logout,
+    signOut,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin'
+    isAdmin: user?.role === 'admin',
+    checkAuth
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

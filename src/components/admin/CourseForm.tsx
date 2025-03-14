@@ -101,7 +101,8 @@ const CourseForm = ({
             if (courseToolsError) throw courseToolsError;
             
             if (courseToolsData && courseToolsData.length > 0) {
-              const toolsList = courseToolsData.map(item => item.tools) as Tool[];
+              // Properly type and map the tools data
+              const toolsList = courseToolsData.map(item => item.tools as Tool);
               setSelectedTools(toolsList);
             }
           }

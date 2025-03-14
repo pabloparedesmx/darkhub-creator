@@ -28,7 +28,8 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
         if (error) throw error;
         
         if (data) {
-          const toolsList = data.map(item => item.tools) as Tool[];
+          // Properly type and map the tools data
+          const toolsList = data.map(item => item.tools as Tool);
           setTools(toolsList);
         }
       } catch (error) {
