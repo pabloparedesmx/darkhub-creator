@@ -65,7 +65,7 @@ const CategoryFilters = ({
   }
   return <div className="border-t border-border pt-4">
       <button className="flex justify-between items-center w-full text-left mb-2" onClick={() => setIsOpen(!isOpen)}>
-        <span className="text-sm font-medium">Categorias</span>
+        <span className="text-sm font-medium">Categorías</span>
         <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       
