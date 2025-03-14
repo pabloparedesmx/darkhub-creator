@@ -26,7 +26,7 @@ const Signup = () => {
     if (!fullName || !email || !password) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Por favor complete todos los campos",
         variant: "destructive",
       });
       return;
@@ -35,7 +35,7 @@ const Signup = () => {
     if (!agreeTerms) {
       toast({
         title: "Error",
-        description: "Please agree to the terms and conditions",
+        description: "Por favor acepte los términos y condiciones",
         variant: "destructive",
       });
       return;
@@ -58,14 +58,14 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background ai-neural-bg">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
+      <div className="absolute inset-0 bg-gray-900/90 backdrop-blur-sm"></div>
       <main className="flex-grow flex items-center justify-center p-4 relative z-10">
         <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="ai-card p-8"
+            className="ai-card p-8 border-blue-400/20"
           >
             <div className="flex justify-center mb-8">
               <Link to="/" className="flex items-center">
@@ -77,38 +77,38 @@ const Signup = () => {
               </Link>
             </div>
             
-            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Create an account</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Crear una cuenta</h1>
             
             <form onSubmit={handleSignup}>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-blue-100">Full Name</Label>
+                  <Label htmlFor="fullName" className="text-blue-100">Nombre completo</Label>
                   <Input
                     id="fullName"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Juan Pérez"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
+                    className="bg-blue-950/50 border-blue-500/30 text-blue-100 placeholder:text-blue-400/70"
                     disabled={isLoading}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-blue-100">Email</Label>
+                  <Label htmlFor="email" className="text-blue-100">Correo electrónico</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder="nombre@ejemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
+                    className="bg-blue-950/50 border-blue-500/30 text-blue-100 placeholder:text-blue-400/70"
                     disabled={isLoading}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-blue-100">Password</Label>
+                  <Label htmlFor="password" className="text-blue-100">Contraseña</Label>
                   <div className="relative">
                     <Input
                       id="password"
@@ -116,7 +116,7 @@ const Signup = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
+                      className="bg-blue-950/50 border-blue-500/30 text-blue-100 placeholder:text-blue-400/70"
                       disabled={isLoading}
                     />
                     <button
@@ -146,12 +146,12 @@ const Signup = () => {
                     htmlFor="terms"
                     className="text-sm font-medium leading-none text-blue-100/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    I agree to the <Link to="/terms" className="text-blue-400 hover:text-blue-300 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-blue-400 hover:text-blue-300 hover:underline">Privacy Policy</Link>
+                    Acepto los <Link to="/terms" className="text-blue-400 hover:text-blue-300 hover:underline">Términos de servicio</Link> y la <Link to="/privacy" className="text-blue-400 hover:text-blue-300 hover:underline">Política de privacidad</Link>
                   </label>
                 </div>
                 
                 <Button type="submit" className="w-full ai-button" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Sign up"}
+                  {isLoading ? "Creando cuenta..." : "Registrarse"}
                 </Button>
               </div>
             </form>
@@ -162,7 +162,7 @@ const Signup = () => {
                   <div className="w-full border-t border-blue-500/30"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-secondary px-2 text-blue-300">Or continue with</span>
+                  <span className="bg-secondary px-2 text-blue-300">O continuar con</span>
                 </div>
               </div>
               
@@ -186,9 +186,9 @@ const Signup = () => {
             </div>
             
             <div className="mt-6 text-center text-sm text-blue-100/70">
-              Already have an account?{" "}
+              ¿Ya tiene una cuenta?{" "}
               <Link to="/login" className="text-blue-400 hover:text-blue-300 hover:underline">
-                Log in
+                Iniciar sesión
               </Link>
             </div>
           </motion.div>

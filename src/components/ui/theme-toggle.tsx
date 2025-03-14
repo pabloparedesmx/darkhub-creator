@@ -6,7 +6,12 @@ import { useTheme } from '@/hooks/use-theme';
 import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isPublicRoute } = useTheme();
+  
+  // Don't render the theme toggle on public routes
+  if (isPublicRoute) {
+    return null;
+  }
   
   return (
     <Button 

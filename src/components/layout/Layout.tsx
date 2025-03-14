@@ -13,21 +13,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { setTheme } = useTheme();
   const location = useLocation();
   
+  const isPublicRoute = ['/login', '/signup', '/'].includes(location.pathname);
+  
   useEffect(() => {
-    // Check if we're on public routes
-    const isPublicRoute = ['/login', '/signup', '/'].includes(location.pathname);
-    
-    // Check if user has a theme preference
-    const storedTheme = localStorage.getItem('dashboard-theme');
-    
-    // If no user preference exists, apply route-based default
-    if (!storedTheme) {
-      setTheme(isPublicRoute ? 'dark' : 'light');
+    // For public routes, always enforce dark mode
+    if (isPublicRoute) {
+      setTheme('dark');
     }
-  }, [location.pathname, setTheme]);
+  }, [location.pathname, setTheme, isPublicRoute]);
   
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className={`flex flex-col min-h-screen ${isPublicRoute ? 'bg-background dark:bg-background' : 'bg-gray-50 dark:bg-background'}`}>
       <Navbar />
       <main className="flex-1">
         {children}
