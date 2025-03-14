@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -6,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Category } from '@/types/admin';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -36,6 +38,7 @@ const CourseEditor = () => {
   const [course, setCourse] = useState({
     title: '',
     description: '',
+    short_description: '',
     slug: '',
     icon: '',
     category_id: '',
@@ -80,6 +83,7 @@ const CourseEditor = () => {
           setCourse({
             title: courseData.title,
             description: courseData.description,
+            short_description: courseData.short_description || '',
             slug: courseData.slug,
             icon: courseData.icon || '',
             category_id: courseData.category_id || '',
@@ -114,7 +118,7 @@ const CourseEditor = () => {
   }, [courseId, isNewCourse, toast]);
 
   const handleSaveCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = course;
+    const { title, description, short_description, slug, icon, category_id, isPro, isFree, difficulty } = course;
     
     if (!title || !description || !slug) {
       toast({
@@ -137,6 +141,7 @@ const CourseEditor = () => {
           .insert([{
             title,
             description,
+            short_description,
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
@@ -161,6 +166,7 @@ const CourseEditor = () => {
           .update({
             title,
             description,
+            short_description,
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
@@ -319,6 +325,27 @@ const CourseEditor = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     This will be the URL of your course page
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <label htmlFor="shortDescription" className="text-sm font-medium">
+                    Short Description<span className="text-red-500">*</span> <span className="text-muted-foreground">(max 200 chars)</span>
+                  </label>
+                  <Textarea
+                    id="shortDescription"
+                    placeholder="A brief summary that will appear on course cards"
+                    value={course.short_description}
+                    onChange={(e) => {
+                      // Limit to 200 characters
+                      const value = e.target.value.slice(0, 200);
+                      handleInputChange('short_description', value);
+                    }}
+                    className="resize-none h-20"
+                    maxLength={200}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {course.short_description?.length || 0}/200 characters
                   </p>
                 </div>
                 

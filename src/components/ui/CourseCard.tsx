@@ -17,6 +17,7 @@ export type Course = {
   toolIds?: string[]; // For filtering
   categoryId?: string; // Add category for filtering
   summary?: string; // Brief summary description
+  short_description?: string; // New field for short description
 };
 
 interface CourseCardProps {
@@ -27,9 +28,9 @@ interface CourseCardProps {
 const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Remove HTML tags from description for clean display
+  // Use short_description if available, otherwise fallback to cleaned description
   const plainDescription = course.description.replace(/<[^>]*>/g, '');
-  const summary = course.summary || plainDescription;
+  const displayText = course.short_description || course.summary || plainDescription;
   
   // Function to render tool icon (either as emoji or image)
   const renderToolIcon = (icon?: string) => {
@@ -84,7 +85,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
               </motion.h3>
               
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                {summary}
+                {displayText}
               </p>
             </div>
             

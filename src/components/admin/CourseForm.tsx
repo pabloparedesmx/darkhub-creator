@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -20,6 +21,7 @@ interface CourseFormProps {
   newCourse: {
     title: string;
     description: string;
+    short_description: string;
     slug: string;
     icon: string;
     category_id: string;
@@ -136,6 +138,25 @@ const CourseForm = ({
             placeholder="e.g. ai-product-development"
           />
         </div>
+      </div>
+      
+      <div className="space-y-2">
+        <label htmlFor="shortDescription">Short Description* (max 200 characters)</label>
+        <Textarea
+          id="shortDescription"
+          value={newCourse.short_description}
+          onChange={(e) => {
+            // Limit to 200 characters
+            const value = e.target.value.slice(0, 200);
+            setNewCourse({...newCourse, short_description: value});
+          }}
+          placeholder="A brief summary that will appear on course cards"
+          className="resize-none h-20"
+          maxLength={200}
+        />
+        <p className="text-xs text-muted-foreground">
+          {newCourse.short_description?.length || 0}/200 characters
+        </p>
       </div>
       
       <div className="space-y-2">
