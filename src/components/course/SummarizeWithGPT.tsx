@@ -28,43 +28,19 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     try {
       console.log("Requesting summary for course:", courseTitle);
       
-      // Use the Supabase URL from the supabase client instead of environment variable
-      const supabaseUrl = 'https://knrpakvzbpvpfuzlyoxj.supabase.co';
-      
-      const response = await fetch(`${supabaseUrl}/functions/v1/summarize-with-gemini`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Use Supabase Functions.invoke for proper authentication
+      const { data, error: fnError } = await supabase.functions.invoke("summarize-with-gemini", {
+        body: {
           title: courseTitle,
           content: courseContent
-        }),
+        }
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        
-        try {
-          // Try to parse error as JSON
-          const errorData = JSON.parse(errorText);
-          if (errorData.error) {
-            errorMessage = errorData.error;
-          }
-        } catch {
-          // If it's not valid JSON, use the raw text
-          if (errorText) {
-            errorMessage += ` - ${errorText}`;
-          }
-        }
-        
-        throw new Error(errorMessage);
+      if (fnError) {
+        throw new Error(`Error calling function: ${fnError.message}`);
       }
       
-      const data = await response.json();
-      
-      if (!data.summary) {
+      if (!data || !data.summary) {
         throw new Error('No se recibió ningún resumen del servidor');
       }
       
