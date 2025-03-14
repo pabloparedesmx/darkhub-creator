@@ -48,8 +48,8 @@ serve(async (req) => {
 
     console.log("Calling Gemini API with structured prompt");
 
-    // Configure the Gemini API to prefer JSON output
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
+    // Use the proper v1 endpoint (not v1beta)
+    const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
