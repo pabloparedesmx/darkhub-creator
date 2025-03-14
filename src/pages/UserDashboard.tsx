@@ -1,44 +1,127 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Bell, CreditCard, Home, Settings, User } from 'lucide-react';
+import { Bell, Search, CreditCard, Home, Settings, User, ChevronDown, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
 
 const UserDashboard = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [showAll, setShowAll] = useState(true);
+  const [showCourses, setShowCourses] = useState(false);
+  const [showTutorials, setShowTutorials] = useState(false);
+  
   const [courses, setCourses] = useState<Course[]>([
     {
       id: '1',
-      title: 'AI Product Development',
-      description: 'Learn how to build AI-powered products from scratch.',
-      badges: ['pro'],
-      slug: 'ai-product-development',
-      icon: '🤖',
+      title: 'Use Grok 3 DeepSearch to do product research on X',
+      description: 'How to use Grok 3\'s DeepSearch more to do detailed product research quickly.',
+      badges: ['tutorial', 'pro'],
+      slug: 'grok-product-research',
+      toolName: 'Grok',
+      toolIcon: '🤖',
     },
     {
       id: '2',
-      title: 'Growth Marketing',
-      description: 'Strategies to grow your product and acquire users.',
-      badges: ['tutorial', 'free'],
-      slug: 'growth-marketing',
-      icon: '📈',
+      title: 'Build a simple to-do list app using Bolt',
+      description: 'A walkthrough building in Bolt—perfect if you\'re just starting out creating apps using AI.',
+      badges: ['tutorial'],
+      slug: 'bolt-todo-app',
+      toolName: 'Bolt',
+      toolIcon: '⚡',
+    },
+    {
+      id: '3',
+      title: 'Build an app with AI coding tool Bolt',
+      description: 'A walkthrough on how to build a waitlist signup web app with login functionality using Bolt.',
+      badges: ['tutorial', 'pro'],
+      slug: 'bolt-ai-coding',
+      toolName: 'Bolt',
+      toolIcon: '⚡',
+    },
+    {
+      id: '4',
+      title: 'Upscale images for better resolution',
+      description: 'Learn how to upscale images using Topaz Lab\'s Gigapixel.',
+      badges: ['tutorial', 'pro'],
+      slug: 'upscale-images',
+      toolName: 'Topaz Lab',
+      toolIcon: '🖼️',
+    },
+    {
+      id: '5',
+      title: 'Build an app with AI coding tool Create',
+      description: 'A walkthrough on how to build an app using Create',
+      badges: ['tutorial', 'pro'],
+      slug: 'create-ai-coding',
+      toolName: 'Create',
+      toolIcon: '✨',
+    },
+    {
+      id: '6',
+      title: 'Monitoring and improving the sales pipeline',
+      description: 'Monitor your sales performance and engagement data to create insightful reports using Claude.',
+      badges: ['tutorial', 'pro'],
+      slug: 'sales-pipeline',
+      toolName: 'Claude',
+      toolIcon: '📊',
     },
   ]);
 
-  const [savedCourses, setSavedCourses] = useState<Course[]>([
-    {
-      id: '3',
-      title: 'UX Research',
-      description: 'Learn how to conduct user research and analyze results.',
-      badges: ['pro'],
-      slug: 'ux-research',
-      icon: '👥',
-    },
-  ]);
+  // Filter courses based on search term and filter toggles
+  useEffect(() => {
+    let filtered = courses;
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(course => 
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (course.toolName && course.toolName.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+    
+    // Apply type filters (only if not showing all)
+    if (!showAll) {
+      if (showCourses && !showTutorials) {
+        filtered = filtered.filter(course => !course.badges.includes('tutorial'));
+      } else if (!showCourses && showTutorials) {
+        filtered = filtered.filter(course => course.badges.includes('tutorial'));
+      } else if (!showCourses && !showTutorials) {
+        // If nothing selected, show nothing
+        filtered = [];
+      }
+    }
+    
+    setFilteredCourses(filtered);
+  }, [searchTerm, courses, showAll, showCourses, showTutorials]);
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setShowAll(true);
+    setShowCourses(false);
+    setShowTutorials(false);
+  };
+
+  const handleFilterToggle = (filter: 'all' | 'courses' | 'tutorials') => {
+    if (filter === 'all') {
+      setShowAll(true);
+      setShowCourses(false);
+      setShowTutorials(false);
+    } else {
+      setShowAll(false);
+      if (filter === 'courses') {
+        setShowCourses(prev => !prev);
+      } else if (filter === 'tutorials') {
+        setShowTutorials(prev => !prev);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,25 +202,135 @@ const UserDashboard = () => {
                 </TabsList>
                 
                 <TabsContent value="courses">
-                  <div className="mb-6">
-                    <Input 
-                      placeholder="Search your courses..." 
-                      className="max-w-md"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {courses.map(course => (
-                      <CourseCard key={course.id} course={course} />
-                    ))}
+                  <div className="space-y-4">
+                    {/* Course browse header */}
+                    <h2 className="text-2xl font-bold">Browse all courses & tutorials</h2>
+                    
+                    {/* Filters and search row */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 my-4">
+                      <div className="space-y-3 w-full sm:w-auto">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-lg font-medium">Filters</h3>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={clearFilters}
+                            className="h-8 px-2 text-xs"
+                          >
+                            Clear all
+                          </Button>
+                        </div>
+                        
+                        {/* Type filters */}
+                        <div className="flex flex-wrap gap-3">
+                          <div className="flex items-center">
+                            <input 
+                              type="checkbox" 
+                              id="all" 
+                              checked={showAll}
+                              onChange={() => handleFilterToggle('all')}
+                              className="mr-2"
+                            />
+                            <label htmlFor="all" className="text-sm cursor-pointer">
+                              All
+                            </label>
+                          </div>
+                          <div className="flex items-center">
+                            <input 
+                              type="checkbox" 
+                              id="courses" 
+                              checked={showCourses}
+                              onChange={() => handleFilterToggle('courses')}
+                              className="mr-2"
+                              disabled={showAll}
+                            />
+                            <label htmlFor="courses" className="text-sm cursor-pointer">
+                              Courses
+                            </label>
+                          </div>
+                          <div className="flex items-center">
+                            <input 
+                              type="checkbox" 
+                              id="tutorials" 
+                              checked={showTutorials}
+                              onChange={() => handleFilterToggle('tutorials')}
+                              className="mr-2"
+                              disabled={showAll}
+                            />
+                            <label htmlFor="tutorials" className="text-sm cursor-pointer">
+                              Tutorials
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="w-full sm:w-auto relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="text"
+                          placeholder="Search tutorials and courses"
+                          className="pl-10 pr-8 py-2 w-full sm:w-80"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        {searchTerm && (
+                          <button 
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                            onClick={() => setSearchTerm('')}
+                          >
+                            <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="w-full sm:w-auto flex items-center">
+                        <span className="text-sm text-muted-foreground mr-2">Sort</span>
+                        <select className="py-2 px-3 rounded-md bg-secondary/50 text-sm border border-border">
+                          <option>Newest</option>
+                          <option>Oldest</option>
+                          <option>A-Z</option>
+                          <option>Z-A</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {/* Displaying count */}
+                    <div className="text-sm text-muted-foreground">
+                      Showing {filteredCourses.length} of {courses.length}
+                    </div>
+                    
+                    {/* Course grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                      {filteredCourses.map((course, index) => (
+                        <motion.div
+                          key={course.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                        >
+                          <CourseCard course={course} />
+                        </motion.div>
+                      ))}
+                    </div>
+                    
+                    {filteredCourses.length === 0 && (
+                      <div className="text-center py-10">
+                        <p className="text-muted-foreground">No courses match your filters. Try adjusting your search criteria.</p>
+                        <Button 
+                          variant="outline" 
+                          onClick={clearFilters}
+                          className="mt-4"
+                        >
+                          Clear all filters
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
                 
                 <TabsContent value="saved">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {savedCourses.map(course => (
-                      <CourseCard key={course.id} course={course} />
-                    ))}
+                  <div className="text-center py-10">
+                    <p className="text-muted-foreground">You haven't saved any courses yet.</p>
                   </div>
                 </TabsContent>
                 

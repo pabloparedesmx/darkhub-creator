@@ -64,7 +64,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
     
     if (isUrl) {
       return (
-        <Avatar className="h-8 w-8 mr-3">
+        <Avatar className="h-10 w-10 mr-3">
           <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
           <AvatarFallback>🔧</AvatarFallback>
         </Avatar>
@@ -98,7 +98,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
         {tools.map(tool => (
           <div 
             key={tool.id} 
-            className="p-4 border border-border rounded-lg bg-muted/30 flex items-start"
+            className="p-4 border border-border rounded-lg bg-muted/30 flex items-start hover:border-primary/20 transition-colors"
           >
             {renderFavicon(tool.favicon)}
             <div className="flex-1">

@@ -7,9 +7,10 @@ interface CourseGridProps {
   courses: Course[];
   coursesData: Course[];
   clearAllFilters: () => void;
+  featured?: boolean;
 }
 
-const CourseGrid = ({ courses, coursesData, clearAllFilters }: CourseGridProps) => {
+const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }: CourseGridProps) => {
   return (
     <>
       <div className="text-sm text-muted-foreground mb-6">
@@ -24,7 +25,7 @@ const CourseGrid = ({ courses, coursesData, clearAllFilters }: CourseGridProps) 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <CourseCard course={course} />
+            <CourseCard course={course} featured={featured && index === 0} />
           </motion.div>
         ))}
       </div>
