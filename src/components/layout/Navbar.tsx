@@ -59,8 +59,8 @@ const Navbar = () => {
           {isAuthenticated ?
         // User is logged in
         <div className="flex items-center ml-4 space-x-2">
-              {/* Theme Toggle - Only show in dashboard area */}
-              {isDashboardArea && <ThemeToggle />}
+              {/* Theme Toggle - Show on all pages */}
+              <ThemeToggle />
               
               {/* Notifications */}
               <Button variant="ghost" size="icon" className="relative">
@@ -120,6 +120,9 @@ const Navbar = () => {
             </div> :
         // User is not logged in
         <div className="flex items-center space-x-2 ml-4">
+              {/* Theme Toggle - Show on all pages */}
+              <ThemeToggle />
+              
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-sm">
                   Iniciar sesión
@@ -153,11 +156,11 @@ const Navbar = () => {
               </Link>
             </div>
             <div className="pt-2 border-t border-border">
-              {/* Add theme toggle to mobile menu if in dashboard area */}
-              {isDashboardArea && <div className="flex items-center justify-between py-2 px-3">
-                  <span className="text-sm">Tema</span>
-                  <ThemeToggle />
-                </div>}
+              {/* Add theme toggle to mobile menu for all pages */}
+              <div className="flex items-center justify-between py-2 px-3">
+                <span className="text-sm">Tema</span>
+                <ThemeToggle />
+              </div>
               
               <div className="relative my-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />

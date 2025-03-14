@@ -17,88 +17,83 @@ const Footer = () => {
               />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Learn, build and master AI tools with our bite-sized courses and vibrant community.
+              Aprende, construye y domina herramientas de IA con nuestros cursos y comunidad vibrante.
             </p>
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Explore</h4>
+            <h4 className="font-semibold text-foreground mb-4">Explorar</h4>
             <ul className="space-y-3">
               <li>
                 <Link to="/courses" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Courses
+                  Cursos
                 </Link>
               </li>
               <li>
                 <Link to="/workshops" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Workshops
+                  Talleres
                 </Link>
               </li>
               <li>
-                <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Blog
+                <Link to="/prompts" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Prompts
                 </Link>
               </li>
               <li>
                 <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Pricing
+                  Precios
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Community</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link to="/community/forums" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Forums
-                </Link>
-              </li>
-              <li>
-                <Link to="/community/events" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Events
-                </Link>
-              </li>
-              <li>
-                <Link to="/community/discord" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Discord
-                </Link>
-              </li>
-              <li>
-                <Link to="/community/contributors" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contributors
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-foreground mb-4">Company</h4>
+            <h4 className="font-semibold text-foreground mb-4">Empresa</h4>
             <ul className="space-y-3">
               <li>
                 <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  About us
+                  Sobre nosotros
                 </Link>
               </li>
               <li>
                 <Link to="/careers" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Careers
+                  Empleo
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Contact
+                  Contacto
                 </Link>
               </li>
               <li>
                 <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy
+                  Privacidad
                 </Link>
               </li>
               <li>
                 <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Terms
+                  Términos
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-foreground mb-4">Recursos</h4>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/documentation" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Documentación
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Preguntas frecuentes
+                </Link>
+              </li>
+              <li>
+                <Link to="/support" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Soporte
                 </Link>
               </li>
             </ul>
@@ -107,7 +102,7 @@ const Footer = () => {
 
         <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} AI Makers. All rights reserved.
+            © {currentYear} AI Makers. Todos los derechos reservados.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
