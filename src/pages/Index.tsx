@@ -11,14 +11,10 @@ import { motion } from 'framer-motion';
 import { useTheme } from '@/hooks/use-theme';
 
 const Index = () => {
-  const { setTheme } = useTheme();
-  
-  // Scroll to top on page load and force dark theme
+  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-    // Always force dark theme on homepage
-    setTheme('dark');
-  }, [setTheme]);
+  }, []);
 
   return (
     <motion.div

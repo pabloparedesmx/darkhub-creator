@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useTheme } from '@/hooks/use-theme';
@@ -10,20 +10,10 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { setTheme } = useTheme();
-  const location = useLocation();
-  
-  const isPublicRoute = ['/login', '/signup', '/'].includes(location.pathname);
-  
-  useEffect(() => {
-    // For public routes, always enforce dark mode
-    if (isPublicRoute) {
-      setTheme('dark');
-    }
-  }, [location.pathname, setTheme, isPublicRoute]);
+  const { theme, isPublicRoute } = useTheme();
   
   return (
-    <div className={`flex flex-col min-h-screen ${isPublicRoute ? 'bg-background dark:bg-background' : 'bg-gray-50 dark:bg-background'}`}>
+    <div className={`flex flex-col min-h-screen ${isPublicRoute ? 'bg-background dark:bg-background' : theme === 'light' ? 'bg-gray-50' : 'bg-background'}`}>
       <Navbar />
       <main className="flex-1">
         {children}

@@ -18,7 +18,7 @@ export function ThemeToggle() {
       variant="outline" 
       size="icon" 
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      title={`Cambiar a modo ${theme === 'light' ? 'oscuro' : 'claro'}`}
       className="rounded-full border border-blue-500/30 bg-background relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-blue-500/10 backdrop-blur-sm rounded-full"></div>
@@ -35,7 +35,7 @@ export function ThemeToggle() {
           <Sun className="h-5 w-5 text-foreground" />
         )}
       </motion.div>
-      <span className="sr-only">Toggle theme</span>
+      <span className="sr-only">Cambiar tema</span>
     </Button>
   );
 }

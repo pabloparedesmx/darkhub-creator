@@ -1,5 +1,6 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type Theme = 'light' | 'dark';
 
@@ -33,30 +34,28 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
-
-  // Get the current path from window.location
-  const currentPath = window.location.pathname;
+  
+  // Use location from react-router for consistency
+  const location = useLocation();
   
   // Detect if we're on a public route (homepage, login, signup)
   const isPublicRoute = 
-    currentPath === '/' || 
-    currentPath === '/login' || 
-    currentPath === '/signup';
-
-  // Set the appropriate default theme based on route
-  const routeBasedDefaultTheme = isPublicRoute ? 'dark' : 'light';
+    location.pathname === '/' || 
+    location.pathname === '/login' || 
+    location.pathname === '/signup';
 
   useEffect(() => {
     // Always enforce dark mode on public routes
     if (isPublicRoute) {
       setTheme('dark');
     } else {
-      // Apply the default theme based on route only if user hasn't set a preference yet
-      if (!localStorage.getItem(storageKey)) {
-        setTheme(routeBasedDefaultTheme);
+      // For non-public routes, respect user preference if it exists
+      const savedTheme = localStorage.getItem(storageKey) as Theme;
+      if (savedTheme) {
+        setTheme(savedTheme);
       }
     }
-  }, [currentPath, routeBasedDefaultTheme, storageKey, isPublicRoute]);
+  }, [location.pathname, storageKey, isPublicRoute]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -75,10 +74,10 @@ export function ThemeProvider({
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
+    setTheme: (newTheme: Theme) => {
       // Only allow theme changes on non-public routes
       if (!isPublicRoute) {
-        setTheme(theme);
+        setTheme(newTheme);
       }
     },
     isPublicRoute,
