@@ -36,6 +36,10 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
               const toolData = item.tools;
               if (typeof toolData === 'object' && !Array.isArray(toolData) && 
                   'id' in toolData && 'name' in toolData) {
+                // Remove "Herramienta: " prefix from name if present
+                if (toolData.name && toolData.name.startsWith('Herramienta: ')) {
+                  toolData.name = toolData.name.replace('Herramienta: ', '');
+                }
                 return toolData as Tool;
               }
               console.error('Unexpected tool data structure:', item.tools);

@@ -50,6 +50,11 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     // If not a URL, render as emoji
     return <span className="mr-1 text-lg">{icon}</span>;
   };
+
+  // Remove "Herramienta: " prefix from toolName if it exists
+  const displayToolName = course.toolName && course.toolName.startsWith('Herramienta: ') 
+    ? course.toolName.replace('Herramienta: ', '')
+    : course.toolName;
   
   return (
     <Link to={`/courses/${course.slug}`}>
@@ -93,7 +98,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center">
               {renderToolIcon(course.toolIcon || course.icon)}
               <span className="text-xs text-muted-foreground truncate">
-                {course.toolName || course.slug}
+                {displayToolName || course.slug}
               </span>
             </div>
           </div>

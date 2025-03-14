@@ -62,7 +62,18 @@ const CourseForm = ({
         
         if (error) throw error;
         
-        setTools(data as Tool[]);
+        // Process tool names to remove prefix
+        const processedTools = data.map(tool => {
+          if (tool.name && tool.name.startsWith('Herramienta: ')) {
+            return {
+              ...tool,
+              name: tool.name.replace('Herramienta: ', '')
+            };
+          }
+          return tool;
+        });
+        
+        setTools(processedTools as Tool[]);
       } catch (error) {
         console.error('Error fetching tools:', error);
       } finally {

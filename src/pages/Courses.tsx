@@ -63,8 +63,15 @@ const Courses = () => {
           // Set the first tool's info as the course's tool info if not already set
           if (!courseToolInfoMap[item.course_id] && item.tools) {
             const toolInfo = item.tools as any; // Type assertion to access properties
+            
+            // Remove "Herramienta: " prefix from name if it exists
+            let toolName = toolInfo.name;
+            if (toolName && toolName.startsWith('Herramienta: ')) {
+              toolName = toolName.replace('Herramienta: ', '');
+            }
+            
             courseToolInfoMap[item.course_id] = {
-              name: toolInfo.name,
+              name: toolName,
               icon: toolInfo.favicon
             };
           }
@@ -121,10 +128,14 @@ const Courses = () => {
         
         if (toolsError) throw toolsError;
         
-        // Create a map of tool IDs to names
+        // Create a map of tool IDs to names, removing "Herramienta: " prefix if it exists
         const toolsMap: Record<string, string> = {};
         toolsData.forEach(tool => {
-          toolsMap[tool.id] = tool.name;
+          let name = tool.name;
+          if (name && name.startsWith('Herramienta: ')) {
+            name = name.replace('Herramienta: ', '');
+          }
+          toolsMap[tool.id] = name;
         });
         
         setTools(toolsMap);

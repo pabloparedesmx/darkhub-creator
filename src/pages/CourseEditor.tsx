@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -47,6 +46,7 @@ const CourseEditor = () => {
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
 
+  // Modified fetchData function to remove "Herramienta: " prefix
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -61,14 +61,25 @@ const CourseEditor = () => {
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData);
         
-        // Fetch tools
+        // Fetch tools and remove "Herramienta: " prefix from names
         const { data: toolsData, error: toolsError } = await supabase
           .from('tools')
           .select('*')
           .order('name');
         
         if (toolsError) throw toolsError;
-        setTools(toolsData);
+        
+        const processedTools = toolsData.map(tool => {
+          if (tool.name && tool.name.startsWith('Herramienta: ')) {
+            return {
+              ...tool,
+              name: tool.name.replace('Herramienta: ', '')
+            };
+          }
+          return tool;
+        });
+        
+        setTools(processedTools);
         
         if (!isNewCourse && courseId) {
           // Fetch course data
