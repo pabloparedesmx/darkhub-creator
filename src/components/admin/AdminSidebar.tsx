@@ -6,6 +6,7 @@ import { LayoutDashboard, Book, Users, DollarSign, ShoppingCart, PlusCircle, Tra
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Category } from '@/types/admin';
+import { Link } from 'react-router-dom';
 
 interface AdminSidebarProps {
   categories: Category[];
@@ -59,9 +60,11 @@ const AdminSidebar = ({
           </div>
           
           <div className="space-y-1">
-            <Button variant="ghost" className="w-full justify-start">
-              <LayoutDashboard className="mr-2 h-5 w-5" />
-              Dashboard
+            <Button variant="ghost" className="w-full justify-start" asChild>
+              <Link to="/courses">
+                <LayoutDashboard className="mr-2 h-5 w-5" />
+                Dashboard
+              </Link>
             </Button>
             <Button variant="ghost" className="w-full justify-start">
               <Book className="mr-2 h-5 w-5" />
