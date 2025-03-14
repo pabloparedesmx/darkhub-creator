@@ -7,7 +7,8 @@ import { motion } from 'framer-motion';
 export type Course = {
   id: string;
   title: string;
-  short_description: string;
+  description: string;
+  short_description?: string;
   badges: Array<'pro' | 'free'>;  // Only 'pro' or 'free' are allowed
   slug: string;
   icon?: string;
@@ -17,7 +18,6 @@ export type Course = {
   toolIds?: string[]; // For filtering
   categoryId?: string; // Add category for filtering
   summary?: string; // Brief summary description
-  short_description?: string; // New field for short description
 };
 
 interface CourseCardProps {
@@ -28,9 +28,8 @@ interface CourseCardProps {
 const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Use short_description if available, otherwise fallback to cleaned description
-  const plainDescription = course.description.replace(/<[^>]*>/g, '');
-  const displayText = course.short_description || course.summary || plainDescription;
+  // Prioritize short_description if available
+  const displayText = course.short_description || course.summary || course.description.replace(/<[^>]*>/g, '');
   
   // Function to render tool icon (either as emoji or image)
   const renderToolIcon = (icon?: string) => {
