@@ -18,6 +18,7 @@ import CoursePlayer from "./pages/CoursePlayer";
 import CourseEditor from "./pages/CourseEditor";
 import Prompts from "./pages/Prompts";
 import PromptDetail from "./pages/PromptDetail";
+import Tools from "./pages/Tools";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,9 @@ const App = () => (
               {/* Prompts routes */}
               <Route path="/prompts" element={<Prompts />} />
               <Route path="/prompts/:id" element={<PromptDetail />} />
+              
+              {/* Tools route */}
+              <Route path="/tools" element={<Tools />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

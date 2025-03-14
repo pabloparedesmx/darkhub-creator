@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -14,63 +13,67 @@ import { supabase } from '@/lib/supabase';
 import { PromptWithCategory } from '@/types/prompt';
 import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
-
 const Prompts = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Fetch prompts with categories
-  const { data: prompts, error, isLoading } = useQuery({
+  const {
+    data: prompts,
+    error,
+    isLoading
+  } = useQuery({
     queryKey: ['prompts', selectedCategories, searchQuery],
     queryFn: async () => {
-      let query = supabase
-        .from('prompts')
-        .select(`
+      let query = supabase.from('prompts').select(`
           *,
           categories (
             name
           )
         `);
-      
+
       // Filter by categories if selected
       if (selectedCategories.length > 0) {
         query = query.in('category_id', selectedCategories);
       }
-      
+
       // Filter by search query if provided
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
       }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
+      const {
+        data,
+        error
+      } = await query.order('created_at', {
+        ascending: false
+      });
       if (error) throw error;
       return data as PromptWithCategory[];
     }
   });
-  
+
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
-  
+
   // Function to clear search
   const clearSearch = () => {
     setSearchQuery('');
   };
-  
   if (error) {
     return <ErrorState message="Error loading prompts" />;
   }
-  
-  return (
-    <Layout>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="container py-16"  // Increased vertical padding from py-8 to py-16
-      >
+  return <Layout>
+      <motion.div initial={{
+      opacity: 0,
+      y: 20
+    }} animate={{
+      opacity: 1,
+      y: 0
+    }} transition={{
+      duration: 0.5
+    }} className="container py-[64px]">
         <div className="mt-8 mb-12">  {/* Added top margin and increased bottom margin */}
           <h1 className="text-3xl font-bold mb-6">Prompts</h1> {/* Increased bottom margin from mb-4 to mb-6 */}
           <p className="text-muted-foreground mb-10"> {/* Increased bottom margin from mb-8 to mb-10 */}
@@ -83,10 +86,7 @@ const Prompts = () => {
           <div className="md:col-span-3 space-y-8"> {/* Increased space-y from space-y-6 to space-y-8 */}
             <div className="rounded-lg border p-6 bg-card"> {/* Increased padding from p-4 to p-6 */}
               <h3 className="font-semibold mb-6">Filtros</h3> {/* Increased margin from mb-4 to mb-6 */}
-              <CategoryFilters 
-                selectedCategories={selectedCategories}
-                setSelectedCategories={setSelectedCategories}
-              />
+              <CategoryFilters selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} />
             </div>
           </div>
           
@@ -96,42 +96,25 @@ const Prompts = () => {
             <div className="flex gap-4 items-center mb-8"> {/* Increased margin from mb-6 to mb-8 */}
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <Input 
-                  placeholder="Buscar prompts..." 
-                  className="pl-10"
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                />
+                <Input placeholder="Buscar prompts..." className="pl-10" value={searchQuery} onChange={handleSearchChange} />
               </div>
-              {searchQuery && (
-                <Button variant="ghost" onClick={clearSearch}>
+              {searchQuery && <Button variant="ghost" onClick={clearSearch}>
                   Clear
-                </Button>
-              )}
+                </Button>}
             </div>
             
             {/* Prompt grid */}
-            {isLoading ? (
-              <LoadingState message="Cargando prompts..." />
-            ) : prompts && prompts.length > 0 ? (
-              <PromptGrid prompts={prompts} />
-            ) : (
-              <div className="text-center py-16"> {/* Increased padding from py-12 to py-16 */}
+            {isLoading ? <LoadingState message="Cargando prompts..." /> : prompts && prompts.length > 0 ? <PromptGrid prompts={prompts} /> : <div className="text-center py-16"> {/* Increased padding from py-12 to py-16 */}
                 <h3 className="text-xl font-medium mb-4"> {/* Increased margin from mb-2 to mb-4 */}
                   No se encontraron prompts
                 </h3>
                 <p className="text-muted-foreground">
-                  {selectedCategories.length > 0 || searchQuery 
-                    ? "Intenta ajustando tus filtros de búsqueda"
-                    : "No hay prompts disponibles en este momento"}
+                  {selectedCategories.length > 0 || searchQuery ? "Intenta ajustando tus filtros de búsqueda" : "No hay prompts disponibles en este momento"}
                 </p>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </motion.div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Prompts;
