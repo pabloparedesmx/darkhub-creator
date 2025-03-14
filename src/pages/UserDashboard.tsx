@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -141,7 +140,12 @@ const UserDashboard = () => {
         filters.push({
           id: 'courses',
           label: 'Courses',
-          onRemove: () => setShowCourses(false)
+          onRemove: () => {
+            if (!showPro) {
+              setShowAll(true);
+            }
+            setShowCourses(false);
+          }
         });
       }
       
@@ -149,7 +153,12 @@ const UserDashboard = () => {
         filters.push({
           id: 'pro',
           label: 'Pro Content',
-          onRemove: () => setShowPro(false)
+          onRemove: () => {
+            if (!showCourses) {
+              setShowAll(true);
+            }
+            setShowPro(false);
+          }
         });
       }
     }
@@ -328,7 +337,7 @@ const UserDashboard = () => {
                       </div>
                     </div>
 
-                    {/* Filter Tags */}
+                    {/* Filter Tags - now placed directly below the search bar */}
                     <FilterTags activeFilters={getActiveFilters()} />
                     
                     {/* Displaying count */}

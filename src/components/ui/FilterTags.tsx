@@ -11,8 +11,8 @@ type FilterTagProps = {
 export function FilterTag({ label, onRemove }: FilterTagProps) {
   return (
     <Badge 
-      variant="outline" 
-      className="bg-background border-primary/20 text-primary hover:bg-background/80 flex items-center gap-1 py-1"
+      variant="filter" 
+      className="flex items-center gap-1 py-1.5 px-3"
     >
       {label}
       <button 
@@ -38,7 +38,7 @@ export function FilterTags({ activeFilters }: FilterTagsProps) {
   if (activeFilters.length === 0) return null;
   
   return (
-    <div className="flex flex-wrap gap-2 mt-2">
+    <div className="flex flex-wrap gap-2 my-3">
       {activeFilters.map((filter) => (
         <FilterTag 
           key={filter.id} 
