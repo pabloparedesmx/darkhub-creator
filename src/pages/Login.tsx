@@ -27,7 +27,7 @@ const Login = () => {
     if (!email || !password) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Por favor, completa todos los campos",
         variant: "destructive",
       });
       return;
@@ -58,8 +58,8 @@ const Login = () => {
         console.log("Login timeout reached, resetting loading state");
         setLoginAttempted(false);
         toast({
-          title: "Login timeout",
-          description: "Login is taking too long. Please try again.",
+          title: "Tiempo de espera agotado",
+          description: "El inicio de sesión está tardando demasiado. Por favor, inténtalo de nuevo.",
           variant: "destructive",
         });
       }
@@ -87,16 +87,16 @@ const Login = () => {
               </Link>
             </div>
             
-            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Welcome back</h1>
+            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Bienvenido de nuevo</h1>
             
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-blue-100">Email</Label>
+                  <Label htmlFor="email" className="text-blue-100">Correo electrónico</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder="nombre@ejemplo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
@@ -106,9 +106,9 @@ const Login = () => {
                 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-blue-100">Password</Label>
+                    <Label htmlFor="password" className="text-blue-100">Contraseña</Label>
                     <Link to="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 hover:underline">
-                      Forgot password?
+                      ¿Olvidaste tu contraseña?
                     </Link>
                   </div>
                   <div className="relative">
@@ -148,17 +148,17 @@ const Login = () => {
                     htmlFor="remember"
                     className="text-sm font-medium leading-none text-blue-100/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Remember me
+                    Recordarme
                   </label>
                 </div>
                 
                 <Button type="submit" className="w-full ai-button" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                  {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
                 </Button>
                 
                 {isLoading && loginAttempted && (
                   <p className="text-xs text-center text-blue-400 animate-pulse">
-                    Login in progress, please wait...
+                    Inicio de sesión en progreso, espera por favor...
                   </p>
                 )}
               </div>
@@ -170,7 +170,7 @@ const Login = () => {
                   <div className="w-full border-t border-blue-500/30"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-secondary px-2 text-blue-300">Or continue with</span>
+                  <span className="bg-secondary px-2 text-blue-300">O continuar con</span>
                 </div>
               </div>
               
@@ -194,9 +194,9 @@ const Login = () => {
             </div>
             
             <div className="mt-6 text-center text-sm text-blue-100/70">
-              Don't have an account?{" "}
+              ¿No tienes una cuenta?{" "}
               <Link to="/signup" className="text-blue-400 hover:text-blue-300 hover:underline">
-                Sign up
+                Regístrate
               </Link>
             </div>
           </motion.div>
