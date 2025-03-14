@@ -33,14 +33,10 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
             // Check if tools is defined and extract it
             if (item.tools) {
               // Ensure item.tools is a valid Tool object and not an array
-              const toolData = item.tools;
+              const toolData = item.tools as Tool;
               if (typeof toolData === 'object' && !Array.isArray(toolData) && 
                   'id' in toolData && 'name' in toolData) {
-                // Remove "Herramienta: " prefix from name if present
-                if (toolData.name && toolData.name.startsWith('Herramienta: ')) {
-                  toolData.name = toolData.name.replace('Herramienta: ', '');
-                }
-                return toolData as Tool;
+                return toolData;
               }
               console.error('Unexpected tool data structure:', item.tools);
             }
