@@ -5,7 +5,7 @@ interface LoadingStateProps {
   message?: string;
 }
 
-const LoadingState = ({ message = "Loading..." }: LoadingStateProps) => {
+const LoadingState = ({ message = "Cargando..." }: LoadingStateProps) => {
   return (
     <div className="min-h-screen flex-col">
       <Navbar />

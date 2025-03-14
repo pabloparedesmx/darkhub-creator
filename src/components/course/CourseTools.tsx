@@ -63,7 +63,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
     if (isUrl) {
       return (
         <Avatar className="h-10 w-10 mr-3">
-          <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
+          <img src={favicon} alt="Icono de herramienta" className="h-full w-full object-contain" />
           <AvatarFallback>🔧</AvatarFallback>
         </Avatar>
       );
@@ -91,7 +91,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
 
   return (
     <div className="mt-8 mb-8">
-      <h3 className="text-xl font-semibold mb-4">You'll need</h3>
+      <h3 className="text-xl font-semibold mb-4">Necesitarás</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tools.map(tool => (
           <div 
@@ -104,7 +104,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
               <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{tool.description}</p>
               <Button size="sm" variant="outline" className="text-xs dark:border-blue-500/30" asChild>
                 <a href={tool.url} target="_blank" rel="noopener noreferrer">
-                  Visit Tool <ExternalLink className="ml-1 h-3 w-3" />
+                  Visitar Herramienta <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </Button>
             </div>

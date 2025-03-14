@@ -117,7 +117,7 @@ const CourseDetails = () => {
               <div className="mb-4 space-y-4">
                 {/* Tool & Category Tags */}
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">Tags</div>
+                  <div className="text-sm font-medium text-muted-foreground">Etiquetas</div>
                   <div className="flex flex-wrap gap-2">
                     {course.toolName && (
                       <Badge variant="filter" className="border-blue-500/30">
@@ -132,10 +132,12 @@ const CourseDetails = () => {
                 
                 {/* Level Badge */}
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">Level</div>
+                  <div className="text-sm font-medium text-muted-foreground">Nivel</div>
                   <div className="flex">
                     <Badge variant="outline" className="border-blue-500/30 bg-secondary/20">
-                      {course.difficulty || 'Beginner'}
+                      {course.difficulty === 'beginner' ? 'Principiante' : 
+                       course.difficulty === 'intermediate' ? 'Intermedio' : 
+                       course.difficulty === 'advanced' ? 'Avanzado' : 'Principiante'}
                     </Badge>
                   </div>
                 </div>
@@ -156,7 +158,7 @@ const CourseDetails = () => {
                   <div className="flex items-center justify-between mb-6">
                     <span className="text-sm text-muted-foreground flex items-center">
                       <span className="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
-                      In Progress
+                      En Progreso
                     </span>
                   </div>
                   
@@ -168,11 +170,11 @@ const CourseDetails = () => {
                   {/* Action Buttons */}
                   <div className="space-y-3">
                     <Button variant="default" className="w-full justify-center" onClick={() => {}}>
-                      <Save className="mr-2 h-4 w-4" /> Save
+                      <Save className="mr-2 h-4 w-4" /> Guardar
                     </Button>
                     
                     <Button variant="outline" className="w-full justify-center" onClick={() => {}}>
-                      <CheckCircle className="mr-2 h-4 w-4" /> Mark as complete
+                      <CheckCircle className="mr-2 h-4 w-4" /> Marcar como completado
                     </Button>
                   </div>
                 </div>

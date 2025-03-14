@@ -9,8 +9,8 @@ interface ErrorStateProps {
 }
 
 const ErrorState = ({ 
-  title = "Not Found", 
-  message = "The resource you're looking for doesn't exist or has been removed."
+  title = "No Encontrado", 
+  message = "El recurso que estás buscando no existe o ha sido eliminado."
 }: ErrorStateProps) => {
   return (
     <div className="min-h-screen flex-col">
@@ -20,7 +20,7 @@ const ErrorState = ({
           <h1 className="text-2xl font-bold mb-4">{title}</h1>
           <p className="mb-6">{message}</p>
           <Button asChild>
-            <Link to="/courses">Back to Courses</Link>
+            <Link to="/courses">Volver a Cursos</Link>
           </Button>
         </div>
       </div>

@@ -46,7 +46,7 @@ const CourseHeader = ({ course }: CourseHeaderProps) => {
           <h1 className="text-3xl md:text-4xl font-bold mb-3">{course.title}</h1>
           {/* Subtitle (brief description) */}
           <p className="text-lg text-muted-foreground">
-            {course.short_description || "Learn how to use this tool effectively for your projects."}
+            {course.short_description || "Aprende a usar esta herramienta de manera efectiva para tus proyectos."}
           </p>
         </div>
         

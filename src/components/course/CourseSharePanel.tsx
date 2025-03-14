@@ -1,3 +1,4 @@
+
 import { Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from "@/hooks/use-toast";
@@ -23,12 +24,12 @@ const CourseSharePanel = ({
       
       <Button variant="outline" className="w-full mb-4 justify-center dark:border-blue-500/30 dark:hover:border-blue-500/50" onClick={copyToClipboard}>
         <Copy className="mr-2 h-4 w-4" />
-        Copy to clipboard
+        Copiar al portapapeles
       </Button>
       
       <div className="flex justify-between">
         <Button variant="outline" size="icon" className="rounded-md flex-1 mr-2 dark:border-blue-500/30 dark:hover:border-blue-500/50" onClick={() => {
-        window.open(`https://twitter.com/intent/tweet?text=Check out this course: ${courseTitle}&url=${window.location.href}`, '_blank');
+        window.open(`https://twitter.com/intent/tweet?text=Mira este curso: ${courseTitle}&url=${window.location.href}`, '_blank');
       }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor" />
