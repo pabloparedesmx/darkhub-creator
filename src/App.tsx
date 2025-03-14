@@ -16,7 +16,6 @@ import CourseDetails from "./pages/CourseDetails";
 import NotFound from "./pages/NotFound";
 import CoursePlayer from "./pages/CoursePlayer";
 import CourseEditor from "./pages/CourseEditor";
-import Workshops from "./pages/Workshops";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -34,7 +33,6 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/workshops" element={<Workshops />} />
               
               {/* Protected routes */}
               <Route element={<PrivateRoute />}>

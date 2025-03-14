@@ -1,32 +1,44 @@
 
-import React from 'react';
+import { useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
 import FeaturedCourses from '@/components/home/FeaturedCourses';
-import Pricing from '@/components/home/Pricing';
 import GetStarted from '@/components/home/GetStarted';
-import FAQ from '@/components/home/FAQ';
 import Testimonials from '@/components/home/Testimonials';
 import Education from '@/components/home/Education';
-import Workshops from '@/components/home/Workshops';
+import FAQ from '@/components/home/FAQ';
+import Pricing from '@/components/home/Pricing';
+import { motion } from 'framer-motion';
 
 const Index = () => {
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Force dark theme for the futuristic AI look
+    document.documentElement.classList.add('dark');
+  }, []);
+
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen flex flex-col bg-background"
+    >
       <Navbar />
-      <main>
+      <main className="flex-grow">
         <Hero />
-        <FeaturedCourses />
-        <Education />
-        <Workshops />
-        <Pricing />
-        <Testimonials />
-        <FAQ />
         <GetStarted />
+        <Education />
+        <Testimonials />
+        <FeaturedCourses />
+        <Pricing />
+        <FAQ />
       </main>
       <Footer />
-    </div>
+    </motion.div>
   );
 };
 
