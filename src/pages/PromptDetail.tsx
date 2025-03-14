@@ -11,8 +11,8 @@ import { PromptWithCategory } from '@/types/prompt';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import { ErrorState } from '@/components/ui/ErrorState';
-import { LoadingState } from '@/components/ui/LoadingState';
+import ErrorState from '@/components/ui/ErrorState';
+import LoadingState from '@/components/ui/LoadingState';
 import RichTextContent from '@/components/ui/RichTextContent';
 
 const PromptDetail = () => {
