@@ -26,36 +26,48 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     setError(null);
     
     try {
+      // Validate input
+      if (!courseTitle || !courseContent) {
+        throw new Error('Falta el título o contenido del curso');
+      }
+
       console.log("Requesting summary for course:", courseTitle);
       console.log("Content length:", courseContent.length);
       
       // Make API call to the Gemini API through our Supabase edge function
-      const { data, error: fnError } = await supabase.functions.invoke("summarize-with-gemini", {
+      const functionResponse = await supabase.functions.invoke("summarize-with-gemini", {
         body: {
           title: courseTitle,
           content: courseContent
         }
       });
       
-      console.log("Response received:", data);
+      console.log("Response received:", functionResponse);
       
-      if (fnError) {
-        console.error("Function error:", fnError);
-        throw new Error(`Error calling function: ${fnError.message}`);
+      // Check for function invocation error
+      if (functionResponse.error) {
+        console.error("Function invocation error:", functionResponse.error);
+        throw new Error(`Error al invocar la función: ${functionResponse.error.message || functionResponse.error}`);
       }
       
+      // Check for data
+      const { data } = functionResponse;
       if (!data) {
         throw new Error('No se recibió ninguna respuesta del servidor');
       }
       
+      // Check for error in response data
       if (data.error) {
+        console.error("Edge function returned error:", data.error);
         throw new Error(`Error del servidor: ${data.error}`);
       }
       
+      // Check for summary in response data
       if (!data.summary) {
         throw new Error('No se recibió ningún resumen del servidor');
       }
       
+      // Set the summary and show success toast
       setSummary(data.summary);
       toast({
         title: "Resumen generado",
@@ -64,10 +76,11 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
       });
     } catch (err) {
       console.error('Error generating summary:', err);
-      setError(err instanceof Error ? err.message : 'Error al generar el resumen');
+      const errorMessage = err instanceof Error ? err.message : 'Error al generar el resumen';
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "No se pudo generar el resumen. Por favor, intenta de nuevo.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
