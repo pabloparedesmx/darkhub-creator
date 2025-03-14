@@ -11,6 +11,7 @@ import CourseGrid from '@/components/courses/CourseGrid';
 import { useCourseFilters } from '@/hooks/useCourseFilters';
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
+import { FilterTags } from '@/components/ui/FilterTags';
 
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
@@ -125,6 +126,64 @@ const Courses = () => {
     setSortOrder(value);
   };
 
+  // Generate active filters array for filter tags
+  const getActiveFilters = () => {
+    const filters = [];
+    
+    // Add search term filter
+    if (searchTerm) {
+      filters.push({
+        id: 'search',
+        label: `Search: ${searchTerm}`,
+        onRemove: () => setSearchTerm('')
+      });
+    }
+    
+    // Add difficulty filters
+    Object.entries(difficulties)
+      .filter(([_, isSelected]) => isSelected)
+      .forEach(([difficulty]) => {
+        filters.push({
+          id: `difficulty-${difficulty}`,
+          label: `${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}`,
+          onRemove: () => {
+            setDifficulties(prev => ({
+              ...prev,
+              [difficulty]: false
+            }));
+          }
+        });
+      });
+    
+    // Add tool filters
+    selectedTools.forEach(toolId => {
+      // Find the tool name from toolId
+      const toolName = "Tool"; // This would be replaced with actual tool name lookup
+      filters.push({
+        id: `tool-${toolId}`,
+        label: toolName,
+        onRemove: () => {
+          setSelectedTools(prev => prev.filter(id => id !== toolId));
+        }
+      });
+    });
+    
+    // Add category filters  
+    selectedCategories.forEach(categoryId => {
+      // Find the category name from categoryId
+      const categoryName = "Category"; // This would be replaced with actual category name lookup
+      filters.push({
+        id: `category-${categoryId}`,
+        label: categoryName,
+        onRemove: () => {
+          setSelectedCategories(prev => prev.filter(id => id !== categoryId));
+        }
+      });
+    });
+    
+    return filters;
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -171,6 +230,9 @@ const Courses = () => {
                   />
                   <CourseSort onSortChange={handleSortChange} />
                 </div>
+                
+                {/* Filter Tags */}
+                <FilterTags activeFilters={getActiveFilters()} />
 
                 <CourseGrid 
                   courses={courses}
