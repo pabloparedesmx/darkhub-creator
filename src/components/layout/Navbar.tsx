@@ -6,7 +6,6 @@ import { Search, Menu, X, ChevronDown, Bell, LogOut, User, Settings, CreditCard 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-
 const Navbar = () => {
   const {
     user,
@@ -18,7 +17,6 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const isDashboardArea = location.pathname.match(/^\/(dashboard|courses|profile|admin)/);
-  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -26,12 +24,10 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-  
-  return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 dark bg-background/95 backdrop-blur-md ${isScrolled ? 'shadow-md py-3' : 'py-4'}`}>
+  return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" alt="AI Makers" className="h-10" />
@@ -237,5 +233,4 @@ const Navbar = () => {
         </div>}
     </header>;
 };
-
 export default Navbar;
