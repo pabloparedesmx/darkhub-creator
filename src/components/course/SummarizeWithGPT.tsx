@@ -27,7 +27,13 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     try {
       console.log("Requesting summary for course:", courseTitle);
       
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/summarize-with-gemini`, {
+      // Make sure to use the complete URL from the import.meta.env
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (!supabaseUrl) {
+        throw new Error('VITE_SUPABASE_URL environment variable is not defined');
+      }
+      
+      const response = await fetch(`${supabaseUrl}/functions/v1/summarize-with-gemini`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,8 +45,22 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.error || `Error: ${response.status} ${response.statusText}`;
+        const errorText = await response.text();
+        let errorMessage = `Error: ${response.status} ${response.statusText}`;
+        
+        try {
+          // Try to parse error as JSON
+          const errorData = JSON.parse(errorText);
+          if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          // If it's not valid JSON, use the raw text
+          if (errorText) {
+            errorMessage += ` - ${errorText}`;
+          }
+        }
+        
         throw new Error(errorMessage);
       }
       
