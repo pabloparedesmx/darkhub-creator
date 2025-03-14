@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +17,6 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save } from 'lucide-react';
 
-// Import necessary components
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -45,13 +43,11 @@ const CourseEditor = () => {
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
 
-  // Fetch categories and course data (if editing)
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
       try {
-        // Fetch categories
         const { data: categoriesData, error: categoriesError } = await supabase
           .from('categories')
           .select('*')
@@ -60,7 +56,6 @@ const CourseEditor = () => {
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData);
         
-        // If editing an existing course, fetch its data
         if (!isNewCourse && courseId) {
           const { data: courseData, error: courseError } = await supabase
             .from('courses')
@@ -98,7 +93,7 @@ const CourseEditor = () => {
   }, [courseId, isNewCourse, toast]);
 
   const handleSaveCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = course;
+    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = course;
     
     if (!title || !description || !slug) {
       toast({
@@ -113,7 +108,6 @@ const CourseEditor = () => {
     
     try {
       if (isNewCourse) {
-        // Add new course
         const { error } = await supabase
           .from('courses')
           .insert([{
@@ -136,7 +130,6 @@ const CourseEditor = () => {
           description: "Course added successfully",
         });
       } else {
-        // Update existing course
         const { error } = await supabase
           .from('courses')
           .update({
@@ -160,7 +153,6 @@ const CourseEditor = () => {
         });
       }
       
-      // Navigate back to admin dashboard
       navigate('/admin');
     } catch (error: any) {
       console.error('Error saving course:', error);
@@ -378,20 +370,6 @@ const CourseEditor = () => {
                       className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       Free Content
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="isTutorial"
-                      checked={course.isTutorial}
-                      onCheckedChange={(checked) => handleInputChange('isTutorial', !!checked)}
-                    />
-                    <label
-                      htmlFor="isTutorial"
-                      className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Tutorial
                     </label>
                   </div>
                 </div>

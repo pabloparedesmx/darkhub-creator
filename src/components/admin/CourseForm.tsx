@@ -121,7 +121,7 @@ const CourseForm = ({
       </div>
       
       <div className="space-y-2">
-        <label className="font-medium">Course Type</label>
+        <label className="font-medium">Access Settings</label>
         <div className="flex flex-wrap gap-4 mt-2">
           <div className="flex items-center space-x-2">
             <Checkbox 
@@ -151,19 +151,7 @@ const CourseForm = ({
             </label>
           </div>
           
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="isTutorial" 
-              checked={newCourse.isTutorial}
-              onCheckedChange={(checked) => setNewCourse({...newCourse, isTutorial: !!checked})}
-            />
-            <label
-              htmlFor="isTutorial"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Tutorial
-            </label>
-          </div>
+          {/* Tutorial checkbox removed as it's not an access setting */}
         </div>
       </div>
       
