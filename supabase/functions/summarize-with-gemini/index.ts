@@ -20,12 +20,15 @@ serve(async (req) => {
       throw new Error('No content provided for summarization');
     }
 
+    // Strip HTML tags if present (simple implementation)
+    const plainContent = content.replace(/<[^>]*>?/gm, '');
+    
     // Truncate if content is too long (Gemini has token limits)
-    const truncatedContent = content.length > 8000 
-      ? content.substring(0, 8000) + '...'
-      : content;
+    const truncatedContent = plainContent.length > 8000 
+      ? plainContent.substring(0, 8000) + '...'
+      : plainContent;
 
-    console.log("Creating prompt for Gemini API");
+    console.log(`Processing request to summarize content for "${title}". Content length: ${plainContent.length} chars`);
     
     // Create a structured prompt that explicitly instructs Gemini to return a JSON response
     const prompt = `
@@ -46,15 +49,17 @@ serve(async (req) => {
     8. No uses acentos, comillas o caracteres especiales en las claves del JSON (solo en los valores).
     `;
 
-    console.log("Calling Gemini API with structured prompt");
+    // Use the correct API endpoint for gemini-pro model
+    const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+    const apiKey = "AIzaSyAFtpHsblfChzk-CzYYAJe4nccpSw9IEH4";
 
-    // The problem is in the API endpoint - gemini-pro model doesn't exist in v1 endpoint
-    // Let's use the correct endpoint for gemini-1.5-pro
-    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
+    console.log(`Calling Gemini API at: ${apiUrl}`);
+
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": "AIzaSyAFtpHsblfChzk-CzYYAJe4nccpSw9IEH4",
+        "x-goog-api-key": apiKey,
       },
       body: JSON.stringify({
         contents: [
@@ -73,6 +78,9 @@ serve(async (req) => {
       }),
     });
 
+    // Log response status for debugging
+    console.log(`Gemini API response status: ${response.status}`);
+
     // First check if the response is ok
     if (!response.ok) {
       const errorText = await response.text();
@@ -82,14 +90,14 @@ serve(async (req) => {
 
     // Get full response body as text for debugging
     const responseText = await response.text();
-    console.log("Gemini API raw response:", responseText.substring(0, 200) + "...");
+    console.log("Gemini API raw response first 200 chars:", responseText.substring(0, 200));
     
     // Try to parse the Gemini response
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (parseError) {
-      console.error("Failed to parse Gemini API response:", responseText);
+      console.error("Failed to parse Gemini API response:", parseError.message);
       throw new Error(`Failed to parse Gemini API response: ${parseError.message}`);
     }
     
@@ -101,7 +109,7 @@ serve(async (req) => {
     
     // Validate the response structure
     if (!data.candidates || !data.candidates[0] || !data.candidates[0].content || !data.candidates[0].content.parts || !data.candidates[0].content.parts[0]) {
-      console.error("Unexpected Gemini API response structure:", data);
+      console.error("Unexpected Gemini API response structure:", JSON.stringify(data));
       throw new Error("Unexpected response structure from Gemini API");
     }
     
@@ -109,11 +117,11 @@ serve(async (req) => {
     const modelResponseText = data.candidates[0].content.parts[0].text;
     
     if (!modelResponseText) {
-      console.error("No text in Gemini API response:", data);
+      console.error("No text in Gemini API response:", JSON.stringify(data));
       throw new Error("No text in Gemini API response");
     }
 
-    console.log("Raw text from Gemini:", modelResponseText.substring(0, 200) + "...");
+    console.log("Model response text first 100 chars:", modelResponseText.substring(0, 100));
     
     // Improved JSON extraction from the model response
     let summary;
@@ -129,14 +137,14 @@ serve(async (req) => {
       
       if (jsonResponse && jsonResponse.summary) {
         summary = jsonResponse.summary;
-        console.log("Successfully extracted summary from JSON response");
+        console.log("Successfully extracted summary from JSON");
       } else {
         // If we got valid JSON but no summary field
         console.error("Invalid JSON structure (no summary field):", jsonResponse);
         throw new Error("Gemini returned valid JSON but without the required summary field");
       }
     } catch (jsonError) {
-      console.error("Couldn't parse response as JSON:", jsonError, modelResponseText);
+      console.error("Couldn't parse response as JSON:", jsonError.message);
       
       // More aggressive JSON extraction with regex
       const jsonMatch = modelResponseText.match(/\{[\s\S]*"summary"[\s\S]*:[\s\S]*"[\s\S]*"[\s\S]*\}/);
@@ -150,11 +158,11 @@ serve(async (req) => {
             throw new Error("Extracted JSON doesn't contain summary field");
           }
         } catch (extractError) {
-          console.error("Failed to extract JSON with regex:", extractError);
-          // Last resort - use the whole text as summary if it looks reasonably like a summary
+          console.error("Failed to extract JSON with regex:", extractError.message);
+          // Last resort - try to find any text that looks like a summary
           if (modelResponseText.length > 50 && !modelResponseText.includes('```') && !modelResponseText.includes('{"summary":')) {
             summary = modelResponseText.trim();
-            console.log("Using full response as summary after all JSON extraction methods failed");
+            console.log("Using full response as summary after failed JSON extraction");
           } else {
             throw new Error("Could not extract valid summary from Gemini response");
           }
@@ -170,8 +178,9 @@ serve(async (req) => {
       }
     }
 
-    console.log("Final summary (first 100 chars):", summary.substring(0, 100) + "...");
+    console.log("Final summary length:", summary.length);
     
+    // Return the summary as JSON
     return new Response(JSON.stringify({ summary }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

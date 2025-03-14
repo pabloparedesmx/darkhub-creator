@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sparkles, Copy, Check, AlertCircle } from 'lucide-react';
+import { Sparkles, Copy, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 
@@ -27,8 +27,9 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     
     try {
       console.log("Requesting summary for course:", courseTitle);
+      console.log("Content length:", courseContent.length);
       
-      // Make API call to the Gemini API through our backend proxy
+      // Make API call to the Gemini API through our Supabase edge function
       const { data, error: fnError } = await supabase.functions.invoke("summarize-with-gemini", {
         body: {
           title: courseTitle,
@@ -36,11 +37,22 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
         }
       });
       
+      console.log("Response received:", data);
+      
       if (fnError) {
+        console.error("Function error:", fnError);
         throw new Error(`Error calling function: ${fnError.message}`);
       }
       
-      if (!data || !data.summary) {
+      if (!data) {
+        throw new Error('No se recibió ninguna respuesta del servidor');
+      }
+      
+      if (data.error) {
+        throw new Error(`Error del servidor: ${data.error}`);
+      }
+      
+      if (!data.summary) {
         throw new Error('No se recibió ningún resumen del servidor');
       }
       
@@ -75,6 +87,11 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     setTimeout(() => {
       setCopied(false);
     }, 2000);
+  };
+
+  const retryGeneration = () => {
+    setError(null);
+    handleSummarize();
   };
 
   return (
@@ -113,8 +130,9 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
             <Button 
               variant="outline" 
               className="mt-4" 
-              onClick={() => setError(null)}
+              onClick={retryGeneration}
             >
+              <RefreshCw className="h-4 w-4 mr-2" />
               Intentar de nuevo
             </Button>
           </div>
