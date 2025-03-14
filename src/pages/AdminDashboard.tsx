@@ -2,17 +2,17 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Trash } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Category, DbCourse, UserProfile } from '@/types/admin';
+import { Category, DbCourse, UserProfile, Tool } from '@/types/admin';
 
 // Import refactored components
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import UserManagement from '@/components/admin/UserManagement';
 import CourseManagement from '@/components/admin/CourseManagement';
+import ToolManagement from '@/components/admin/ToolManagement';
 import AnalyticsTab from '@/components/admin/AnalyticsTab';
 
 const AdminDashboard = () => {
@@ -22,6 +22,7 @@ const AdminDashboard = () => {
   
   const [courses, setCourses] = useState<DbCourse[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [tools, setTools] = useState<Tool[]>([]);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [userSearchTerm, setUserSearchTerm] = useState('');
@@ -40,6 +41,7 @@ const AdminDashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUserLoading, setIsUserLoading] = useState(true);
+  const [isToolsLoading, setIsToolsLoading] = useState(true);
 
   // Check if user is admin, redirect if not
   useEffect(() => {
@@ -85,7 +87,7 @@ const AdminDashboard = () => {
           return {
             ...course,
             badges,
-            toolName: course.categories ? (course.categories as any).name : undefined
+            toolName: course.categories ? course.categories.name : undefined
           };
         });
         
@@ -104,6 +106,35 @@ const AdminDashboard = () => {
     };
     
     fetchData();
+  }, [toast]);
+
+  // Fetch tools
+  useEffect(() => {
+    const fetchTools = async () => {
+      setIsToolsLoading(true);
+      
+      try {
+        const { data, error } = await supabase
+          .from('tools')
+          .select('*')
+          .order('name');
+        
+        if (error) throw error;
+        
+        setTools(data as Tool[]);
+      } catch (error) {
+        console.error('Error fetching tools:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tools",
+          variant: "destructive",
+        });
+      } finally {
+        setIsToolsLoading(false);
+      }
+    };
+    
+    fetchTools();
   }, [toast]);
 
   // Fetch user data
@@ -236,7 +267,7 @@ const AdminDashboard = () => {
       const newCourseItem: DbCourse = {
         ...data,
         badges,
-        toolName: data.categories ? (data.categories as any).name : undefined
+        toolName: data.categories ? data.categories.name : undefined
       };
       
       setCourses([newCourseItem, ...courses]);
@@ -350,7 +381,7 @@ const AdminDashboard = () => {
       const updatedCourse: DbCourse = {
         ...data,
         badges,
-        toolName: data.categories ? (data.categories as any).name : undefined
+        toolName: data.categories ? data.categories.name : undefined
       };
       
       setCourses(courses.map(course => 
@@ -381,6 +412,85 @@ const AdminDashboard = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to update course",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Tool management functions
+  const handleAddTool = async (newTool: Omit<Tool, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('tools')
+        .insert([newTool])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setTools([...tools, data as Tool]);
+      
+      toast({
+        title: "Success",
+        description: "Tool added successfully",
+      });
+    } catch (error: any) {
+      console.error('Error adding tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add tool",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateTool = async (id: string, updatedTool: Partial<Tool>) => {
+    try {
+      const { data, error } = await supabase
+        .from('tools')
+        .update(updatedTool)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      setTools(tools.map(tool => tool.id === id ? data as Tool : tool));
+      
+      toast({
+        title: "Success",
+        description: "Tool updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update tool",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTool = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('tools')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setTools(tools.filter(tool => tool.id !== id));
+      
+      toast({
+        title: "Success",
+        description: "Tool deleted successfully",
+      });
+    } catch (error: any) {
+      console.error('Error deleting tool:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete tool",
         variant: "destructive",
       });
     }
@@ -443,6 +553,7 @@ const AdminDashboard = () => {
               <Tabs defaultValue="content">
                 <TabsList className="mb-6">
                   <TabsTrigger value="content">Content Management</TabsTrigger>
+                  <TabsTrigger value="tools">Tools Management</TabsTrigger>
                   <TabsTrigger value="users">User Management</TabsTrigger>
                   <TabsTrigger value="analytics">Analytics</TabsTrigger>
                 </TabsList>
@@ -459,6 +570,16 @@ const AdminDashboard = () => {
                     handleUpdateCourse={handleUpdateCourse}
                     handleEditCourse={handleEditCourse}
                     handleDeleteCourse={handleDeleteCourse}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="tools">
+                  <ToolManagement
+                    tools={tools}
+                    isLoading={isToolsLoading}
+                    handleAddTool={handleAddTool}
+                    handleUpdateTool={handleUpdateTool}
+                    handleDeleteTool={handleDeleteTool}
                   />
                 </TabsContent>
                 

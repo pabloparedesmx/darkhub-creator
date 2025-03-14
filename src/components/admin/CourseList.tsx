@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Edit, Trash, BookOpen } from 'lucide-react';
+import { MoreVertical, Edit, Trash, BookOpen, Tool } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import RichTextContent from '@/components/ui/RichTextContent';
 import { DbCourse } from '@/types/admin';
+import CourseToolAssociation from './CourseToolAssociation';
 
 interface CourseListProps {
   courses: DbCourse[];
@@ -22,6 +23,14 @@ const CourseList = ({
   handleDeleteCourse,
   isLoading
 }: CourseListProps) => {
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [isToolDialogOpen, setIsToolDialogOpen] = useState(false);
+
+  const handleManageTools = (courseId: string) => {
+    setSelectedCourseId(courseId);
+    setIsToolDialogOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       {isLoading ? (
@@ -76,26 +85,38 @@ const CourseList = ({
                             </div>
                           </div>
                           
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEditCourse(course)}>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteCourse(course.id)}
-                                className="text-destructive"
-                              >
-                                <Trash className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="mr-2"
+                              onClick={() => handleManageTools(course.id)}
+                            >
+                              <Tool className="h-4 w-4 mr-1" />
+                              Tools
+                            </Button>
+                            
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEditCourse(course)}>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteCourse(course.id)}
+                                  className="text-destructive"
+                                >
+                                  <Trash className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -105,6 +126,14 @@ const CourseList = ({
             </div>
           )}
         </>
+      )}
+      
+      {selectedCourseId && (
+        <CourseToolAssociation
+          courseId={selectedCourseId}
+          isOpen={isToolDialogOpen}
+          onClose={() => setIsToolDialogOpen(false)}
+        />
       )}
     </div>
   );

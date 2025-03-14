@@ -23,6 +23,9 @@ export const useCourseFilters = (coursesData: Course[]) => {
     contentCreation: false
   });
 
+  // Add selected tools filter
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+
   // Difficulty options
   const [difficulties, setDifficulties] = useState({
     beginner: false,
@@ -61,6 +64,13 @@ export const useCourseFilters = (coursesData: Course[]) => {
       }
     }
 
+    // Apply tools filters
+    if (selectedTools.length > 0) {
+      filteredCourses = filteredCourses.filter(course => 
+        course.toolIds && selectedTools.some(toolId => course.toolIds?.includes(toolId))
+      );
+    }
+
     // Apply difficulty filters
     const selectedDifficulties = Object.entries(difficulties)
       .filter(([_, isSelected]) => isSelected)
@@ -89,7 +99,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
     }
 
     setCourses(filteredCourses);
-  }, [searchTerm, filters, difficulties, sortOrder, coursesData]);
+  }, [searchTerm, filters, difficulties, sortOrder, coursesData, selectedTools]);
 
   // Update courses when coursesData changes
   useEffect(() => {
@@ -117,6 +127,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
       intermediate: false,
       advanced: false
     });
+    setSelectedTools([]);
     setSortOrder('newest');
   };
 
@@ -130,6 +141,8 @@ export const useCourseFilters = (coursesData: Course[]) => {
     setCategories,
     difficulties,
     setDifficulties,
+    selectedTools,
+    setSelectedTools,
     clearAllFilters,
     setSortOrder
   };

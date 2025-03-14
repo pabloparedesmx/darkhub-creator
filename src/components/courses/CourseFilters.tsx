@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
+import ToolFilters from './ToolFilters';
 
 type FiltersState = {
   all: boolean;
@@ -33,6 +34,8 @@ interface CourseFiltersProps {
   setCategories: React.Dispatch<React.SetStateAction<CategoriesState>>;
   difficulties: DifficultiesState;
   setDifficulties: React.Dispatch<React.SetStateAction<DifficultiesState>>;
+  selectedTools: string[];
+  setSelectedTools: React.Dispatch<React.SetStateAction<string[]>>;
   clearAllFilters: () => void;
 }
 
@@ -43,6 +46,8 @@ const CourseFilters = ({
   setCategories,
   difficulties,
   setDifficulties,
+  selectedTools,
+  setSelectedTools,
   clearAllFilters
 }: CourseFiltersProps) => {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -154,6 +159,12 @@ const CourseFilters = ({
             </div>
           </div>
         </div>
+
+        {/* Tool filters */}
+        <ToolFilters
+          selectedTools={selectedTools}
+          setSelectedTools={setSelectedTools}
+        />
 
         {/* Difficulty filter */}
         <div className="border-t border-border pt-4">

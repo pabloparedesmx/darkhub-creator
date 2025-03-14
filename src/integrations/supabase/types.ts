@@ -33,6 +33,42 @@ export type Database = {
         }
         Relationships: []
       }
+      course_tools: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          tool_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          tool_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_tools_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_tools_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           author_id: string | null
@@ -226,6 +262,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tools: {
+        Row: {
+          created_at: string
+          description: string
+          favicon: string | null
+          has_pro_perk: boolean
+          id: string
+          name: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          favicon?: string | null
+          has_pro_perk?: boolean
+          id?: string
+          name: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          favicon?: string | null
+          has_pro_perk?: boolean
+          id?: string
+          name?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
       }
     }
     Views: {

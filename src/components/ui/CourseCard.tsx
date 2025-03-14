@@ -15,6 +15,7 @@ export type Course = {
   icon?: string;
   toolName?: string;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  toolIds?: string[]; // Add toolIds for filtering
 };
 
 interface CourseCardProps {

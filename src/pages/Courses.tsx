@@ -21,7 +21,8 @@ const Courses = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const { data, error } = await supabase
+        // First fetch all courses
+        const { data: coursesData, error: coursesError } = await supabase
           .from('courses')
           .select(`
             id, 
@@ -37,10 +38,26 @@ const Courses = () => {
           `)
           .order('created_at', { ascending: false });
         
-        if (error) throw error;
+        if (coursesError) throw coursesError;
+        
+        // Then fetch course-tool relationships
+        const { data: courseToolsData, error: courseToolsError } = await supabase
+          .from('course_tools')
+          .select('course_id, tool_id');
+        
+        if (courseToolsError) throw courseToolsError;
+        
+        // Create a map of course IDs to tool IDs
+        const courseToolsMap: Record<string, string[]> = {};
+        courseToolsData.forEach(item => {
+          if (!courseToolsMap[item.course_id]) {
+            courseToolsMap[item.course_id] = [];
+          }
+          courseToolsMap[item.course_id].push(item.tool_id);
+        });
         
         // Transform data to match Course interface
-        const transformedCourses: Course[] = data.map(course => {
+        const transformedCourses: Course[] = coursesData.map(course => {
           const badges: Array<'tutorial' | 'pro' | 'free'> = [];
           if (course.is_pro) badges.push('pro');
           if (course.is_free) badges.push('free');
@@ -54,7 +71,8 @@ const Courses = () => {
             slug: course.slug,
             icon: course.icon || '📚',
             difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
-            toolName: course.categories && course.categories[0] ? course.categories[0].name : undefined
+            toolName: course.categories ? course.categories.name : undefined,
+            toolIds: courseToolsMap[course.id] || [] // Add tool IDs for filtering
           };
         });
         
@@ -84,6 +102,8 @@ const Courses = () => {
     setCategories,
     difficulties,
     setDifficulties,
+    selectedTools,
+    setSelectedTools,
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
@@ -126,6 +146,8 @@ const Courses = () => {
                 setCategories={setCategories}
                 difficulties={difficulties}
                 setDifficulties={setDifficulties}
+                selectedTools={selectedTools}
+                setSelectedTools={setSelectedTools}
                 clearAllFilters={clearAllFilters}
               />
 
