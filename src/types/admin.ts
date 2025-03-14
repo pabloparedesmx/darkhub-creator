@@ -9,6 +9,7 @@ export type DbCourse = Database['public']['Tables']['courses']['Row'] & {
   badges: Array<'pro' | 'free'>;
   toolName?: string;
   toolIcon?: string;
+  short_description?: string; // Explicitly add short_description property
 };
 
 // Type for user profiles

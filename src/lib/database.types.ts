@@ -67,6 +67,7 @@ export interface Database {
           id: string
           title: string
           description: string
+          short_description: string | null
           slug: string
           icon: string | null
           category_id: string | null
@@ -82,6 +83,7 @@ export interface Database {
           id?: string
           title: string
           description: string
+          short_description?: string | null
           slug: string
           icon?: string | null
           category_id?: string | null
@@ -97,6 +99,7 @@ export interface Database {
           id?: string
           title?: string
           description?: string
+          short_description?: string | null
           slug?: string
           icon?: string | null
           category_id?: string | null

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,6 +29,7 @@ const AdminDashboard = () => {
   const [newCourse, setNewCourse] = useState({
     title: '',
     description: '',
+    short_description: '', // Added short_description field
     slug: '',
     icon: '',
     category_id: '',
@@ -225,7 +227,7 @@ const AdminDashboard = () => {
   };
 
   const handleAddCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = newCourse;
+    const { title, description, short_description, slug, icon, category_id, isPro, isFree, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -242,6 +244,7 @@ const AdminDashboard = () => {
         .insert([{
           title,
           description,
+          short_description, // Add short_description to the insert
           slug,
           icon: icon || '📚',
           category_id: category_id || null,
@@ -270,6 +273,7 @@ const AdminDashboard = () => {
       setNewCourse({
         title: '',
         description: '',
+        short_description: '', // Reset short_description
         slug: '',
         icon: '',
         category_id: '',
@@ -322,6 +326,7 @@ const AdminDashboard = () => {
     setNewCourse({
       title: course.title,
       description: course.description,
+      short_description: course.short_description || '', // Add short_description with fallback
       slug: course.slug,
       icon: course.icon || '',
       category_id: course.category_id || '',
@@ -335,7 +340,7 @@ const AdminDashboard = () => {
   const handleUpdateCourse = async () => {
     if (!selectedCourse) return;
     
-    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = newCourse;
+    const { title, description, short_description, slug, icon, category_id, isPro, isFree, difficulty } = newCourse;
     
     if (!title || !description || !slug) {
       toast({
@@ -352,6 +357,7 @@ const AdminDashboard = () => {
         .update({
           title,
           description,
+          short_description, // Add short_description to the update
           slug,
           icon: icon || '📚',
           category_id: category_id || null,
@@ -385,6 +391,7 @@ const AdminDashboard = () => {
       setNewCourse({
         title: '',
         description: '',
+        short_description: '', // Reset short_description
         slug: '',
         icon: '',
         category_id: '',
