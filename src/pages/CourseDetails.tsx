@@ -114,8 +114,8 @@ const CourseDetails = () => {
             <CourseTools courseId={course.id} />
           </div>
 
-          {/* Right side panel for sharing */}
-          <div className="max-w-4xl mx-auto">
+          {/* Right side panel for sharing - Added mt-12 to increase vertical spacing */}
+          <div className="max-w-4xl mx-auto mt-12">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

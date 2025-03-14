@@ -92,7 +92,7 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
   }
 
   return (
-    <div className="mt-8">
+    <div className="mt-8 mb-8">
       <h3 className="text-xl font-semibold mb-4">Tools Used in This Course</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {tools.map(tool => (

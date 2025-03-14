@@ -35,7 +35,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
   };
 
   return (
-    <div className="bg-secondary/20 rounded-lg p-6 border border-border">
+    <div className="bg-secondary/20 rounded-lg p-6 border border-border mt-2">
       <div className="flex items-center justify-between mb-6">
         <span className="text-sm text-muted-foreground flex items-center">
           <span className="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
