@@ -20,16 +20,16 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(window.location.href);
     toast({
-      title: "Link copied",
-      description: "Course link has been copied to clipboard",
+      title: "Enlace copiado",
+      description: "El enlace del curso ha sido copiado al portapapeles",
       duration: 3000,
     });
   };
 
   const saveToBookmarks = () => {
     toast({
-      title: "Saved",
-      description: "Course has been added to your bookmarks",
+      title: "Guardado",
+      description: "El curso ha sido añadido a tus marcadores",
       duration: 3000,
     });
   };
@@ -39,7 +39,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
       <div className="flex items-center justify-between mb-6">
         <span className="text-sm text-muted-foreground flex items-center">
           <span className="inline-block w-2 h-2 bg-primary rounded-full mr-2"></span>
-          Not Started
+          No iniciado
         </span>
         <div className="flex space-x-2">
           <TooltipProvider>
@@ -50,7 +50,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Save</p>
+                <p>Guardar</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -63,14 +63,14 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Mark as complete</p>
+                <p>Marcar como completado</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
       </div>
 
-      <h3 className="text-lg font-medium mb-4">Share with a friend</h3>
+      <h3 className="text-lg font-medium mb-4">Compartir con un amigo</h3>
       <div className="mb-4">
         <Button 
           variant="outline" 
@@ -78,7 +78,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
           onClick={copyToClipboard}
         >
           <Copy className="mr-2 h-4 w-4" />
-          Copy to clipboard
+          Copiar al portapapeles
         </Button>
       </div>
 
@@ -91,7 +91,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Share on Twitter</p>
+              <p>Compartir en Twitter</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -104,7 +104,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Share on Facebook</p>
+              <p>Compartir en Facebook</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -117,7 +117,7 @@ const CourseSharePanel = ({ courseTitle }: CourseSharePanelProps) => {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Share on LinkedIn</p>
+              <p>Compartir en LinkedIn</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
