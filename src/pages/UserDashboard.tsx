@@ -251,14 +251,14 @@ const UserDashboard = () => {
                           <div className="flex items-center">
                             <input 
                               type="checkbox" 
-                              id="tutorials" 
-                              checked={showTutorials}
-                              onChange={() => handleFilterToggle('tutorials')}
+                              id="pro" 
+                              checked={showPro}
+                              onChange={() => handleFilterToggle('pro')}
                               className="mr-2"
                               disabled={showAll}
                             />
-                            <label htmlFor="tutorials" className="text-sm cursor-pointer">
-                              Tutorials
+                            <label htmlFor="pro" className="text-sm cursor-pointer">
+                              Pro Content
                             </label>
                           </div>
                         </div>
