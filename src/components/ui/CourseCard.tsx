@@ -8,7 +8,7 @@ export type Course = {
   id: string;
   title: string;
   description: string;
-  badges: Array<'tutorial' | 'pro'>;
+  badges: Array<'tutorial' | 'pro' | 'free'>;
   slug: string;
   icon?: string;
   toolName?: string;
