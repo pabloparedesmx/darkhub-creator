@@ -25,7 +25,9 @@ serve(async (req) => {
       ? content.substring(0, 8000) + '...'
       : content;
 
-    // Create a prompt for Gemini
+    console.log("Creating prompt for Gemini API");
+    
+    // Create a structured prompt that instructs Gemini to return a JSON response
     const prompt = `
     Título del curso: "${title}"
     
@@ -38,11 +40,14 @@ serve(async (req) => {
     3. Destaca los puntos clave y las ideas principales.
     4. Usa un tono profesional pero accesible.
     5. Evita repeticiones y contenido irrelevante.
+    6. IMPORTANTE: Debes retornar EXCLUSIVAMENTE un objeto JSON válido con la siguiente estructura:
+       { "summary": "el texto del resumen aquí" }
+    7. No incluyas ningún texto adicional o explicación fuera del objeto JSON.
     `;
 
-    console.log("Calling Gemini API with prompt:", prompt.substring(0, 100) + "...");
+    console.log("Calling Gemini API with structured prompt");
 
-    // Call Gemini API
+    // Call Gemini API with specific configuration for JSON output
     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
       method: "POST",
       headers: {
@@ -73,14 +78,16 @@ serve(async (req) => {
       throw new Error(`HTTP error from Gemini API: ${response.status} ${errorText}`);
     }
 
-    // Try to parse the JSON response
+    // Get full response body as text
+    const responseBody = await response.text();
+    console.log("Gemini API raw response:", responseBody.substring(0, 200) + "...");
+    
+    // Try to parse the Gemini response
     let data;
     try {
-      data = await response.json();
-      console.log("Gemini API response received:", JSON.stringify(data).substring(0, 200) + "...");
+      data = JSON.parse(responseBody);
     } catch (parseError) {
-      const responseText = await response.text();
-      console.error("Failed to parse Gemini API response:", responseText);
+      console.error("Failed to parse Gemini API response:", responseBody);
       throw new Error(`Failed to parse Gemini API response: ${parseError.message}`);
     }
     
@@ -96,15 +103,60 @@ serve(async (req) => {
       throw new Error("Unexpected response structure from Gemini API");
     }
     
-    // Extract the summary text
-    const summary = data.candidates[0].content.parts[0].text;
+    // Extract the response text
+    const responseText = data.candidates[0].content.parts[0].text;
     
-    if (!summary) {
-      console.error("No summary text in Gemini API response:", data);
-      throw new Error("No summary text in Gemini API response");
+    if (!responseText) {
+      console.error("No text in Gemini API response:", data);
+      throw new Error("No text in Gemini API response");
     }
 
-    console.log("Successfully generated summary, returning response");
+    console.log("Raw text from Gemini:", responseText.substring(0, 200) + "...");
+    
+    // Try to extract the JSON from the response text
+    // First, we'll try to parse it directly in case it's a clean JSON string
+    let summary;
+    try {
+      // Attempt to parse the entire response as JSON
+      const jsonResponse = JSON.parse(responseText.trim());
+      if (jsonResponse && jsonResponse.summary) {
+        summary = jsonResponse.summary;
+        console.log("Successfully extracted summary from JSON response");
+      } else {
+        // If we got valid JSON but no summary field
+        console.error("Invalid JSON structure (no summary field):", jsonResponse);
+        throw new Error("Gemini returned valid JSON but without the required summary field");
+      }
+    } catch (jsonError) {
+      // If direct parsing fails, try to extract JSON from text
+      console.log("Couldn't parse response directly as JSON, attempting to extract JSON...");
+      try {
+        // Look for JSON-like patterns
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonStr = jsonMatch[0];
+          const extractedJson = JSON.parse(jsonStr);
+          if (extractedJson && extractedJson.summary) {
+            summary = extractedJson.summary;
+            console.log("Successfully extracted JSON from text response");
+          } else {
+            throw new Error("Extracted JSON doesn't contain summary field");
+          }
+        } else {
+          // If no JSON pattern found, use the whole text as summary
+          console.log("No JSON found in response, using entire text as summary");
+          summary = responseText.trim();
+        }
+      } catch (extractError) {
+        console.error("Failed to extract JSON:", extractError);
+        // Fall back to using the whole response as the summary
+        summary = responseText.trim();
+        console.log("Using full response as summary after failed JSON extraction");
+      }
+    }
+
+    console.log("Final summary (first 100 chars):", summary.substring(0, 100) + "...");
+    
     return new Response(JSON.stringify({ summary }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
