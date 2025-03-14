@@ -8,6 +8,7 @@ import GetStarted from '@/components/home/GetStarted';
 import Testimonials from '@/components/home/Testimonials';
 import Education from '@/components/home/Education';
 import FAQ from '@/components/home/FAQ';
+import Pricing from '@/components/home/Pricing';
 import { motion } from 'framer-motion';
 
 const Index = () => {
@@ -33,6 +34,7 @@ const Index = () => {
         <Education />
         <Testimonials />
         <FeaturedCourses />
+        <Pricing />
         <FAQ />
       </main>
       <Footer />
