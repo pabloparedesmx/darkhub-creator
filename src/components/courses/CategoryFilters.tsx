@@ -13,7 +13,7 @@ interface CategoryFiltersProps {
 }
 
 const CategoryFilters = ({ selectedCategories, setSelectedCategories }: CategoryFiltersProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
