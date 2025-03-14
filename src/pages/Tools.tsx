@@ -74,7 +74,7 @@ const Tools = () => {
     if (isUrl) {
       return (
         <Avatar className="h-12 w-12 mr-4">
-          <img src={favicon} alt="Tool icon" className="h-full w-full object-contain" />
+          <img src={favicon} alt="Ícono de herramienta" className="h-full w-full object-contain" />
           <AvatarFallback>🔧</AvatarFallback>
         </Avatar>
       );
@@ -88,11 +88,11 @@ const Tools = () => {
   if (isLoading) {
     return <Layout>
       <div className="container py-16">
-        <h1 className="text-3xl font-bold mb-2">Tools</h1>
+        <h1 className="text-3xl font-bold mb-2">Herramientas</h1>
         <p className="text-muted-foreground mb-8">
-          All the AI tools we teach in our tutorials.
+          Todas las herramientas de IA que enseñamos en nuestros tutoriales.
         </p>
-        <LoadingState message="Loading tools..." />
+        <LoadingState message="Cargando herramientas..." />
       </div>
     </Layout>;
   }
@@ -101,7 +101,7 @@ const Tools = () => {
   if (error) {
     return <Layout>
       <div className="container py-16">
-        <ErrorState message="Error loading tools" />
+        <ErrorState message="Error al cargar las herramientas" />
       </div>
     </Layout>;
   }
@@ -114,9 +114,9 @@ const Tools = () => {
         transition={{ duration: 0.5 }}
         className="container py-16"
       >
-        <h1 className="text-3xl font-bold mb-2">Tools</h1>
+        <h1 className="text-3xl font-bold mb-2">Herramientas</h1>
         <p className="text-muted-foreground mb-8">
-          All the AI tools we teach in our tutorials.
+          Todas las herramientas de IA que enseñamos en nuestros tutoriales.
         </p>
 
         {/* Search and Sort */}
@@ -124,7 +124,7 @@ const Tools = () => {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
             <Input 
-              placeholder="Search tools..." 
+              placeholder="Buscar herramientas..." 
               className="pl-10 pr-10" 
               value={searchQuery}
               onChange={handleSearchChange}
@@ -143,15 +143,15 @@ const Tools = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="min-w-[100px]">
                 <SortAsc className="mr-2 h-4 w-4" />
-                Sort
+                Ordenar
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => handleSortChange('name')}>
-                Name {sortOption === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Nombre {sortOption === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleSortChange('created_at')}>
-                Date Added {sortOption === 'created_at' && (sortDirection === 'asc' ? '↑' : '↓')}
+                Fecha añadida {sortOption === 'created_at' && (sortDirection === 'asc' ? '↑' : '↓')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -174,7 +174,7 @@ const Tools = () => {
                     <h3 className="text-xl font-semibold">{tool.name}</h3>
                     {tool.has_pro_perk && (
                       <Badge variant="secondary" className="mt-1">
-                        Pro perk available
+                        Beneficio Pro disponible
                       </Badge>
                     )}
                   </div>
@@ -182,17 +182,17 @@ const Tools = () => {
                 <p className="text-muted-foreground mb-4 flex-grow">{tool.description}</p>
                 <Button variant="outline" size="sm" className="w-full" asChild>
                   <a href={tool.url} target="_blank" rel="noopener noreferrer">
-                    Visit Tool <ExternalLink className="ml-2 h-3 w-3" />
+                    Visitar Herramienta <ExternalLink className="ml-2 h-3 w-3" />
                   </a>
                 </Button>
               </motion.div>
             ))
           ) : (
             <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground">No tools found matching your search.</p>
+              <p className="text-muted-foreground">No se encontraron herramientas que coincidan con tu búsqueda.</p>
               {searchQuery && (
                 <Button variant="outline" onClick={clearSearch} className="mt-4">
-                  Clear Search
+                  Limpiar búsqueda
                 </Button>
               )}
             </div>
