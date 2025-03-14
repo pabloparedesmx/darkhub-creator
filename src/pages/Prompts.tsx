@@ -73,7 +73,7 @@ const Prompts = () => {
       y: 0
     }} transition={{
       duration: 0.5
-    }} className="container py-0">
+    }} className="container py-[64px]">
         <div className="mt-8 mb-12">  {/* Added top margin and increased bottom margin */}
           <h1 className="text-3xl font-bold mb-6">Prompts</h1> {/* Increased bottom margin from mb-4 to mb-6 */}
           <p className="text-muted-foreground mb-10"> {/* Increased bottom margin from mb-8 to mb-10 */}
