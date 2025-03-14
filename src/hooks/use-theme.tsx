@@ -22,9 +22,6 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-// Array of routes that should always use dark mode
-const FORCE_DARK_ROUTES = ['/', '/login', '/signup'];
-
 export function ThemeProvider({
   children,
   defaultTheme = 'dark',
@@ -38,26 +35,21 @@ export function ThemeProvider({
   // Get the current path from window.location
   const currentPath = window.location.pathname;
   
-  // Check if we're on a route that should force dark mode
-  const shouldForceDarkMode = FORCE_DARK_ROUTES.includes(currentPath);
+  // Detect if we're on a public route (homepage, login, signup)
+  const isPublicRoute = 
+    currentPath === '/' || 
+    currentPath === '/login' || 
+    currentPath === '/signup';
+
+  // Set the appropriate default theme based on route
+  const routeBasedDefaultTheme = isPublicRoute ? 'dark' : 'light';
 
   useEffect(() => {
-    // For force dark mode routes, always use dark theme
-    if (shouldForceDarkMode) {
-      setTheme('dark');
-      return;
-    }
-    
-    // For other routes, apply the default theme based on route only if user hasn't set a preference yet
+    // Apply the default theme based on route only if user hasn't set a preference yet
     if (!localStorage.getItem(storageKey)) {
-      const isPublicRoute = 
-        currentPath === '/' || 
-        currentPath === '/login' || 
-        currentPath === '/signup';
-      const routeBasedDefaultTheme = isPublicRoute ? 'dark' : 'light';
       setTheme(routeBasedDefaultTheme);
     }
-  }, [currentPath, storageKey, shouldForceDarkMode]);
+  }, [currentPath, routeBasedDefaultTheme, storageKey]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -68,19 +60,14 @@ export function ThemeProvider({
     // Add the current theme class
     root.classList.add(theme);
     
-    // Only store the theme if we're not on a force dark mode route
-    if (!shouldForceDarkMode) {
-      localStorage.setItem(storageKey, theme);
-    }
-  }, [theme, storageKey, shouldForceDarkMode]);
+    // Store the current theme
+    localStorage.setItem(storageKey, theme);
+  }, [theme, storageKey]);
 
   const value = {
     theme,
-    setTheme: (newTheme: Theme) => {
-      // Only allow theme changes if we're not on a force dark mode route
-      if (!shouldForceDarkMode) {
-        setTheme(newTheme);
-      }
+    setTheme: (theme: Theme) => {
+      setTheme(theme);
     },
   };
 

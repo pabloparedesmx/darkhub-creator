@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,10 +5,6 @@ import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
-
-// Array of routes that should always use dark mode
-const FORCE_DARK_ROUTES = ['/', '/login', '/signup'];
-
 const Navbar = () => {
   const location = useLocation();
   const {
@@ -32,16 +27,11 @@ const Navbar = () => {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
-  
   const isHome = location.pathname === '/';
   const isAuthPage = ['/login', '/signup'].includes(location.pathname);
 
-  // Check if we're on public routes
+  // Check if we are on public routes
   const isPublicRoute = isHome || isAuthPage;
-  
-  // Check if we're on a route that forces dark mode
-  const shouldForceDarkMode = FORCE_DARK_ROUTES.includes(location.pathname);
-  
   return <header className={cn('fixed top-0 z-50 w-full border-b transition-all duration-200', isScrolled || !isPublicRoute ? 'border-border/40 bg-background/95 backdrop-blur-md' : 'border-transparent bg-transparent')}>
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
@@ -88,7 +78,7 @@ const Navbar = () => {
               </>}
           </div>
           
-          {/* Theme toggle - only shown on pages where theme can be changed */}
+          {/* Theme toggle - always visible */}
           <ThemeToggle />
         </nav>
         
