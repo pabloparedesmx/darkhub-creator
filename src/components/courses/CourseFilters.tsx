@@ -4,11 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 import ToolFilters from './ToolFilters';
-
-type FiltersState = {
-  all: boolean;
-  tutorials: boolean;
-};
+import CategoryFilters from './CategoryFilters';
 
 type DifficultiesState = {
   beginner: boolean;
@@ -17,22 +13,22 @@ type DifficultiesState = {
 };
 
 interface CourseFiltersProps {
-  filters: FiltersState;
-  setFilters: React.Dispatch<React.SetStateAction<FiltersState>>;
   difficulties: DifficultiesState;
   setDifficulties: React.Dispatch<React.SetStateAction<DifficultiesState>>;
   selectedTools: string[];
   setSelectedTools: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedCategories: string[];
+  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
   clearAllFilters: () => void;
 }
 
 const CourseFilters = ({
-  filters,
-  setFilters,
   difficulties,
   setDifficulties,
   selectedTools,
   setSelectedTools,
+  selectedCategories,
+  setSelectedCategories,
   clearAllFilters
 }: CourseFiltersProps) => {
   const [isDifficultyOpen, setIsDifficultyOpen] = useState(true);
@@ -52,46 +48,16 @@ const CourseFilters = ({
           </Button>
         </div>
 
-        {/* Type filters */}
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="all" 
-              checked={filters.all}
-              onCheckedChange={(checked) => {
-                if (checked) {
-                  setFilters({
-                    all: true,
-                    tutorials: false
-                  });
-                }
-              }}
-            />
-            <label htmlFor="all" className="text-sm font-medium cursor-pointer">
-              All
-            </label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="tutorials" 
-              checked={filters.tutorials}
-              onCheckedChange={(checked) => {
-                setFilters({
-                  all: false,
-                  tutorials: !!checked
-                });
-              }}
-            />
-            <label htmlFor="tutorials" className="text-sm font-medium cursor-pointer">
-              Tutorials
-            </label>
-          </div>
-        </div>
-
         {/* Tool filters */}
         <ToolFilters
           selectedTools={selectedTools}
           setSelectedTools={setSelectedTools}
+        />
+
+        {/* Category filters */}
+        <CategoryFilters
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
         />
 
         {/* Difficulty filter */}

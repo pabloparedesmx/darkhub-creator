@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from '@/contexts/AuthContext';
-import { Category, DbCourse } from '@/types/admin';
+import { Category } from '@/types/admin';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Save } from 'lucide-react';
-
+import { Switch } from "@/components/ui/switch";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -37,7 +37,8 @@ const CourseEditor = () => {
     slug: '',
     icon: '',
     category_id: '',
-    isTutorial: false,
+    isPro: false,
+    isFree: true,
     difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
   });
 
@@ -69,7 +70,8 @@ const CourseEditor = () => {
             slug: courseData.slug,
             icon: courseData.icon || '',
             category_id: courseData.category_id || '',
-            isTutorial: courseData.is_tutorial,
+            isPro: courseData.is_pro || false,
+            isFree: courseData.is_free || true,
             difficulty: courseData.difficulty || 'beginner'
           });
         }
@@ -89,7 +91,7 @@ const CourseEditor = () => {
   }, [courseId, isNewCourse, toast]);
 
   const handleSaveCourse = async () => {
-    const { title, description, slug, icon, category_id, isTutorial, difficulty } = course;
+    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = course;
     
     if (!title || !description || !slug) {
       toast({
@@ -112,7 +114,8 @@ const CourseEditor = () => {
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
-            is_tutorial: isTutorial,
+            is_pro: isPro,
+            is_free: isFree,
             difficulty: difficulty,
             author_id: user?.id
           }]);
@@ -132,7 +135,8 @@ const CourseEditor = () => {
             slug,
             icon: icon || '📚',
             category_id: category_id || null,
-            is_tutorial: isTutorial,
+            is_pro: isPro,
+            is_free: isFree,
             difficulty
           })
           .eq('id', courseId);
@@ -330,6 +334,30 @@ const CourseEditor = () => {
                       <SelectItem value="advanced">Advanced</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Access Type</label>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Switch 
+                      id="isPro"
+                      checked={course.isPro}
+                      onCheckedChange={(checked) => handleInputChange('isPro', checked)}
+                    />
+                    <label htmlFor="isPro" className="text-sm cursor-pointer">
+                      Pro Content
+                    </label>
+                  </div>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Switch 
+                      id="isFree"
+                      checked={course.isFree}
+                      onCheckedChange={(checked) => handleInputChange('isFree', checked)}
+                    />
+                    <label htmlFor="isFree" className="text-sm cursor-pointer">
+                      Free Access
+                    </label>
+                  </div>
                 </div>
                 
                 <Separator className="my-4" />

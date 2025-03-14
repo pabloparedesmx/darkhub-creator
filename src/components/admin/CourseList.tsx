@@ -79,11 +79,24 @@ const CourseList = ({
                             <Link to={`/courses/${course.slug}`} className="hover:text-primary transition-colors">
                               <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                             </Link>
-                            {course.badges && course.badges.includes('tutorial') && (
-                              <div className="inline-block bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded-full text-xs mb-3">
-                                Tutorial
-                              </div>
-                            )}
+                            {/* Display badges */}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {course.is_pro && (
+                                <div className="inline-block bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-1 rounded-full text-xs">
+                                  Pro
+                                </div>
+                              )}
+                              {course.is_free && (
+                                <div className="inline-block bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded-full text-xs">
+                                  Free
+                                </div>
+                              )}
+                              {course.difficulty && (
+                                <div className="inline-block bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded-full text-xs">
+                                  {course.difficulty}
+                                </div>
+                              )}
+                            </div>
                             <div className="mb-4">
                               <RichTextContent 
                                 content={course.description} 
@@ -93,9 +106,6 @@ const CourseList = ({
                             <div className="flex items-center text-xs text-muted-foreground">
                               <BookOpen className="h-3 w-3 mr-1" />
                               <span>Slug: {course.slug}</span>
-                              {course.difficulty && (
-                                <span className="ml-3">Difficulty: {course.difficulty}</span>
-                              )}
                             </div>
                           </div>
                           

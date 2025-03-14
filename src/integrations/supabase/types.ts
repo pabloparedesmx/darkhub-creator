@@ -78,7 +78,8 @@ export type Database = {
           difficulty: string | null
           icon: string | null
           id: string
-          is_tutorial: boolean
+          is_free: boolean | null
+          is_pro: boolean | null
           slug: string
           title: string
           updated_at: string
@@ -91,7 +92,8 @@ export type Database = {
           difficulty?: string | null
           icon?: string | null
           id?: string
-          is_tutorial?: boolean
+          is_free?: boolean | null
+          is_pro?: boolean | null
           slug: string
           title: string
           updated_at?: string
@@ -104,7 +106,8 @@ export type Database = {
           difficulty?: string | null
           icon?: string | null
           id?: string
-          is_tutorial?: boolean
+          is_free?: boolean | null
+          is_pro?: boolean | null
           slug?: string
           title?: string
           updated_at?: string

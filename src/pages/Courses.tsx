@@ -32,8 +32,8 @@ const Courses = () => {
             icon,
             is_pro,
             is_free,
-            is_tutorial,
-            difficulty
+            difficulty,
+            category_id
           `)
           .order('created_at', { ascending: false });
         
@@ -69,8 +69,7 @@ const Courses = () => {
         
         // Transform data to match Course interface
         const transformedCourses: Course[] = coursesData.map(course => {
-          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-          if (course.is_tutorial) badges.push('tutorial');
+          const badges: Array<'pro' | 'free'> = [];
           if (course.is_pro) badges.push('pro');
           if (course.is_free) badges.push('free');
           
@@ -87,7 +86,8 @@ const Courses = () => {
             difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
             toolName: toolInfo.name,
             toolIcon: toolInfo.icon,
-            toolIds: courseToolsMap[course.id] || []
+            toolIds: courseToolsMap[course.id] || [],
+            categoryId: course.category_id
           };
         });
         
@@ -111,12 +111,12 @@ const Courses = () => {
     searchTerm,
     setSearchTerm,
     courses,
-    filters,
-    setFilters,
     difficulties,
     setDifficulties,
     selectedTools,
     setSelectedTools,
+    selectedCategories,
+    setSelectedCategories,
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
@@ -153,12 +153,12 @@ const Courses = () => {
             <div className="flex flex-col lg:flex-row gap-8">
               {/* Filters sidebar */}
               <CourseFilters 
-                filters={filters}
-                setFilters={setFilters}
                 difficulties={difficulties}
                 setDifficulties={setDifficulties}
                 selectedTools={selectedTools}
                 setSelectedTools={setSelectedTools}
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
                 clearAllFilters={clearAllFilters}
               />
 

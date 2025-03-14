@@ -6,13 +6,12 @@ export const useCourseFilters = (coursesData: Course[]) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
   const [courses, setCourses] = useState<Course[]>(coursesData);
-  const [filters, setFilters] = useState({
-    all: true,
-    tutorials: false
-  });
 
-  // Add selected tools filter
+  // Tool filters
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
+
+  // Category filters
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   // Difficulty options
   const [difficulties, setDifficulties] = useState({
@@ -33,19 +32,17 @@ export const useCourseFilters = (coursesData: Course[]) => {
       );
     }
 
-    // Apply type filters (tutorial)
-    if (!filters.all) {
-      if (filters.tutorials) {
-        filteredCourses = filteredCourses.filter(course => 
-          course.badges.includes('tutorial')
-        );
-      }
-    }
-
     // Apply tools filters
     if (selectedTools.length > 0) {
       filteredCourses = filteredCourses.filter(course => 
         course.toolIds && selectedTools.some(toolId => course.toolIds?.includes(toolId))
+      );
+    }
+
+    // Apply category filters
+    if (selectedCategories.length > 0) {
+      filteredCourses = filteredCourses.filter(course => 
+        course.categoryId && selectedCategories.includes(course.categoryId)
       );
     }
 
@@ -77,7 +74,7 @@ export const useCourseFilters = (coursesData: Course[]) => {
     }
 
     setCourses(filteredCourses);
-  }, [searchTerm, filters, difficulties, sortOrder, coursesData, selectedTools]);
+  }, [searchTerm, difficulties, sortOrder, coursesData, selectedTools, selectedCategories]);
 
   // Update courses when coursesData changes
   useEffect(() => {
@@ -86,16 +83,13 @@ export const useCourseFilters = (coursesData: Course[]) => {
 
   const clearAllFilters = () => {
     setSearchTerm('');
-    setFilters({
-      all: true,
-      tutorials: false
-    });
     setDifficulties({
       beginner: false,
       intermediate: false,
       advanced: false
     });
     setSelectedTools([]);
+    setSelectedCategories([]);
     setSortOrder('newest');
   };
 
@@ -103,12 +97,12 @@ export const useCourseFilters = (coursesData: Course[]) => {
     searchTerm,
     setSearchTerm,
     courses,
-    filters,
-    setFilters,
     difficulties,
     setDifficulties,
     selectedTools,
     setSelectedTools,
+    selectedCategories,
+    setSelectedCategories,
     clearAllFilters,
     setSortOrder
   };
