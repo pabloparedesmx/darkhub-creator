@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -9,6 +8,7 @@ import { ChevronLeft, ChevronRight, Play, Lock, Check, CheckCircle } from 'lucid
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import NewsletterSubscribe from '@/components/ui/NewsletterSubscribe';
 
 interface Lesson {
   id: string;
@@ -443,6 +443,11 @@ const CoursePlayer = () => {
                     Continue exploring the content and make sure to complete the exercises at the end of this lesson
                     to reinforce your understanding.
                   </p>
+                </div>
+                
+                {/* Newsletter signup */}
+                <div className="my-8">
+                  <NewsletterSubscribe courseTitle={course?.title} />
                 </div>
                 
                 {/* Navigation */}
