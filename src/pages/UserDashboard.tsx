@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
-import { Bell, Search, CreditCard, Home, Settings, User, ChevronDown, X } from 'lucide-react';
+import { Bell, Search, CreditCard, Home, Settings, User, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
 

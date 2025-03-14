@@ -30,6 +30,8 @@ const Courses = () => {
             description, 
             slug, 
             icon,
+            is_pro,
+            is_free,
             is_tutorial,
             difficulty
           `)
@@ -57,17 +59,20 @@ const Courses = () => {
           
           // Set the first tool's info as the course's tool info if not already set
           if (!courseToolInfoMap[item.course_id] && item.tools) {
+            const toolInfo = item.tools as any; // Type assertion to access properties
             courseToolInfoMap[item.course_id] = {
-              name: item.tools.name,
-              icon: item.tools.favicon
+              name: toolInfo.name,
+              icon: toolInfo.favicon
             };
           }
         });
         
         // Transform data to match Course interface
         const transformedCourses: Course[] = coursesData.map(course => {
-          const badges: Array<'tutorial'> = [];
+          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
           if (course.is_tutorial) badges.push('tutorial');
+          if (course.is_pro) badges.push('pro');
+          if (course.is_free) badges.push('free');
           
           // Get the tool info for this course, if any
           const toolInfo = courseToolInfoMap[course.id] || {};

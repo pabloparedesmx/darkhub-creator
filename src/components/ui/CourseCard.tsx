@@ -8,7 +8,7 @@ export type Course = {
   id: string;
   title: string;
   description: string;
-  badges: Array<'tutorial'>;
+  badges: Array<'tutorial' | 'pro' | 'free'>;  // Updated to include 'pro' and 'free'
   slug: string;
   icon?: string;
   toolName?: string;
@@ -65,7 +65,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                   key={index} 
                   className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                 >
-                  {badge === 'tutorial' ? 'Tutorial' : badge}
+                  {badge === 'tutorial' ? 'Tutorial' : badge === 'pro' ? 'Pro' : 'Free'}
                 </span>
               ))}
             </div>

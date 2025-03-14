@@ -38,9 +38,9 @@ const FeaturedCourses = () => {
         // Transform data to match Course interface
         const transformedCourses: Course[] = data.map(course => {
           const badges: Array<'tutorial' | 'pro' | 'free'> = [];
+          if (course.is_tutorial) badges.push('tutorial');
           if (course.is_pro) badges.push('pro');
           if (course.is_free) badges.push('free');
-          if (course.is_tutorial) badges.push('tutorial');
           
           return {
             id: course.id,
