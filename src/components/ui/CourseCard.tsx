@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 export type Course = {
   id: string;
   title: string;
-  description: string;
+  short_description: string;
   badges: Array<'pro' | 'free'>;  // Only 'pro' or 'free' are allowed
   slug: string;
   icon?: string;
