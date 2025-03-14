@@ -14,14 +14,14 @@ const UserDashboard = () => {
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [showAll, setShowAll] = useState(true);
   const [showCourses, setShowCourses] = useState(false);
-  const [showTutorials, setShowTutorials] = useState(false);
+  const [showPro, setShowPro] = useState(false);
   
   const [courses, setCourses] = useState<Course[]>([
     {
       id: '1',
       title: 'Use Grok 3 DeepSearch to do product research on X',
       description: 'How to use Grok 3\'s DeepSearch more to do detailed product research quickly.',
-      badges: ['tutorial', 'pro'],
+      badges: ['pro', 'free'],
       slug: 'grok-product-research',
       toolName: 'Grok',
       toolIcon: '🤖',
@@ -30,7 +30,7 @@ const UserDashboard = () => {
       id: '2',
       title: 'Build a simple to-do list app using Bolt',
       description: 'A walkthrough building in Bolt—perfect if you\'re just starting out creating apps using AI.',
-      badges: ['tutorial'],
+      badges: ['free'],
       slug: 'bolt-todo-app',
       toolName: 'Bolt',
       toolIcon: '⚡',
@@ -39,7 +39,7 @@ const UserDashboard = () => {
       id: '3',
       title: 'Build an app with AI coding tool Bolt',
       description: 'A walkthrough on how to build a waitlist signup web app with login functionality using Bolt.',
-      badges: ['tutorial', 'pro'],
+      badges: ['pro', 'free'],
       slug: 'bolt-ai-coding',
       toolName: 'Bolt',
       toolIcon: '⚡',
@@ -48,7 +48,7 @@ const UserDashboard = () => {
       id: '4',
       title: 'Upscale images for better resolution',
       description: 'Learn how to upscale images using Topaz Lab\'s Gigapixel.',
-      badges: ['tutorial', 'pro'],
+      badges: ['pro', 'free'],
       slug: 'upscale-images',
       toolName: 'Topaz Lab',
       toolIcon: '🖼️',
@@ -57,7 +57,7 @@ const UserDashboard = () => {
       id: '5',
       title: 'Build an app with AI coding tool Create',
       description: 'A walkthrough on how to build an app using Create',
-      badges: ['tutorial', 'pro'],
+      badges: ['pro', 'free'],
       slug: 'create-ai-coding',
       toolName: 'Create',
       toolIcon: '✨',
@@ -66,7 +66,7 @@ const UserDashboard = () => {
       id: '6',
       title: 'Monitoring and improving the sales pipeline',
       description: 'Monitor your sales performance and engagement data to create insightful reports using Claude.',
-      badges: ['tutorial', 'pro'],
+      badges: ['pro', 'free'],
       slug: 'sales-pipeline',
       toolName: 'Claude',
       toolIcon: '📊',
@@ -88,37 +88,37 @@ const UserDashboard = () => {
     
     // Apply type filters (only if not showing all)
     if (!showAll) {
-      if (showCourses && !showTutorials) {
-        filtered = filtered.filter(course => !course.badges.includes('tutorial'));
-      } else if (!showCourses && showTutorials) {
-        filtered = filtered.filter(course => course.badges.includes('tutorial'));
-      } else if (!showCourses && !showTutorials) {
+      if (showCourses && !showPro) {
+        filtered = filtered.filter(course => !course.badges.includes('pro'));
+      } else if (!showCourses && showPro) {
+        filtered = filtered.filter(course => course.badges.includes('pro'));
+      } else if (!showCourses && !showPro) {
         // If nothing selected, show nothing
         filtered = [];
       }
     }
     
     setFilteredCourses(filtered);
-  }, [searchTerm, courses, showAll, showCourses, showTutorials]);
+  }, [searchTerm, courses, showAll, showCourses, showPro]);
 
   const clearFilters = () => {
     setSearchTerm('');
     setShowAll(true);
     setShowCourses(false);
-    setShowTutorials(false);
+    setShowPro(false);
   };
 
-  const handleFilterToggle = (filter: 'all' | 'courses' | 'tutorials') => {
+  const handleFilterToggle = (filter: 'all' | 'courses' | 'pro') => {
     if (filter === 'all') {
       setShowAll(true);
       setShowCourses(false);
-      setShowTutorials(false);
+      setShowPro(false);
     } else {
       setShowAll(false);
       if (filter === 'courses') {
         setShowCourses(prev => !prev);
-      } else if (filter === 'tutorials') {
-        setShowTutorials(prev => !prev);
+      } else if (filter === 'pro') {
+        setShowPro(prev => !prev);
       }
     }
   };

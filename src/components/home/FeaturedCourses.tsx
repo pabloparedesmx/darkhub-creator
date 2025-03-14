@@ -1,4 +1,3 @@
-
 import { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
@@ -28,7 +27,6 @@ const FeaturedCourses = () => {
             icon,
             is_pro,
             is_free,
-            is_tutorial,
             categories(name)
           `)
           .limit(5);
@@ -37,8 +35,7 @@ const FeaturedCourses = () => {
         
         // Transform data to match Course interface
         const transformedCourses: Course[] = data.map(course => {
-          const badges: Array<'tutorial' | 'pro' | 'free'> = [];
-          if (course.is_tutorial) badges.push('tutorial');
+          const badges: Array<'pro' | 'free'> = [];
           if (course.is_pro) badges.push('pro');
           if (course.is_free) badges.push('free');
           

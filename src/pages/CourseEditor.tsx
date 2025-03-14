@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -7,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Category } from '@/types/admin';
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { 
   Select,
   SelectContent,
@@ -31,6 +29,7 @@ const CourseEditor = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  
   const [course, setCourse] = useState({
     title: '',
     description: '',

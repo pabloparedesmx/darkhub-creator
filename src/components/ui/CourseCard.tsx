@@ -8,7 +8,7 @@ export type Course = {
   id: string;
   title: string;
   description: string;
-  badges: Array<'pro' | 'free'>;  // Updated to remove 'tutorial'
+  badges: Array<'pro' | 'free'>;  // Only 'pro' or 'free' are allowed
   slug: string;
   icon?: string;
   toolName?: string;

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Category } from '@/types/admin';
+import { Switch } from '@/components/ui/switch';
 
 interface CourseFormProps {
   newCourse: {
@@ -20,7 +21,8 @@ interface CourseFormProps {
     slug: string;
     icon: string;
     category_id: string;
-    isTutorial: boolean;
+    isPro: boolean;
+    isFree: boolean;
     difficulty?: 'beginner' | 'intermediate' | 'advanced';
   };
   setNewCourse: (course: any) => void;
@@ -114,6 +116,29 @@ const CourseForm = ({
               <SelectItem value="advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="space-y-2">
+          <label>Access Type</label>
+          <div className="flex items-center space-x-2 mt-4">
+            <Switch 
+              id="isPro"
+              checked={newCourse.isPro}
+              onCheckedChange={(checked) => setNewCourse({...newCourse, isPro: checked})}
+            />
+            <label htmlFor="isPro" className="text-sm cursor-pointer">
+              Pro Content
+            </label>
+          </div>
+          <div className="flex items-center space-x-2 mt-2">
+            <Switch 
+              id="isFree"
+              checked={newCourse.isFree}
+              onCheckedChange={(checked) => setNewCourse({...newCourse, isFree: checked})}
+            />
+            <label htmlFor="isFree" className="text-sm cursor-pointer">
+              Free Access
+            </label>
+          </div>
         </div>
       </div>
       
