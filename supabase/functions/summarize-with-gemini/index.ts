@@ -48,8 +48,9 @@ serve(async (req) => {
 
     console.log("Calling Gemini API with structured prompt");
 
-    // Use the proper v1 endpoint (not v1beta)
-    const response = await fetch("https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent", {
+    // The problem is in the API endpoint - gemini-pro model doesn't exist in v1 endpoint
+    // Let's use the correct endpoint for gemini-1.5-pro
+    const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
