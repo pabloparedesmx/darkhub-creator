@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -77,34 +78,34 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20% 95%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
  
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
 
-    --secondary: 217 33% 17%;
+    --secondary: 222.2 47.4% 11.2%;
     --secondary-foreground: 210 40% 98%;
  
     --accent: 217 33% 17%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
 
-    --ring: 212 100% 47%;
+    --ring: 224 76% 48%;
 
     --sidebar-background: 217 33% 17%;
     --sidebar-foreground: 210 40% 98%;
@@ -243,7 +244,7 @@
 }
 
 .ai-button {
-  @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all;
+  @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30;
 }
 
 .ai-hero-bg {
@@ -260,4 +261,33 @@
   background-image: url('/lovable-uploads/2d11c5ed-a05a-4379-9b30-a8004decb20c.png');
   background-size: cover;
   background-position: center;
+}
+
+/* New Futuristic UI Styles */
+.glassmorphism {
+  @apply backdrop-blur-md bg-black/20 border border-white/10;
+}
+
+.blue-glassmorphism {
+  @apply backdrop-blur-md bg-blue-950/30 border border-blue-500/30 shadow-sm shadow-blue-500/10;
+}
+
+.blue-card-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), 0 0 40px rgba(59, 130, 246, 0.05);
+}
+
+.blue-text-glow {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.blue-input-focus {
+  @apply focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all;
+}
+
+.blue-accent-border {
+  @apply border-blue-500/30;
+}
+
+.blue-accent-gradient {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0) 100%);
 }

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from '@/components/layout/Navbar';
@@ -11,6 +12,7 @@ import { useCourseFilters } from '@/hooks/useCourseFilters';
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
+
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -157,6 +159,7 @@ const Courses = () => {
     };
     fetchToolsAndCategories();
   }, []);
+  
   const {
     searchTerm,
     setSearchTerm,
@@ -170,6 +173,7 @@ const Courses = () => {
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
+  
   const handleSortChange = (value: string) => {
     setSortOrder(value);
   };
@@ -228,6 +232,7 @@ const Courses = () => {
     });
     return filters;
   };
+  
   return <motion.div initial={{
     opacity: 0
   }} animate={{
@@ -249,11 +254,11 @@ const Courses = () => {
         }} transition={{
           duration: 0.5
         }} className="max-w-4xl mx-auto mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">Navega por nuestros tutoriales de IA</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center ai-gradient-text ai-blue-glow">Navega por nuestros tutoriales de IA</h1>
           </motion.div>
 
           {isLoading ? <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 shadow-md shadow-blue-500/20"></div>
             </div> : <div className="flex flex-col lg:flex-row gap-8">
               {/* Filters sidebar */}
               <CourseFilters difficulties={difficulties} setDifficulties={setDifficulties} selectedTools={selectedTools} setSelectedTools={setSelectedTools} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} clearAllFilters={clearAllFilters} />
@@ -276,4 +281,5 @@ const Courses = () => {
       <Footer />
     </motion.div>;
 };
+
 export default Courses;

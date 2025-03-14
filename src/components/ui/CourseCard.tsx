@@ -59,7 +59,11 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
-        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-md border-border ${featured ? 'border-primary/40' : 'hover:border-primary/20'} backdrop-blur-sm`}
+        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 
+                    backdrop-blur-sm ${featured ? 'border-blue-500/40' : 'hover:border-blue-500/30'} 
+                    relative after:absolute after:inset-0 after:-z-10 after:bg-gradient-to-br 
+                    after:from-blue-900/20 after:to-transparent after:opacity-0 hover:after:opacity-100 
+                    after:transition-opacity`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -70,7 +74,11 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
               {course.badges.map((badge, index) => (
                 <span 
                   key={index} 
-                  className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    badge === 'pro' 
+                      ? 'bg-purple-900/30 text-purple-300 border border-purple-500/30' 
+                      : 'bg-green-900/30 text-green-300 border border-green-500/30'
+                  }`}
                 >
                   {badge === 'pro' ? 'Pro' : 'Gratis'}
                 </span>
@@ -80,11 +88,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             {/* Course title */}
             <div className="px-4 pt-2 pb-3 flex-grow">
               <motion.h3 
-                className="text-lg font-semibold mb-2"
-                animate={{ 
-                  color: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--foreground))'
-                }}
-                transition={{ duration: 0.2 }}
+                className={`text-lg font-semibold mb-2 ${isHovered ? 'text-blue-400 blue-text-glow' : 'text-blue-50'} transition-all duration-300`}
               >
                 {course.title}
               </motion.h3>
@@ -95,9 +99,9 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             </div>
             
             {/* Tool icon at the bottom */}
-            <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center">
+            <div className="px-4 py-3 border-t border-blue-900/30 bg-blue-950/20 flex items-center">
               {renderToolIcon(course.toolIcon || course.icon)}
-              <span className="text-xs text-muted-foreground truncate">
+              <span className="text-xs text-blue-300 truncate">
                 {displayToolName || course.slug}
               </span>
             </div>
