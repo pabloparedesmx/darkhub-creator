@@ -63,6 +63,17 @@ const Courses = () => {
           if (course.is_free) badges.push('free');
           if (course.is_tutorial) badges.push('tutorial');
           
+          // Fix for the categories object - ensure we get the name correctly
+          let categoryName: string | undefined;
+          if (course.categories) {
+            // Handle both cases: if categories is an object with a name property or a Record type
+            categoryName = typeof course.categories === 'object' && course.categories !== null
+              ? 'name' in course.categories
+                ? (course.categories as { name: string }).name
+                : undefined
+              : undefined;
+          }
+          
           return {
             id: course.id,
             title: course.title,
@@ -71,7 +82,7 @@ const Courses = () => {
             slug: course.slug,
             icon: course.icon || '📚',
             difficulty: course.difficulty as 'beginner' | 'intermediate' | 'advanced',
-            toolName: course.categories ? course.categories.name : undefined,
+            toolName: categoryName,
             toolIds: courseToolsMap[course.id] || [] // Add tool IDs for filtering
           };
         });

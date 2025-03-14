@@ -31,7 +31,13 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
           .map(item => {
             // Check if tools is defined and extract it
             if (item.tools) {
-              return item.tools as Tool;
+              // Ensure item.tools is a valid Tool object and not an array
+              const toolData = item.tools;
+              if (typeof toolData === 'object' && !Array.isArray(toolData) && 
+                  'id' in toolData && 'name' in toolData) {
+                return toolData as Tool;
+              }
+              console.error('Unexpected tool data structure:', item.tools);
             }
             return null;
           })

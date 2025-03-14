@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Edit, Trash, BookOpen, Tool } from 'lucide-react';
+import { MoreVertical, Edit, Trash, BookOpen, Wrench } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import RichTextContent from '@/components/ui/RichTextContent';
@@ -92,7 +92,7 @@ const CourseList = ({
                               className="mr-2"
                               onClick={() => handleManageTools(course.id)}
                             >
-                              <Tool className="h-4 w-4 mr-1" />
+                              <Wrench className="h-4 w-4 mr-1" />
                               Tools
                             </Button>
                             
