@@ -30,13 +30,19 @@ const CourseTools = ({ courseId }: CourseToolsProps) => {
         // Extract the tool objects from the response
         const toolsData = data
           .map(item => {
-            // Check if tools is defined and extract it
+            // Check if tools property exists and is not null
             if (item.tools) {
-              // Ensure item.tools is a valid Tool object and not an array
-              const toolData = item.tools as Tool;
-              if (typeof toolData === 'object' && !Array.isArray(toolData) && 
-                  'id' in toolData && 'name' in toolData) {
-                return toolData;
+              // First cast to unknown, then to Tool to avoid TypeScript error
+              const toolData = item.tools as unknown;
+              // Now check if it's a valid Tool object
+              if (
+                typeof toolData === 'object' && 
+                toolData !== null && 
+                !Array.isArray(toolData) && 
+                'id' in toolData && 
+                'name' in toolData
+              ) {
+                return toolData as Tool;
               }
               console.error('Unexpected tool data structure:', item.tools);
             }
