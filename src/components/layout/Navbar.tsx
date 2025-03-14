@@ -13,12 +13,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const isDashboardArea = location.pathname.match(/^\/(dashboard|courses|profile|admin)/);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,6 +94,9 @@ const Navbar = () => {
           {isAuthenticated ? (
             // User is logged in
             <div className="flex items-center ml-4 space-x-2">
+              {/* Theme Toggle - Only show in dashboard area */}
+              {isDashboardArea && <ThemeToggle />}
+              
               {/* Notifications */}
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="h-5 w-5" />
@@ -208,6 +213,14 @@ const Navbar = () => {
               </details>
             </div>
             <div className="pt-2 border-t border-border">
+              {/* Add theme toggle to mobile menu if in dashboard area */}
+              {isDashboardArea && (
+                <div className="flex items-center justify-between py-2 px-3">
+                  <span className="text-sm">Theme</span>
+                  <ThemeToggle />
+                </div>
+              )}
+              
               <div className="relative my-2">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
