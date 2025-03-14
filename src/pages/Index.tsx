@@ -1,7 +1,5 @@
 
 import { useEffect } from 'react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 import Hero from '@/components/home/Hero';
 import FeaturedCourses from '@/components/home/FeaturedCourses';
 import GetStarted from '@/components/home/GetStarted';
@@ -36,7 +34,6 @@ const Index = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen flex flex-col bg-background"
     >
-      <Navbar />
       <main className="flex-grow">
         <Hero />
         <GetStarted />
@@ -46,7 +43,6 @@ const Index = () => {
         <Pricing />
         <FAQ />
       </main>
-      <Footer />
     </motion.div>
   );
 };

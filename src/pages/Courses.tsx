@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import { Layout } from '@/components/layout/Layout';
 import { Course } from '@/components/ui/CourseCard';
 import CourseFilters from '@/components/courses/CourseFilters';
 import CourseSearch from '@/components/courses/CourseSearch';
@@ -11,12 +10,11 @@ import { useCourseFilters } from '@/hooks/useCourseFilters';
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
+
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [tools, setTools] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<Record<string, string>>({});
 
@@ -25,10 +23,7 @@ const Courses = () => {
     const fetchCourses = async () => {
       try {
         // First fetch all courses
-        const {
-          data: coursesData,
-          error: coursesError
-        } = await supabase.from('courses').select(`
+        const { data: coursesData, error: coursesError } = await supabase.from('courses').select(`
             id, 
             title, 
             description, 
@@ -38,24 +33,16 @@ const Courses = () => {
             is_free,
             difficulty,
             category_id
-          `).order('created_at', {
-          ascending: false
-        });
+          `).order('created_at', { ascending: false });
         if (coursesError) throw coursesError;
 
         // Then fetch course-tool relationships
-        const {
-          data: courseToolsData,
-          error: courseToolsError
-        } = await supabase.from('course_tools').select('course_id, tool_id, tools(id, name, favicon)');
+        const { data: courseToolsData, error: courseToolsError } = await supabase.from('course_tools').select('course_id, tool_id, tools(id, name, favicon)');
         if (courseToolsError) throw courseToolsError;
 
         // Create a map of course IDs to tool IDs and tool data
         const courseToolsMap: Record<string, string[]> = {};
-        const courseToolInfoMap: Record<string, {
-          name?: string;
-          icon?: string;
-        }> = {};
+        const courseToolInfoMap: Record<string, { name?: string; icon?: string; }> = {};
         courseToolsData.forEach(item => {
           // Add tool ID to the course's tool IDs array
           if (!courseToolsMap[item.course_id]) {
@@ -121,10 +108,7 @@ const Courses = () => {
     const fetchToolsAndCategories = async () => {
       try {
         // Fetch all tools
-        const {
-          data: toolsData,
-          error: toolsError
-        } = await supabase.from('tools').select('id, name');
+        const { data: toolsData, error: toolsError } = await supabase.from('tools').select('id, name');
         if (toolsError) throw toolsError;
 
         // Create a map of tool IDs to names, removing "Herramienta: " prefix if it exists
@@ -139,10 +123,7 @@ const Courses = () => {
         setTools(toolsMap);
 
         // Fetch all categories
-        const {
-          data: categoriesData,
-          error: categoriesError
-        } = await supabase.from('categories').select('id, name');
+        const { data: categoriesData, error: categoriesError } = await supabase.from('categories').select('id, name');
         if (categoriesError) throw categoriesError;
 
         // Create a map of category IDs to names
@@ -157,6 +138,7 @@ const Courses = () => {
     };
     fetchToolsAndCategories();
   }, []);
+
   const {
     searchTerm,
     setSearchTerm,
@@ -170,6 +152,7 @@ const Courses = () => {
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
+
   const handleSortChange = (value: string) => {
     setSortOrder(value);
   };
@@ -228,52 +211,58 @@ const Courses = () => {
     });
     return filters;
   };
-  return <motion.div initial={{
-    opacity: 0
-  }} animate={{
-    opacity: 1
-  }} exit={{
-    opacity: 0
-  }} transition={{
-    duration: 0.5
-  }} className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-grow pt-24 pb-20 px-4">
-        <div className="container mx-auto">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5
-        }} className="max-w-4xl mx-auto mb-12">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">Navega por nuestros tutoriales de IA</h1>
-          </motion.div>
 
-          {isLoading ? <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div> : <div className="flex flex-col lg:flex-row gap-8">
-              {/* Filters sidebar */}
-              <CourseFilters difficulties={difficulties} setDifficulties={setDifficulties} selectedTools={selectedTools} setSelectedTools={setSelectedTools} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} clearAllFilters={clearAllFilters} />
-
-              {/* Main content */}
-              <div className="flex-1">
-                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <CourseSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-                  <CourseSort onSortChange={handleSortChange} />
-                </div>
-                
-                {/* Filter Tags */}
-                <FilterTags activeFilters={getActiveFilters()} />
-
-                <CourseGrid courses={courses} coursesData={coursesData} clearAllFilters={clearAllFilters} />
-              </div>
-            </div>}
+  return (
+    <Layout>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="container py-16"
+      >
+        <div className="mt-8 mb-12">
+          <h1 className="text-3xl font-bold mb-6">Tutoriales de IA</h1>
+          <p className="text-muted-foreground mb-10">
+            Navega por nuestros tutoriales de IA
+          </p>
         </div>
-      </main>
-      <Footer />
-    </motion.div>;
+
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+            {/* Filters sidebar */}
+            <div className="md:col-span-3 space-y-8">
+              <CourseFilters 
+                difficulties={difficulties} 
+                setDifficulties={setDifficulties} 
+                selectedTools={selectedTools} 
+                setSelectedTools={setSelectedTools} 
+                selectedCategories={selectedCategories} 
+                setSelectedCategories={setSelectedCategories} 
+                clearAllFilters={clearAllFilters} 
+              />
+            </div>
+
+            {/* Main content */}
+            <div className="md:col-span-9">
+              <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <CourseSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                <CourseSort onSortChange={handleSortChange} />
+              </div>
+              
+              {/* Filter Tags */}
+              <FilterTags activeFilters={getActiveFilters()} />
+
+              <CourseGrid courses={courses} coursesData={coursesData} clearAllFilters={clearAllFilters} />
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </Layout>
+  );
 };
+
 export default Courses;

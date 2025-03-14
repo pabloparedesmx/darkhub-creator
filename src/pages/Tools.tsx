@@ -86,24 +86,28 @@ const Tools = () => {
 
   // Show loading state
   if (isLoading) {
-    return <Layout>
-      <div className="container py-16">
-        <h1 className="text-3xl font-bold mb-2">Herramientas</h1>
-        <p className="text-muted-foreground mb-8">
-          Todas las herramientas de IA que enseñamos en nuestros tutoriales.
-        </p>
-        <LoadingState message="Cargando herramientas..." />
-      </div>
-    </Layout>;
+    return (
+      <Layout>
+        <div className="container py-16">
+          <h1 className="text-3xl font-bold mb-6">Herramientas</h1>
+          <p className="text-muted-foreground mb-10">
+            Todas las herramientas de IA que enseñamos en nuestros tutoriales.
+          </p>
+          <LoadingState message="Cargando herramientas..." />
+        </div>
+      </Layout>
+    );
   }
 
   // Show error state
   if (error) {
-    return <Layout>
-      <div className="container py-16">
-        <ErrorState message="Error al cargar las herramientas" />
-      </div>
-    </Layout>;
+    return (
+      <Layout>
+        <div className="container py-16">
+          <ErrorState message="Error al cargar las herramientas" />
+        </div>
+      </Layout>
+    );
   }
 
   return (
@@ -114,10 +118,12 @@ const Tools = () => {
         transition={{ duration: 0.5 }}
         className="container py-16"
       >
-        <h1 className="text-3xl font-bold mb-2">Herramientas</h1>
-        <p className="text-muted-foreground mb-8">
-          Todas las herramientas de IA que enseñamos en nuestros tutoriales.
-        </p>
+        <div className="mt-8 mb-12">
+          <h1 className="text-3xl font-bold mb-6">Herramientas</h1>
+          <p className="text-muted-foreground mb-10">
+            Todas las herramientas de IA que enseñamos en nuestros tutoriales.
+          </p>
+        </div>
 
         {/* Search and Sort */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-between">

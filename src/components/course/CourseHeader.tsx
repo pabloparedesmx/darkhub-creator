@@ -13,7 +13,7 @@ interface CourseHeaderProps {
 
 const CourseHeader = ({ course }: CourseHeaderProps) => {
   return (
-    <div className="mb-8">
+    <div className="mb-12">
       {/* Breadcrumb */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -42,10 +42,10 @@ const CourseHeader = ({ course }: CourseHeaderProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <div className="mb-4">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">{course.title}</h1>
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold mb-6">{course.title}</h1>
           {/* Subtitle (brief description) */}
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-muted-foreground mb-10">
             {course.short_description || "Aprende a usar esta herramienta de manera efectiva para tus proyectos."}
           </p>
         </div>
