@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Bell, CreditCard, Home, Settings, User } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
 
 const UserDashboard = () => {
@@ -47,7 +48,10 @@ const UserDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold mb-8">My Dashboard</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">My Dashboard</h1>
+            <ThemeToggle />
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
             {/* Sidebar */}
