@@ -11,10 +11,20 @@ import { motion } from 'framer-motion';
 import { useTheme } from '@/hooks/use-theme';
 
 const Index = () => {
+  const { setTheme } = useTheme();
+  
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Check if user has set a theme preference
+    const storedTheme = localStorage.getItem('dashboard-theme');
+    
+    // Only force dark theme if no user preference exists
+    if (!storedTheme) {
+      setTheme('dark');
+    }
+  }, [setTheme]);
 
   return (
     <motion.div

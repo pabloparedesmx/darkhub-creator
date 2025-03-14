@@ -6,19 +6,14 @@ import { useTheme } from '@/hooks/use-theme';
 import { motion } from 'framer-motion';
 
 export function ThemeToggle() {
-  const { theme, setTheme, isPublicRoute } = useTheme();
-  
-  // Don't render the theme toggle on public routes
-  if (isPublicRoute) {
-    return null;
-  }
+  const { theme, setTheme } = useTheme();
   
   return (
     <Button 
       variant="outline" 
       size="icon" 
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
-      title={`Cambiar a modo ${theme === 'light' ? 'oscuro' : 'claro'}`}
+      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       className="rounded-full border border-blue-500/30 bg-background relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-blue-500/10 backdrop-blur-sm rounded-full"></div>
@@ -35,7 +30,7 @@ export function ThemeToggle() {
           <Sun className="h-5 w-5 text-foreground" />
         )}
       </motion.div>
-      <span className="sr-only">Cambiar tema</span>
+      <span className="sr-only">Toggle theme</span>
     </Button>
   );
 }
