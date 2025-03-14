@@ -28,7 +28,7 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
     try {
       console.log("Requesting summary for course:", courseTitle);
       
-      // Use Supabase Functions.invoke for proper authentication
+      // Make API call to the Gemini API through our backend proxy
       const { data, error: fnError } = await supabase.functions.invoke("summarize-with-gemini", {
         body: {
           title: courseTitle,
