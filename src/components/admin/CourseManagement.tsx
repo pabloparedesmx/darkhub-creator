@@ -2,10 +2,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Search, PlusCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import CourseList from './CourseList';
-import CourseForm from './CourseForm';
 import { DbCourse, Category } from '@/types/admin';
 
 interface CourseManagementProps {
@@ -49,30 +48,12 @@ const CourseManagement = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search content..." className="pl-10" />
         </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add Course
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>{isEditing ? 'Edit Course' : 'Add New Course'}</DialogTitle>
-              <DialogDescription>
-                {isEditing ? 'Update the course details' : 'Create a new course in your platform'}
-              </DialogDescription>
-            </DialogHeader>
-            <CourseForm 
-              newCourse={newCourse}
-              setNewCourse={setNewCourse}
-              isEditing={isEditing}
-              categories={categories}
-              handleAddCourse={handleAddCourse}
-              handleUpdateCourse={handleUpdateCourse}
-            />
-          </DialogContent>
-        </Dialog>
+        <Button asChild>
+          <Link to="/admin/courses/new">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Course
+          </Link>
+        </Button>
       </div>
       
       <CourseList 
