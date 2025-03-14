@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,11 +17,13 @@ const UserDashboard = () => {
   const [showCourses, setShowCourses] = useState(false);
   const [showPro, setShowPro] = useState(false);
   
+  // Updated mock courses to include short_description field
   const [courses, setCourses] = useState<Course[]>([
     {
       id: '1',
       title: 'Use Grok 3 DeepSearch to do product research on X',
       description: 'How to use Grok 3\'s DeepSearch more to do detailed product research quickly.',
+      short_description: 'Bolt has taken the tech world by storm in recent months thanks to the launch of its innovative AI features.',
       badges: ['pro', 'free'],
       slug: 'grok-product-research',
       toolName: 'Grok',
@@ -30,6 +33,7 @@ const UserDashboard = () => {
       id: '2',
       title: 'Build a simple to-do list app using Bolt',
       description: 'A walkthrough building in Bolt—perfect if you\'re just starting out creating apps using AI.',
+      short_description: 'In the world of learning to code (with AI or otherwise), building a to-do list app is a classic starting point.',
       badges: ['free'],
       slug: 'bolt-todo-app',
       toolName: 'Bolt',
@@ -39,6 +43,7 @@ const UserDashboard = () => {
       id: '3',
       title: 'Build an app with AI coding tool Bolt',
       description: 'A walkthrough on how to build a waitlist signup web app with login functionality using Bolt.',
+      short_description: 'Learn how to create a functional web app with user authentication using the powerful Bolt AI coding assistant.',
       badges: ['pro', 'free'],
       slug: 'bolt-ai-coding',
       toolName: 'Bolt',
@@ -48,6 +53,7 @@ const UserDashboard = () => {
       id: '4',
       title: 'Upscale images for better resolution',
       description: 'Learn how to upscale images using Topaz Lab\'s Gigapixel.',
+      short_description: 'Transform low-resolution images into crisp, detailed visuals with this step-by-step guide to image upscaling.',
       badges: ['pro', 'free'],
       slug: 'upscale-images',
       toolName: 'Topaz Lab',
@@ -57,6 +63,7 @@ const UserDashboard = () => {
       id: '5',
       title: 'Build an app with AI coding tool Create',
       description: 'A walkthrough on how to build an app using Create',
+      short_description: 'Follow this comprehensive guide to building your first application with the Create AI coding platform.',
       badges: ['pro', 'free'],
       slug: 'create-ai-coding',
       toolName: 'Create',
@@ -64,11 +71,12 @@ const UserDashboard = () => {
     },
     {
       id: '6',
-      title: 'Monitoring and improving the sales pipeline',
-      description: 'Monitor your sales performance and engagement data to create insightful reports using Claude.',
+      title: 'Curso de Prueba',
+      description: 'Grok 3&rsquo;s release&nbsp;came with DeepSearch mode, a tool that dives deeper into the web.',
+      short_description: 'Grok 3\'s release came with DeepSearch mode, a tool that dives deeper into the web.',
       badges: ['pro', 'free'],
-      slug: 'sales-pipeline',
-      toolName: 'Claude',
+      slug: 'curso-de-prueba',
+      toolName: 'Test',
       toolIcon: '📊',
     },
   ]);
