@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,6 +9,7 @@ import { DbCourse } from '@/types/admin';
 import { useToast } from "@/hooks/use-toast";
 import CourseHeader from '@/components/course/CourseHeader';
 import CourseSharePanel from '@/components/course/CourseSharePanel';
+import SummarizeWithGPT from '@/components/course/SummarizeWithGPT';
 import CourseTools from '@/components/course/CourseTools';
 import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
@@ -15,9 +17,11 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Bookmark, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CategoryBadge from '@/components/ui/CategoryBadge';
+
 interface CourseDetailData extends Omit<DbCourse, 'badges'> {
   badges: Array<'tutorial' | 'pro' | 'free'>;
 }
+
 const CourseDetails = () => {
   const {
     slug
@@ -86,12 +90,15 @@ const CourseDetails = () => {
     // Scroll to top on page load
     window.scrollTo(0, 0);
   }, [slug, navigate, toast]);
+
   if (isLoading) {
     return <LoadingState />;
   }
+
   if (!course) {
     return <ErrorState title="Curso No Encontrado" message="El curso que estás buscando no existe o ha sido eliminado." />;
   }
+
   return <motion.div initial={{
     opacity: 0
   }} animate={{
@@ -141,8 +148,11 @@ const CourseDetails = () => {
             {/* Right sidebar CTA - 1/3 width on desktop */}
             <div className="w-full lg:w-1/3">
               <div className="lg:sticky lg:top-24 space-y-6">
-                {/* Progress Indicator */}
-                
+                {/* GPT Summarization Widget */}
+                <SummarizeWithGPT 
+                  courseTitle={course.title} 
+                  courseContent={course.description} 
+                />
                 
                 {/* Share Panel */}
                 <CourseSharePanel courseTitle={course.title} />
@@ -154,4 +164,5 @@ const CourseDetails = () => {
       <Footer />
     </motion.div>;
 };
+
 export default CourseDetails;
