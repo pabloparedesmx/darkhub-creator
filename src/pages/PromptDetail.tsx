@@ -83,19 +83,19 @@ const PromptDetail = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container py-8"
+        className="container py-16" // Increased from py-8 to py-16
       >
-        <div className="mb-6">
+        <div className="mt-8 mb-10"> {/* Added top margin and increased bottom margin */}
           <Button 
             variant="ghost" 
             onClick={() => navigate('/prompts')}
-            className="mb-4"
+            className="mb-8" // Increased from mb-4 to mb-8
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a prompts
           </Button>
           
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-2">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-6"> {/* Increased gaps from gap-4 to gap-6 and mb-2 to mb-6 */}
             <h1 className="text-3xl font-bold">{prompt.name}</h1>
             <Button onClick={handleCopyPrompt} className="w-full md:w-auto">
               <Copy className="mr-2 h-4 w-4" />
@@ -103,7 +103,7 @@ const PromptDetail = () => {
             </Button>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-8"> {/* Increased from mb-6 to mb-8 */}
             <span>
               Creado: {format(new Date(prompt.created_at), 'dd MMM yyyy')}
             </span>
@@ -115,7 +115,7 @@ const PromptDetail = () => {
           </div>
         </div>
         
-        <div className="bg-card rounded-lg border p-6">
+        <div className="bg-card rounded-lg border p-8 mb-8"> {/* Increased padding from p-6 to p-8, added bottom margin */}
           <RichTextContent 
             content={prompt.content} 
             className="prose dark:prose-invert max-w-none"

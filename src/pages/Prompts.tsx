@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
@@ -68,18 +69,20 @@ const Prompts = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="container py-8"
+        className="container py-16"  // Increased vertical padding from py-8 to py-16
       >
-        <h1 className="text-3xl font-bold mb-4">Prompts</h1>
-        <p className="text-muted-foreground mb-8">
-          Explora nuestra colección de prompts organizados por categoría
-        </p>
+        <div className="mt-8 mb-12">  {/* Added top margin and increased bottom margin */}
+          <h1 className="text-3xl font-bold mb-6">Prompts</h1> {/* Increased bottom margin from mb-4 to mb-6 */}
+          <p className="text-muted-foreground mb-10"> {/* Increased bottom margin from mb-8 to mb-10 */}
+            Explora nuestra colección de prompts organizados por categoría
+          </p>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10"> {/* Increased gap from gap-8 to gap-10 */}
           {/* Sidebar with filters */}
-          <div className="md:col-span-3 space-y-6">
-            <div className="rounded-lg border p-4 bg-card">
-              <h3 className="font-semibold mb-4">Filtros</h3>
+          <div className="md:col-span-3 space-y-8"> {/* Increased space-y from space-y-6 to space-y-8 */}
+            <div className="rounded-lg border p-6 bg-card"> {/* Increased padding from p-4 to p-6 */}
+              <h3 className="font-semibold mb-6">Filtros</h3> {/* Increased margin from mb-4 to mb-6 */}
               <CategoryFilters 
                 selectedCategories={selectedCategories}
                 setSelectedCategories={setSelectedCategories}
@@ -90,7 +93,7 @@ const Prompts = () => {
           {/* Main content */}
           <div className="md:col-span-9">
             {/* Search bar */}
-            <div className="flex gap-4 items-center mb-6">
+            <div className="flex gap-4 items-center mb-8"> {/* Increased margin from mb-6 to mb-8 */}
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <Input 
@@ -113,8 +116,10 @@ const Prompts = () => {
             ) : prompts && prompts.length > 0 ? (
               <PromptGrid prompts={prompts} />
             ) : (
-              <div className="text-center py-12">
-                <h3 className="text-xl font-medium mb-2">No se encontraron prompts</h3>
+              <div className="text-center py-16"> {/* Increased padding from py-12 to py-16 */}
+                <h3 className="text-xl font-medium mb-4"> {/* Increased margin from mb-2 to mb-4 */}
+                  No se encontraron prompts
+                </h3>
                 <p className="text-muted-foreground">
                   {selectedCategories.length > 0 || searchQuery 
                     ? "Intenta ajustando tus filtros de búsqueda"
