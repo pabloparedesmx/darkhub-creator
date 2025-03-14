@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Bell, Search, CreditCard, Home, Settings, User, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import CourseCard, { Course } from '@/components/ui/CourseCard';
+import { FilterTags } from '@/components/ui/FilterTags';
 
 const UserDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -121,6 +122,39 @@ const UserDashboard = () => {
         setShowPro(prev => !prev);
       }
     }
+  };
+
+  // Generate active filters for filter tags
+  const getActiveFilters = () => {
+    const filters = [];
+    
+    if (searchTerm) {
+      filters.push({
+        id: 'search',
+        label: `Search: ${searchTerm}`,
+        onRemove: () => setSearchTerm('')
+      });
+    }
+    
+    if (!showAll) {
+      if (showCourses) {
+        filters.push({
+          id: 'courses',
+          label: 'Courses',
+          onRemove: () => setShowCourses(false)
+        });
+      }
+      
+      if (showPro) {
+        filters.push({
+          id: 'pro',
+          label: 'Pro Content',
+          onRemove: () => setShowPro(false)
+        });
+      }
+    }
+    
+    return filters;
   };
 
   return (
@@ -293,6 +327,9 @@ const UserDashboard = () => {
                         </select>
                       </div>
                     </div>
+
+                    {/* Filter Tags */}
+                    <FilterTags activeFilters={getActiveFilters()} />
                     
                     {/* Displaying count */}
                     <div className="text-sm text-muted-foreground">
