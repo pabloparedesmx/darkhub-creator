@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/hooks/use-theme';
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -11,13 +12,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { ModeToggle } from '../ui/mode-toggle';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from 'lucide-react';
 
+// Create a custom ModeToggle component since the import is missing
+const ModeToggle = () => {
+  const { theme, setTheme } = useTheme();
+  
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          {theme === 'dark' ? <Moon className="h-[1.2rem] w-[1.2rem]" /> : <Sun className="h-[1.2rem] w-[1.2rem]" />}
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+};
+
 const NavLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<React.AnchorHTMLAttributes<HTMLAnchorElement>>
+  React.PropsWithChildren<React.ComponentProps<typeof RouterNavLink>>
 >(({ children, ...props }, ref) => {
   return (
     <RouterNavLink
@@ -35,7 +62,7 @@ NavLink.displayName = "NavLink";
 
 const MobileNavLink = React.forwardRef<
   HTMLAnchorElement,
-  React.PropsWithChildren<React.AnchorHTMLAttributes<HTMLAnchorElement>>
+  React.PropsWithChildren<React.ComponentProps<typeof RouterNavLink>>
 >(({ children, ...props }, ref) => {
   return (
     <RouterNavLink
@@ -52,7 +79,7 @@ const MobileNavLink = React.forwardRef<
 MobileNavLink.displayName = "MobileNavLink";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const { theme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -91,8 +118,12 @@ const Navbar = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.user_metadata?.avatar_url as string} alt={user?.user_metadata?.full_name as string} />
-                    <AvatarFallback>{getInitials(user?.user_metadata?.full_name as string)}</AvatarFallback>
+                    {user.name && (
+                      <>
+                        <AvatarImage src="" alt={user.name} />
+                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                      </>
+                    )}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -100,7 +131,7 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/profile">Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout()}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <ModeToggle />
@@ -136,7 +167,7 @@ const Navbar = () => {
               {user ? (
                 <>
                   <MobileNavLink to="/profile" onClick={closeMobileMenu}>Profile</MobileNavLink>
-                  <Button variant="destructive" size="sm" onClick={() => { signOut(); closeMobileMenu(); }}>Sign Out</Button>
+                  <Button variant="destructive" size="sm" onClick={() => { logout(); closeMobileMenu(); }}>Sign Out</Button>
                 </>
               ) : (
                 <>
@@ -163,7 +194,7 @@ const Navbar = () => {
               {user ? (
                 <>
                   <MobileNavLink to="/profile" onClick={closeMobileMenu}>Profile</MobileNavLink>
-                  <Button variant="destructive" size="sm" onClick={() => { signOut(); closeMobileMenu(); }}>Sign Out</Button>
+                  <Button variant="destructive" size="sm" onClick={() => { logout(); closeMobileMenu(); }}>Sign Out</Button>
                 </>
               ) : (
                 <>
