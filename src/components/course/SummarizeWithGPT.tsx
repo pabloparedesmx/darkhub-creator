@@ -38,39 +38,15 @@ const SummarizeWithGPT = ({ courseTitle, courseContent, className = '' }: Summar
         }),
       });
       
-      // Get the response text only once
-      const responseText = await response.text();
-      console.log("Received response:", responseText);
-      
       if (!response.ok) {
-        let errorMessage = 'Error al generar el resumen';
-        try {
-          // Try to parse the error response as JSON
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorMessage;
-        } catch (parseError) {
-          // If parsing fails, use the response text directly
-          errorMessage = responseText || errorMessage;
-          console.error("Failed to parse error response:", responseText);
-        }
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.error || `Error: ${response.status} ${response.statusText}`;
         throw new Error(errorMessage);
       }
       
-      // Try to parse the response JSON from the already read responseText
-      if (!responseText || responseText.trim() === '') {
-        throw new Error('Empty response from server');
-      }
-      
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error("JSON parse error:", parseError);
-        throw new Error(`Error al procesar la respuesta: ${parseError.message}`);
-      }
+      const data = await response.json();
       
       if (!data.summary) {
-        console.error("No summary in response:", data);
         throw new Error('No se recibió ningún resumen del servidor');
       }
       
