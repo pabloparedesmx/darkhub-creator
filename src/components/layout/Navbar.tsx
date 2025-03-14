@@ -31,7 +31,7 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
   
-  return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 dark ${isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-4'}`}>
+  return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 dark bg-background/95 backdrop-blur-md ${isScrolled ? 'shadow-md py-3' : 'py-4'}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <img src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" alt="AI Makers" className="h-10" />
