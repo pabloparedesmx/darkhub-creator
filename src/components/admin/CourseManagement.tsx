@@ -13,6 +13,7 @@ interface CourseManagementProps {
   newCourse: {
     title: string;
     description: string;
+    short_description: string; // Added short_description field
     slug: string;
     icon: string;
     category_id: string;

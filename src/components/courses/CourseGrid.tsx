@@ -25,7 +25,10 @@ const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }:
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.05 }}
           >
-            <CourseCard course={course} featured={featured && index === 0} />
+            <CourseCard 
+              course={course} 
+              featured={featured && index === 0} 
+            />
           </motion.div>
         ))}
       </div>
