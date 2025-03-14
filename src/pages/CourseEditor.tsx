@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -93,7 +94,7 @@ const CourseEditor = () => {
   }, [courseId, isNewCourse, toast]);
 
   const handleSaveCourse = async () => {
-    const { title, description, slug, icon, category_id, isPro, isFree, difficulty } = course;
+    const { title, description, slug, icon, category_id, isPro, isFree, isTutorial, difficulty } = course;
     
     if (!title || !description || !slug) {
       toast({
