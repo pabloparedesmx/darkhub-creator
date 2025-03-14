@@ -7,6 +7,7 @@ import { Search, Menu, X, ChevronDown, Bell, LogOut, User, Settings, CreditCard 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useTheme } from '@/hooks/use-theme';
 
 const Navbar = () => {
   const {
@@ -15,6 +16,7 @@ const Navbar = () => {
     isAuthenticated,
     isAdmin
   } = useAuth();
+  const { logoUrl } = useTheme();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -35,7 +37,7 @@ const Navbar = () => {
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-background/95 backdrop-blur-md shadow-md py-3' : 'bg-transparent py-4'}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img src="/lovable-uploads/a1eb8418-2a78-4ec8-b3f9-ac0807a34936.png" alt="AI Makers" className="h-10" />
+          <img src={logoUrl} alt="AI Makers" className="h-10" />
         </Link>
 
         <nav className="hidden md:flex items-center space-x-1">
