@@ -1,27 +1,47 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, ArrowRight, Mail } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Eye, EyeOff, ArrowRight, Mail, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const { toast } = useToast();
-  const { login, signInWithGoogle, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const { login, signInWithGoogle, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loginAttempted, setLoginAttempted] = useState(false);
+  const [timeoutError, setTimeoutError] = useState(false);
+  
+  // If already authenticated, redirect to courses
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/courses');
+    }
+  }, [isAuthenticated, navigate]);
+  
+  // Clear timeout error when user makes changes to form
+  useEffect(() => {
+    if (timeoutError) {
+      setTimeoutError(false);
+    }
+  }, [email, password]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Login form submitted with email:", email);
+    
+    // Reset states
+    setTimeoutError(false);
     
     // Basic validation
     if (!email || !password) {
@@ -52,19 +72,29 @@ const Login = () => {
   };
 
   // Add a safety timeout to reset loading state if stuck
-  if (loginAttempted && isLoading) {
-    setTimeout(() => {
-      if (isLoading) {
-        console.log("Login timeout reached, resetting loading state");
-        setLoginAttempted(false);
-        toast({
-          title: "Login timeout",
-          description: "Login is taking too long. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }, 10000); // 10-second timeout
-  }
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    
+    if (loginAttempted && isLoading) {
+      timeoutId = setTimeout(() => {
+        if (isLoading) {
+          console.log("Login timeout reached, resetting loading state");
+          setLoginAttempted(false);
+          setTimeoutError(true);
+          
+          toast({
+            title: "Login timeout",
+            description: "Login is taking too long. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }, 10000); // 10-second timeout
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [loginAttempted, isLoading, toast]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#051526] bg-gradient-to-b from-[#051526] to-[#0a2540]">
@@ -90,6 +120,15 @@ const Login = () => {
               <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
               <p className="text-blue-100/70 text-sm">Please enter your details to sign in.</p>
             </div>
+            
+            {timeoutError && (
+              <Alert variant="destructive" className="mb-4 bg-red-500/10 border-red-500/30 text-red-200">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Login timed out. Please try again or refresh the page if the issue persists.
+                </AlertDescription>
+              </Alert>
+            )}
             
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
