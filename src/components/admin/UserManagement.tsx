@@ -10,7 +10,7 @@ interface UserManagementProps {
   users: UserProfile[];
   userSearchTerm: string;
   setUserSearchTerm: (value: string) => void;
-  handleUpdateUserRole: (userId: string, currentRole: 'user' | 'admin') => void;
+  handleUpdateUserRole: (userId: string, currentRole: 'user' | 'admin') => Promise<void>;
   isUserLoading: boolean;
 }
 
