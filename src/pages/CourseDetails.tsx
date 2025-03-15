@@ -17,21 +17,16 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Bookmark, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CategoryBadge from '@/components/ui/CategoryBadge';
+import SEO from '@/components/ui/SEO';
 
 interface CourseDetailData extends Omit<DbCourse, 'badges'> {
   badges: Array<'tutorial' | 'pro' | 'free'>;
 }
 
 const CourseDetails = () => {
-  const {
-    slug
-  } = useParams<{
-    slug: string;
-  }>();
+  const { slug } = useParams<{ slug: string; }>();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [course, setCourse] = useState<CourseDetailData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -99,15 +94,24 @@ const CourseDetails = () => {
     return <ErrorState title="Curso No Encontrado" message="El curso que estás buscando no existe o ha sido eliminado." />;
   }
 
-  return <motion.div initial={{
-    opacity: 0
-  }} animate={{
-    opacity: 1
-  }} exit={{
-    opacity: 0
-  }} transition={{
-    duration: 0.5
-  }} className="min-h-screen flex flex-col">
+  // Generate a short description for SEO
+  const seoDescription = course.short_description || 
+    `Aprende sobre ${course.title}. ${course.difficulty === 'beginner' ? 'Curso para principiantes' : 
+    course.difficulty === 'intermediate' ? 'Nivel intermedio' : 'Nivel avanzado'}.`;
+
+  return (
+    <motion.div initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                transition={{ duration: 0.5 }} 
+                className="min-h-screen flex flex-col">
+      {/* Add SEO component with dynamic course data */}
+      <SEO
+        title={`${course.title} | AI Makers Tutoriales`}
+        description={seoDescription}
+        type="article"
+      />
+      
       <Navbar />
       <main className="flex-grow pt-24 pb-20 px-4">
         <div className="container mx-auto">
@@ -162,7 +166,8 @@ const CourseDetails = () => {
         </div>
       </main>
       <Footer />
-    </motion.div>;
+    </motion.div>
+  );
 };
 
 export default CourseDetails;

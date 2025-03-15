@@ -13,24 +13,16 @@ import { useToast } from '@/hooks/use-toast';
 import ErrorState from '@/components/ui/ErrorState';
 import LoadingState from '@/components/ui/LoadingState';
 import RichTextContent from '@/components/ui/RichTextContent';
+import SEO from '@/components/ui/SEO';
+
 const PromptDetail = () => {
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
+  const { id } = useParams<{ id: string; }>();
   const navigate = useNavigate();
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const [copied, setCopied] = useState(false);
 
   // Fetch the prompt
-  const {
-    data: prompt,
-    error,
-    isLoading
-  } = useQuery({
+  const { data: prompt, error, isLoading } = useQuery({
     queryKey: ['prompt', id],
     queryFn: async () => {
       if (!id) throw new Error('Prompt ID is required');
@@ -47,6 +39,7 @@ const PromptDetail = () => {
       return data as PromptWithCategory;
     }
   });
+
   const handleCopyPrompt = () => {
     if (!prompt) return;
 
@@ -70,22 +63,28 @@ const PromptDetail = () => {
       });
     });
   };
+
   if (isLoading) {
     return <LoadingState message="Cargando prompt..." />;
   }
+
   if (error || !prompt) {
     return <ErrorState message="No se pudo cargar el prompt" />;
   }
-  return <Layout>
-      <motion.div initial={{
-      opacity: 0,
-      y: 20
-    }} animate={{
-      opacity: 1,
-      y: 0
-    }} transition={{
-      duration: 0.5
-    }} className="container py-0">
+
+  return (
+    <Layout>
+      {/* Add SEO component with dynamic data */}
+      <SEO
+        title={`${prompt.name} | AI Makers Prompts`}
+        description={`${prompt.name} - Prompt optimizado para ${prompt.categories?.name || 'uso general'}`}
+        type="article"
+      />
+      
+      <motion.div initial={{ opacity: 0, y: 20 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  transition={{ duration: 0.5 }} 
+                  className="container py-0">
         <div className="mt-8 mb-10"> {/* Added top margin and increased bottom margin */}
           <Button variant="ghost" onClick={() => navigate('/prompts')} className="mb-8" // Increased from mb-4 to mb-8
         >
@@ -115,6 +114,8 @@ const PromptDetail = () => {
           <RichTextContent content={prompt.content} className="prose dark:prose-invert max-w-none" />
         </div>
       </motion.div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default PromptDetail;

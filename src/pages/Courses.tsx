@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
@@ -10,6 +11,7 @@ import { useCourseFilters } from '@/hooks/useCourseFilters';
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
+import SEO from '@/components/ui/SEO';
 
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
@@ -214,6 +216,12 @@ const Courses = () => {
 
   return (
     <Layout>
+      {/* Add SEO component */}
+      <SEO
+        title="Tutoriales de IA | AI Makers"
+        description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva."
+      />
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
