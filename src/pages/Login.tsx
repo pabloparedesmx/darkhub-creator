@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
@@ -67,15 +67,14 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background ai-neural-bg">
-      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
+    <div className="min-h-screen flex flex-col bg-[#051526] bg-gradient-to-b from-[#051526] to-[#0a2540]">
       <main className="flex-grow flex items-center justify-center p-4 relative z-10">
         <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="ai-card p-8"
+            className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
           >
             <div className="flex justify-center mb-8">
               <Link to="/" className="flex items-center">
@@ -87,21 +86,29 @@ const Login = () => {
               </Link>
             </div>
             
-            <h1 className="text-2xl font-bold mb-6 text-center text-blue-100">Welcome back</h1>
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-white mb-2">Welcome back</h1>
+              <p className="text-blue-100/70 text-sm">Please enter your details to sign in.</p>
+            </div>
             
             <form onSubmit={handleLogin}>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-blue-100">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
-                    disabled={isLoading}
-                  />
+                  <div className="relative">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400">
+                      <Mail className="h-4 w-4" />
+                    </div>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50 pl-10"
+                      disabled={isLoading}
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -118,7 +125,7 @@ const Login = () => {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="bg-blue-950/30 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
+                      className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
                       disabled={isLoading}
                     />
                     <button
@@ -152,8 +159,22 @@ const Login = () => {
                   </label>
                 </div>
                 
-                <Button type="submit" className="w-full ai-button" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-medium rounded-xl h-11 shadow-lg shadow-blue-500/20" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center">
+                      <span className="mr-2">Logging in</span>
+                      <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <span className="mr-2">Log in</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  )}
                 </Button>
                 
                 {isLoading && loginAttempted && (
@@ -170,14 +191,14 @@ const Login = () => {
                   <div className="w-full border-t border-blue-500/30"></div>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-secondary px-2 text-blue-300">Or continue with</span>
+                  <span className="px-2 text-blue-300 bg-[#0a1e36]">OR</span>
                 </div>
               </div>
               
               <div className="mt-6">
                 <Button 
                   variant="outline" 
-                  className="w-full border-blue-500/30 text-blue-100 hover:bg-blue-900/30" 
+                  className="w-full border-blue-500/30 text-blue-100 hover:bg-blue-900/30 rounded-xl" 
                   disabled={isLoading}
                   onClick={handleGoogleSignIn}
                 >
@@ -188,7 +209,7 @@ const Login = () => {
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                     <path d="M1 1h22v22H1z" fill="none"/>
                   </svg>
-                  Google
+                  Continue with Google
                 </Button>
               </div>
             </div>

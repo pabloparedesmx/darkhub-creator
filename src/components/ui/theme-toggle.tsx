@@ -4,9 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const location = useLocation();
+  
+  // Check if we're on a public route
+  const isPublicRoute = 
+    location.pathname === '/' || 
+    location.pathname === '/login' || 
+    location.pathname === '/signup';
+  
+  // Don't render theme toggle on public routes
+  if (isPublicRoute) {
+    return null;
+  }
   
   return (
     <Button 

@@ -41,15 +41,12 @@ export function ThemeProvider({
     currentPath === '/login' || 
     currentPath === '/signup';
 
-  // Set the appropriate default theme based on route
-  const routeBasedDefaultTheme = isPublicRoute ? 'dark' : 'light';
-
+  // Force dark theme on public routes
   useEffect(() => {
-    // Apply the default theme based on route only if user hasn't set a preference yet
-    if (!localStorage.getItem(storageKey)) {
-      setTheme(routeBasedDefaultTheme);
+    if (isPublicRoute) {
+      setTheme('dark');
     }
-  }, [currentPath, routeBasedDefaultTheme, storageKey]);
+  }, [isPublicRoute]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -60,14 +57,18 @@ export function ThemeProvider({
     // Add the current theme class
     root.classList.add(theme);
     
-    // Store the current theme
-    localStorage.setItem(storageKey, theme);
-  }, [theme, storageKey]);
+    // Only store theme preference if we're not on a public route
+    if (!isPublicRoute) {
+      localStorage.setItem(storageKey, theme);
+    }
+  }, [theme, storageKey, isPublicRoute]);
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      setTheme(theme);
+      if (!isPublicRoute) {
+        setTheme(theme);
+      }
     },
   };
 

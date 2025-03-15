@@ -30,10 +30,15 @@ const Navbar = () => {
     setIsMenuOpen(false);
   }, [location]);
   
-  const isAuthPage = ['/login', '/signup'].includes(location.pathname);
+  const isAuthPage = ['/login', '/signup', '/'].includes(location.pathname);
 
   // Check if we are on public routes
   const isPublicRoute = isAuthPage;
+  
+  // Don't render navbar on auth pages
+  if (isAuthPage) {
+    return null;
+  }
   
   return (
     <header className={cn('fixed top-0 z-50 w-full border-b transition-all duration-200', 
