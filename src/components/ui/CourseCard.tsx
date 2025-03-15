@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from 'framer-motion';
+import { Badge } from '@/components/ui/badge';
 
 export type Course = {
   id: string;
@@ -82,6 +83,19 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     return translations[difficulty] || difficulty;
   };
   
+  // Get difficulty badge color class
+  const getDifficultyBadgeClasses = (difficulty?: string) => {
+    if (!difficulty) return "";
+    
+    const colorClasses: Record<string, string> = {
+      'beginner': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+      'intermediate': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
+      'advanced': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    };
+    
+    return colorClasses[difficulty] || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+  };
+  
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
@@ -108,7 +122,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
               
               {course.difficulty && (
                 <span 
-                  className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                  className={`text-xs px-2 py-1 rounded-full ${getDifficultyBadgeClasses(course.difficulty)}`}
                 >
                   {getDifficultyInSpanish(course.difficulty)}
                 </span>

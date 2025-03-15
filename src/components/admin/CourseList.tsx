@@ -58,6 +58,19 @@ const CourseList = ({
     return translations[difficulty] || difficulty;
   };
 
+  // Get difficulty badge color class
+  const getDifficultyBadgeClasses = (difficulty?: string) => {
+    if (!difficulty) return "";
+    
+    const colorClasses: Record<string, string> = {
+      'beginner': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+      'intermediate': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
+      'advanced': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    };
+    
+    return colorClasses[difficulty] || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+  };
+
   return (
     <div className="space-y-4">
       {isLoading ? (
@@ -105,7 +118,7 @@ const CourseList = ({
                                 </div>
                               )}
                               {course.difficulty && (
-                                <div className="inline-block bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-1 rounded-full text-xs">
+                                <div className={`inline-block px-2 py-1 rounded-full text-xs ${getDifficultyBadgeClasses(course.difficulty)}`}>
                                   {getDifficultyInSpanish(course.difficulty)}
                                 </div>
                               )}
