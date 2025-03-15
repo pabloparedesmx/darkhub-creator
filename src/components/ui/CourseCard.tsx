@@ -105,9 +105,9 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
       >
         <CardContent className="p-0">
           <div className="flex flex-col h-full">
-            {/* Cover Image */}
+            {/* Cover Image with badges positioned at the bottom */}
             {course.cover_image && (
-              <div className="w-full h-40 overflow-hidden">
+              <div className="w-full h-40 overflow-hidden relative">
                 <img 
                   src={course.cover_image} 
                   alt={course.title} 
@@ -116,35 +116,60 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                     transform: isHovered ? 'scale(1.05)' : 'scale(1)'
                   }}
                 />
+                {/* Badges at the bottom of the image */}
+                <div className="absolute bottom-0 left-0 right-0 flex flex-wrap gap-1 p-2">
+                  {course.badges.map((badge, index) => (
+                    <span 
+                      key={index}
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        badge === 'pro' 
+                        ? 'bg-purple-100 text-purple-700' 
+                        : 'bg-green-100 text-green-700'
+                      }`}
+                    >
+                      {badge === 'pro' ? 'Pro' : 'Gratis'}
+                    </span>
+                  ))}
+                  
+                  {course.difficulty && (
+                    <span 
+                      className={`text-xs px-2 py-1 rounded-full ${getDifficultyBadgeClasses(course.difficulty)}`}
+                    >
+                      {getDifficultyInSpanish(course.difficulty)}
+                    </span>
+                  )}
+                </div>
               </div>
             )}
             
-            {/* Badges at the top */}
-            <div className={`flex gap-2 pt-4 px-4 ${course.cover_image ? 'mt-2' : ''}`}>
-              {course.badges.map((badge, index) => (
-                <span 
-                  key={index}
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    badge === 'pro' 
-                    ? 'bg-purple-100 text-purple-700' 
-                    : 'bg-green-100 text-green-700'
-                  }`}
-                >
-                  {badge === 'pro' ? 'Pro' : 'Gratis'}
-                </span>
-              ))}
-              
-              {course.difficulty && (
-                <span 
-                  className={`text-xs px-2 py-1 rounded-full ${getDifficultyBadgeClasses(course.difficulty)}`}
-                >
-                  {getDifficultyInSpanish(course.difficulty)}
-                </span>
-              )}
-            </div>
+            {/* Cards without cover image should still show badges at the top */}
+            {!course.cover_image && (
+              <div className="flex gap-2 pt-4 px-4">
+                {course.badges.map((badge, index) => (
+                  <span 
+                    key={index}
+                    className={`text-xs px-2 py-1 rounded-full ${
+                      badge === 'pro' 
+                      ? 'bg-purple-100 text-purple-700' 
+                      : 'bg-green-100 text-green-700'
+                    }`}
+                  >
+                    {badge === 'pro' ? 'Pro' : 'Gratis'}
+                  </span>
+                ))}
+                
+                {course.difficulty && (
+                  <span 
+                    className={`text-xs px-2 py-1 rounded-full ${getDifficultyBadgeClasses(course.difficulty)}`}
+                  >
+                    {getDifficultyInSpanish(course.difficulty)}
+                  </span>
+                )}
+              </div>
+            )}
             
             {/* Course title */}
-            <div className="px-4 pt-2 pb-3 flex-grow">
+            <div className="px-4 pt-3 pb-3 flex-grow">
               <motion.h3 
                 className="text-lg font-semibold mb-2"
                 animate={{ 

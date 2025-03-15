@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import RichTextContent from '@/components/ui/RichTextContent';
 import { DbCourse } from '@/types/admin';
+import CategoryBadge from '@/components/ui/CategoryBadge';
 
 interface CourseHeaderProps {
   course: Omit<DbCourse, 'badges'> & {
@@ -27,8 +28,22 @@ const CourseHeader = ({ course }: CourseHeaderProps) => {
             alt={course.title} 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+          {/* Display badges at the bottom of the image */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-wrap gap-2">
+            {course.badges.map((type, index) => (
+              <CategoryBadge key={index} type={type} />
+            ))}
+          </div>
         </motion.div>
+      )}
+      
+      {/* Badges for courses without cover images */}
+      {!course.cover_image && course.badges && course.badges.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-6">
+          {course.badges.map((type, index) => (
+            <CategoryBadge key={index} type={type} />
+          ))}
+        </div>
       )}
       
       {/* Breadcrumb */}
@@ -68,7 +83,7 @@ const CourseHeader = ({ course }: CourseHeaderProps) => {
         </div>
         
         {/* Full Rich Text Description */}
-        <div className="mt-6 prose dark:prose-invert max-w-none">
+        <div className="mt-6 prose max-w-none">
           <RichTextContent content={course.description} />
         </div>
       </motion.div>
