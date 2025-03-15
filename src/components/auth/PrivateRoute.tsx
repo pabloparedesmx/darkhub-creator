@@ -16,15 +16,16 @@ const PrivateRoute = () => {
     }
   }, [isLoading]);
 
-  // Only show loading state when initially checking authentication
+  // Show loading state only during initial auth check
   if (isLoading && !authChecked) {
-    return <LoadingState message="Checking authentication..." />;
+    return <LoadingState message="Verificando autenticación..." />;
   }
 
-  // Properly redirect to login page if not authenticated
+  // Redirect to login page if not authenticated
   if (!isAuthenticated || !user) {
-    console.log('Not authenticated, redirecting to login page');
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    console.log('No autenticado, redirigiendo a la página de inicio de sesión');
+    // Use a more reliable approach that doesn't overuse localStorage
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
   // Only return the outlet if authenticated

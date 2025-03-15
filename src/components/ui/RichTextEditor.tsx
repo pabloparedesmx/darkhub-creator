@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
 interface RichTextEditorProps {
@@ -11,6 +11,9 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly = false }: RichTextEditorProps) => {
+  // Generate a unique identifier for this editor instance
+  const editorId = React.useMemo(() => `tiny-editor-${Math.random().toString(36).substring(2, 9)}`, []);
+  
   // For read-only mode, we'll use a separate component for consistent display
   if (readOnly) {
     return (
@@ -21,8 +24,23 @@ const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly =
     );
   }
   
+  // Clean up TinyMCE resources on unmount
+  useEffect(() => {
+    return () => {
+      // Attempt to clean up TinyMCE resources when component unmounts
+      if (window.tinymce) {
+        try {
+          window.tinymce.remove(`#${editorId}`);
+        } catch (e) {
+          console.log('TinyMCE cleanup error:', e);
+        }
+      }
+    };
+  }, [editorId]);
+  
   return (
     <Editor
+      id={editorId}
       apiKey="70jtps1huxsr2ysuwbmm8u9c1j2kgb5j14030vcs3pfxjjcn"
       value={value}
       onEditorChange={(content) => onChange(content)}
@@ -60,7 +78,11 @@ const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly =
         content_css: 'dark',
         branding: false,
         promotion: false,
-        statusbar: false
+        statusbar: false,
+        // Add browser_spellcheck option
+        browser_spellcheck: true,
+        // Set unique selector to avoid conflicts
+        selector: `#${editorId}`
       }}
     />
   );
