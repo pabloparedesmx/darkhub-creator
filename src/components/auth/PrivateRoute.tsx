@@ -17,17 +17,18 @@ const PrivateRoute = () => {
   }, [isLoading]);
 
   // Only show loading state when initially checking authentication
-  // This prevents the loading screen from flashing after login timeout errors
   if (isLoading && !authChecked) {
     return <LoadingState message="Checking authentication..." />;
   }
 
-  // Once we've checked authentication, either allow access or redirect
-  return isAuthenticated && user ? (
-    <Outlet />
-  ) : (
-    <Navigate to="/login" state={{ from: location }} replace />
-  );
+  // Properly redirect to login page if not authenticated
+  if (!isAuthenticated || !user) {
+    console.log('Not authenticated, redirecting to login page');
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Only return the outlet if authenticated
+  return <Outlet />;
 };
 
 export default PrivateRoute;

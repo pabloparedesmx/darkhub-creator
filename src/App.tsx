@@ -48,12 +48,12 @@ const App = () => (
                 <Route path="/admin/courses/edit/:courseId" element={<CourseEditor />} />
               </Route>
               
-              {/* Prompts routes */}
-              <Route path="/prompts" element={<Prompts />} />
-              <Route path="/prompts/:id" element={<PromptDetail />} />
-              
-              {/* Tools route */}
-              <Route path="/tools" element={<Tools />} />
+              {/* These routes should also be protected if they're for members only */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/prompts" element={<Prompts />} />
+                <Route path="/prompts/:id" element={<PromptDetail />} />
+                <Route path="/tools" element={<Tools />} />
+              </Route>
 
               <Route path="*" element={<NotFound />} />
             </Routes>
