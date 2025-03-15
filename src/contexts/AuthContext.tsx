@@ -152,6 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           // Navigate to courses page after login or signup
+          // Fix the TypeScript error by using valid event types from Supabase
           if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
             navigate('/courses');
           }
