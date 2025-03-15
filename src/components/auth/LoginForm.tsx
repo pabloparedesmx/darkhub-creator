@@ -15,30 +15,43 @@ interface LoginFormProps {
 
 const LoginForm = ({ isLoading }: LoginFormProps) => {
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login, authError, clearAuthError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loginAttempted, setLoginAttempted] = useState(false);
   const [timeoutError, setTimeoutError] = useState(false);
+  const [internalLoading, setInternalLoading] = useState(false);
 
-  // Clear timeout error when user makes changes to form
+  // Reset form state when global loading state changes
+  useEffect(() => {
+    if (!isLoading && loginAttempted) {
+      setLoginAttempted(false);
+      setInternalLoading(false);
+    }
+  }, [isLoading, loginAttempted]);
+
+  // Clear errors when user makes changes to form
   useEffect(() => {
     if (timeoutError) {
       setTimeoutError(false);
     }
-  }, [email, password]);
+    if (authError) {
+      clearAuthError();
+    }
+  }, [email, password, authError, clearAuthError]);
 
   // Add a safety timeout to reset loading state if stuck
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
     
-    if (loginAttempted && isLoading) {
+    if (loginAttempted && (isLoading || internalLoading)) {
       timeoutId = setTimeout(() => {
-        if (isLoading) {
+        if (isLoading || internalLoading) {
           console.log("Login timeout reached, resetting loading state");
           setLoginAttempted(false);
+          setInternalLoading(false);
           setTimeoutError(true);
           
           toast({
@@ -47,13 +60,13 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
             variant: "destructive",
           });
         }
-      }, 10000); // 10-second timeout
+      }, 8000); // 8-second timeout, shorter than before
     }
     
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [loginAttempted, isLoading, toast]);
+  }, [loginAttempted, isLoading, internalLoading, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,12 +86,15 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
     }
     
     setLoginAttempted(true);
+    setInternalLoading(true);
     
     try {
       await login(email, password);
+      // Note: We don't reset loading state here as it will be handled by the auth context
     } catch (error) {
       console.error("Login error in component:", error);
       setLoginAttempted(false);
+      setInternalLoading(false);
     }
   };
 
@@ -89,6 +105,15 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Login timed out. Please try again or refresh the page if the issue persists.
+          </AlertDescription>
+        </Alert>
+      )}
+      
+      {authError && (
+        <Alert variant="destructive" className="mb-4 bg-red-500/10 border-red-500/30 text-red-200">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {authError}
           </AlertDescription>
         </Alert>
       )}
@@ -107,7 +132,7 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50 pl-10"
-              disabled={isLoading}
+              disabled={isLoading || internalLoading}
             />
           </div>
         </div>
@@ -127,13 +152,13 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
-              disabled={isLoading}
+              disabled={isLoading || internalLoading}
             />
             <button
               type="button"
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-400 hover:text-blue-300"
               onClick={() => setShowPassword(!showPassword)}
-              disabled={isLoading}
+              disabled={isLoading || internalLoading}
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -149,7 +174,7 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
             id="remember" 
             checked={rememberMe}
             onCheckedChange={(checked) => setRememberMe(!!checked)}
-            disabled={isLoading}
+            disabled={isLoading || internalLoading}
             className="border-blue-500/50 data-[state=checked]:bg-blue-600"
           />
           <label
@@ -163,9 +188,9 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
         <Button 
           type="submit" 
           className="w-full bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-medium rounded-xl h-11 shadow-lg shadow-blue-500/20" 
-          disabled={isLoading}
+          disabled={isLoading || internalLoading}
         >
-          {isLoading ? (
+          {(isLoading || internalLoading) ? (
             <span className="flex items-center justify-center">
               <span className="mr-2">Logging in</span>
               <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -178,7 +203,7 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
           )}
         </Button>
         
-        {isLoading && loginAttempted && (
+        {(isLoading || internalLoading) && loginAttempted && (
           <p className="text-xs text-center text-blue-400 animate-pulse">
             Login in progress, please wait...
           </p>

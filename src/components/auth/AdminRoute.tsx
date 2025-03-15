@@ -1,19 +1,21 @@
 
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/ui/LoadingState';
 
 const AdminRoute = () => {
-  const { isAuthenticated, isAdmin, isLoading, user } = useAuth();
+  const { isAuthenticated, isAdmin, isLoading, user, authChecked } = useAuth();
+  const location = useLocation();
   
-  if (isLoading) {
+  // Show loading state only during initial auth check or when explicitly loading
+  if (isLoading || !authChecked) {
     return <LoadingState message="Checking admin access..." />;
   }
 
   // Redirect to login if not authenticated
   if (!isAuthenticated || !user) {
     console.log('Not authenticated, redirecting to login page');
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
   
   // Redirect to dashboard if authenticated but not admin

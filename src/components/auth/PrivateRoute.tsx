@@ -1,30 +1,21 @@
 
-import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingState from '@/components/ui/LoadingState';
 
 const PrivateRoute = () => {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading, user, authChecked } = useAuth();
   const location = useLocation();
-  const [authChecked, setAuthChecked] = useState(false);
   
-  useEffect(() => {
-    // Set authChecked to true once we've checked authentication status
-    if (!isLoading) {
-      setAuthChecked(true);
-    }
-  }, [isLoading]);
-
-  // Show loading state only during initial auth check
-  if (isLoading && !authChecked) {
+  // Show loading state only during initial auth check or when explicitly loading
+  if (isLoading || !authChecked) {
     return <LoadingState message="Verificando autenticación..." />;
   }
 
   // Redirect to login page if not authenticated
   if (!isAuthenticated || !user) {
     console.log('No autenticado, redirigiendo a la página de inicio de sesión');
-    // Use a more reliable approach that doesn't overuse localStorage
+    // Pass the current location to redirect back after login
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
