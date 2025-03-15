@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 import { Menu, X } from 'lucide-react';
 
@@ -60,23 +59,23 @@ const Navbar = () => {
             <>
               <Link to="/courses" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400")}>
                 Cursos
               </Link>
               <Link to="/prompts" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400")}>
                 Prompts
               </Link>
               <Link to="/tools" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400")}>
                 Herramientas
               </Link>
               {user.role === 'admin' && 
                 <Link to="/admin" className={cn("text-sm font-medium transition-colors", 
                   isAuthPage && "text-white hover:text-white/80", 
-                  location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                  location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400")}>
                   Admin
                 </Link>
               }
@@ -105,14 +104,10 @@ const Navbar = () => {
               </>
             )}
           </div>
-          
-          {/* Theme toggle - only visible for logged in users or non-auth pages */}
-          {(user || !isAuthPage) && <ThemeToggle />}
         </nav>
         
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden">
-          {(user || !isAuthPage) && <ThemeToggle />}
           <button className="ml-2 p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -126,20 +121,20 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to="/courses" className={cn("text-sm font-medium transition-colors", 
-                  location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                  location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400")}>
                   Cursos
                 </Link>
                 <Link to="/prompts" className={cn("text-sm font-medium transition-colors", 
-                  location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                  location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400")}>
                   Prompts
                 </Link>
                 <Link to="/tools" className={cn("text-sm font-medium transition-colors", 
-                  location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                  location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400")}>
                   Herramientas
                 </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" className={cn("text-sm font-medium transition-colors", 
-                    location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
+                    location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400")}>
                     Admin
                   </Link>
                 )}
