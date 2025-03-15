@@ -35,7 +35,7 @@ export function ThemeProvider({
   // Get the current path from window.location
   const currentPath = window.location.pathname;
   
-  // Detect if we're on a public route (homepage, login, signup)
+  // Detect if we're on a public route (login, signup)
   const isPublicRoute = 
     currentPath === '/' || 
     currentPath === '/login' || 
