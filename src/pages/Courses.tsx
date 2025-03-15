@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
@@ -242,7 +243,7 @@ const Courses = () => {
       />
       
       {/* Hero Section with Cover Image */}
-      <div className="relative w-full bg-gradient-to-b from-blue-50 to-white">
+      <div className="relative w-full bg-gradient-to-b from-blue-50 to-white pt-20">
         <div className="container py-12">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}

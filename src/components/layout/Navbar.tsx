@@ -86,7 +86,7 @@ const Navbar = () => {
           <div className="space-x-2">
             {user ? (
               <>
-                <Button variant="secondary" size="sm" onClick={logout}>
+                <Button variant="outline" size="sm" onClick={logout} className="text-primary hover:text-primary-foreground hover:bg-primary/90">
                   Salir
                 </Button>
                 <Button variant={isAuthPage ? "outline" : "default"} size="sm" asChild>
@@ -147,7 +147,7 @@ const Navbar = () => {
                   <Button variant="secondary" size="sm" className="w-full" asChild>
                     <Link to="/profile">Mi Perfil</Link>
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full" onClick={logout}>
+                  <Button variant="outline" size="sm" className="w-full text-primary hover:text-primary-foreground hover:bg-primary/90" onClick={logout}>
                     Salir
                   </Button>
                 </div>
