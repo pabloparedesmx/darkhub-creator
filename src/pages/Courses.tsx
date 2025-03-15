@@ -242,9 +242,6 @@ const Courses = () => {
         description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva." 
       />
       
-      {/* Add ElevenLabs widget */}
-      <ElevenLabsWidget />
-      
       {/* Hero Section with Cover Image */}
       <div className="relative w-full bg-gradient-to-b from-blue-50 to-white pt-20">
         <div className="container py-12">
