@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -36,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Get profile data from Supabase with fallback mechanism
+  // Get profile data from Supabase
   const getProfile = async (userId: string): Promise<User | null> => {
     console.log(`Fetching profile for user ID: ${userId}`);
     
@@ -45,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle(); // Using maybeSingle instead of single to avoid error if profile doesn't exist
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);
@@ -58,67 +59,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: data.id,
           email: data.email,
           name: data.name,
-          role: data.role as 'user' | 'admin', // Add type assertion here
+          role: data.role as 'user' | 'admin',
           subscription: data.subscription as 'free' | 'pro' | undefined
         } as User;
       }
       
       console.warn('No profile found for user ID:', userId);
-      
-      // Create a profile if it doesn't exist
-      console.log('Attempting to create a profile for user ID:', userId);
-      const authUserResponse = await supabase.auth.getUser();
-      const authUser = authUserResponse.data.user;
-      
-      if (!authUser) {
-        console.error('No auth user found for profile creation');
-        return null;
-      }
-      
-      const newProfile = {
-        id: userId,
-        email: authUser.email || 'user@example.com',
-        name: authUser.user_metadata?.name || 'User',
-        role: 'user' as 'user', // Fix type here
-        subscription: 'free' as 'free'
-      };
-      
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert([newProfile]);
-        
-      if (insertError) {
-        console.error('Error creating profile:', insertError);
-        // Still return the profile even if insert fails
-      } else {
-        console.log('Created new profile successfully');
-      }
-      
-      return newProfile as User;
+      return null;
     } catch (error) {
-      console.error('Failed to get profile, using fallback:', error);
-      // Return a fallback user object with explicitly typed role
-      return {
-        id: userId,
-        email: 'user@example.com',
-        name: 'User',
-        role: 'user' as 'user' // Fix type here
-      } as User;
+      console.error('Failed to get profile:', error);
+      return null;
     }
-  };
-
-  // Attempt to update user email from session
-  const updateUserEmailFromSession = async (userId: string, userObj: User): Promise<User> => {
-    try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser && authUser.email) {
-        console.log(`Updating user email from auth session: ${authUser.email}`);
-        return { ...userObj, email: authUser.email };
-      }
-    } catch (error) {
-      console.error('Error getting auth user email:', error);
-    }
-    return userObj;
   };
 
   // Initialize authentication state
@@ -133,11 +84,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (session) {
           console.log('Session found, user is logged in:', session.user.id);
-          handleUserSession(session.user.id);
+          const profile = await getProfile(session.user.id);
+          
+          if (profile) {
+            setUser(profile);
+          } else {
+            // If no profile found but session exists, create a temporary basic profile
+            // This will be updated when the database trigger creates the actual profile
+            const tempUser: User = {
+              id: session.user.id,
+              email: session.user.email || '',
+              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+              role: 'user' // Default role is always 'user'
+            };
+            setUser(tempUser);
+            
+            // Try to create a profile if it doesn't exist
+            try {
+              await supabase.from('profiles').insert([{
+                id: session.user.id,
+                email: session.user.email || '',
+                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                role: 'user',
+                subscription: 'free'
+              }]);
+            } catch (insertError) {
+              console.error('Error creating profile:', insertError);
+            }
+          }
         } else {
           console.log('No session found, user is not logged in');
           setUser(null);
-          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error during auth initialization:', error);
@@ -147,71 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "destructive",
         });
         setUser(null);
-        setIsLoading(false);
-      }
-    };
-    
-    // Helper function to handle user session to reduce duplication
-    const handleUserSession = async (userId: string) => {
-      // Set a timeout to prevent getting stuck
-      const timeoutId = setTimeout(() => {
-        console.warn('Profile fetch timeout, continuing with basic user');
-        setIsLoading(false);
-        
-        // Create a basic user object if timed out with proper typing
-        const basicUser: User = {
-          id: userId,
-          email: 'user@example.com',
-          name: 'User',
-          role: 'user'
-        };
-        
-        setUser(basicUser);
-        
-        // Navigate to courses if needed
-        if (window.location.pathname === '/login') {
-          navigate('/courses');
-        }
-      }, 3000); // 3 second timeout
-      
-      try {
-        let profile = await getProfile(userId);
-        
-        // Clear timeout as we got the profile or error
-        clearTimeout(timeoutId);
-        
-        // If profile is using fallback values, try to update the email
-        if (profile && profile.email === 'user@example.com') {
-          profile = await updateUserEmailFromSession(userId, profile);
-        }
-        
-        console.log('Setting user state with profile:', profile);
-        setUser(profile);
-      } catch (error) {
-        // Clear timeout as we got an error
-        clearTimeout(timeoutId);
-        
-        console.error('Error during profile handling:', error);
-        toast({
-          title: "Profile Error",
-          description: "Failed to load user profile, using basic data.",
-          variant: "destructive",
-        });
-        
-        // Still set a basic user to prevent being stuck with proper typing
-        setUser({
-          id: userId,
-          email: 'user@example.com',
-          name: 'User',
-          role: 'user'
-        });
       } finally {
         setIsLoading(false);
-        
-        // Force navigation if on login page
-        if (window.location.pathname === '/login') {
-          navigate('/courses');
-        }
       }
     };
     
@@ -223,7 +137,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log(`Auth state changed: ${event}`, session ? 'Session exists' : 'No session');
         
         if (session && session.user) {
-          handleUserSession(session.user.id);
+          // Always get a fresh profile after auth changes
+          const profile = await getProfile(session.user.id);
+          
+          if (profile) {
+            setUser(profile);
+          } else {
+            // Create a temporary user object if profile not found
+            const tempUser: User = {
+              id: session.user.id,
+              email: session.user.email || '',
+              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+              role: 'user' // Default role is always 'user'
+            };
+            setUser(tempUser);
+          }
+          
+          // Navigate to courses page after login or signup
+          if (event === 'SIGNED_IN' || event === 'SIGNED_UP') {
+            navigate('/courses');
+          }
         } else {
           console.log('Auth change: No session, setting user to null');
           setUser(null);
@@ -238,9 +171,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log('User is on protected route, redirecting to home');
             navigate('/', { replace: true });
           }
-          
-          setIsLoading(false);
         }
+        
+        setIsLoading(false);
       }
     );
     
@@ -251,65 +184,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [toast, navigate]);
 
-  // Login function with timeout and better error handling
+  // Login function
   const login = async (email: string, password: string) => {
     console.log(`Attempting login for email: ${email}`);
     setIsLoading(true);
     
-    // Set a global timeout for the entire login process
-    const loginTimeout = setTimeout(() => {
-      console.warn('Login process timeout, resetting loading state');
-      setIsLoading(false);
-      toast({
-        title: "Login Timeout",
-        description: "Login process took too long. Please try again.",
-        variant: "destructive",
-      });
-    }, 5000); // 5 second timeout for entire login process
-    
     try {
-      // First, try to sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      // Clear the login timeout since we got a response
-      clearTimeout(loginTimeout);
       
       if (error) {
         console.error('Login error:', error);
         throw error;
       }
       
-      if (data.user) {
-        console.log('Sign in successful, getting profile for:', data.user.id);
-        
-        // Navigate to courses immediately after successful sign-in
-        // We don't need to wait for profile fetch to complete
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
-        });
-        
-        // Force navigation to courses page
-        navigate('/courses');
-        
-        // The profile fetch will continue in the background
-        // Profile will be set by the auth state change listener
-      }
-    } catch (error: any) {
-      // Clear the login timeout since we got an error
-      clearTimeout(loginTimeout);
+      console.log('Sign in successful');
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
       
+      // Navigation will be handled by the onAuthStateChange listener
+    } catch (error: any) {
       console.error('Login process failed:', error);
       toast({
         title: "Login failed",
         description: error.message || "Invalid email or password",
         variant: "destructive",
       });
-    } finally {
-      console.log('Login process completed');
       setIsLoading(false);
     }
   };
@@ -338,8 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "You'll be redirected to Google for authentication",
       });
       
-      // No need to navigate or set user here as Supabase will handle the redirect
-      // and the onAuthStateChange listener will handle the session
+      // Navigation will be handled by the onAuthStateChange listener
     } catch (error: any) {
       console.error('Google sign-in process failed:', error);
       toast({
@@ -347,12 +250,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message || "Could not sign in with Google",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
 
-  // Signup function with better error handling
+  // Signup function
   const signup = async (name: string, email: string, password: string) => {
     console.log(`Attempting signup for email: ${email}`);
     setIsLoading(true);
@@ -364,7 +266,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
         options: {
           data: {
-            name,
+            name, // Store name in user metadata
           },
         },
       });
@@ -377,10 +279,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Signup successful');
       toast({
         title: "Signup successful",
-        description: `Welcome to KnowledgeBites, ${name}!`,
+        description: `Welcome, ${name}!`,
       });
       
-      navigate('/courses');
+      // The database trigger should create the profile with 'user' role
+      // Navigation will be handled by the onAuthStateChange listener
     } catch (error: any) {
       console.error('Signup process failed:', error);
       toast({
@@ -388,13 +291,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message || "Failed to create account",
         variant: "destructive",
       });
-    } finally {
-      console.log('Signup process completed');
       setIsLoading(false);
     }
   };
 
-  // Logout function with better error handling
+  // Logout function
   const logout = async () => {
     console.log('Attempting logout');
     setIsLoading(true);

@@ -19,6 +19,7 @@ import Prompts from "./pages/Prompts";
 import PromptDetail from "./pages/PromptDetail";
 import Tools from "./pages/Tools";
 import PrivateRoute from "./components/auth/PrivateRoute";
+import AdminRoute from "./components/auth/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -36,23 +37,23 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               
-              {/* Protected routes */}
+              {/* Protected routes for all authenticated users */}
               <Route element={<PrivateRoute />}>
                 <Route path="/dashboard" element={<Navigate to="/courses" replace />} />
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/courses/:slug" element={<CourseDetails />} />
                 <Route path="/courses/:slug/learn" element={<CoursePlayer />} />
                 <Route path="/profile" element={<UserProfile />} />
-                <Route path="/admin" element={<AdminDashboard />} />
-                <Route path="/admin/courses/new" element={<CourseEditor />} />
-                <Route path="/admin/courses/edit/:courseId" element={<CourseEditor />} />
-              </Route>
-              
-              {/* These routes should also be protected if they're for members only */}
-              <Route element={<PrivateRoute />}>
                 <Route path="/prompts" element={<Prompts />} />
                 <Route path="/prompts/:id" element={<PromptDetail />} />
                 <Route path="/tools" element={<Tools />} />
+              </Route>
+              
+              {/* Admin-only routes */}
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/courses/new" element={<CourseEditor />} />
+                <Route path="/admin/courses/edit/:courseId" element={<CourseEditor />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />

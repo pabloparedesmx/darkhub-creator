@@ -42,6 +42,7 @@ const Signup = () => {
     }
     
     try {
+      // Pass the user's full name to the signup function
       await signup(fullName, email, password);
     } catch (error) {
       console.error("Signup error:", error);
