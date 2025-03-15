@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
@@ -99,7 +98,7 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} autoComplete="off">
       {timeoutError && (
         <Alert variant="destructive" className="mb-4 bg-red-500/10 border-red-500/30 text-red-200">
           <AlertCircle className="h-4 w-4" />
@@ -120,39 +119,41 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
       
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-blue-100">Email</Label>
+          <Label htmlFor="app_email" className="text-blue-100">Email</Label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400">
               <Mail className="h-4 w-4" />
             </div>
             <Input
-              id="email"
+              id="app_email"
               type="email"
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50 pl-10"
               disabled={isLoading || internalLoading}
+              autoComplete="off"
             />
           </div>
         </div>
         
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-blue-100">Password</Label>
+            <Label htmlFor="app_password" className="text-blue-100">Password</Label>
             <a href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300 hover:underline">
               Forgot password?
             </a>
           </div>
           <div className="relative">
             <Input
-              id="password"
+              id="app_password"
               type={showPassword ? "text" : "password"}
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
               disabled={isLoading || internalLoading}
+              autoComplete="off"
             />
             <button
               type="button"
@@ -171,14 +172,14 @@ const LoginForm = ({ isLoading }: LoginFormProps) => {
         
         <div className="flex items-center space-x-2">
           <Checkbox 
-            id="remember" 
+            id="app_remember" 
             checked={rememberMe}
             onCheckedChange={(checked) => setRememberMe(!!checked)}
             disabled={isLoading || internalLoading}
             className="border-blue-500/50 data-[state=checked]:bg-blue-600"
           />
           <label
-            htmlFor="remember"
+            htmlFor="app_remember"
             className="text-sm font-medium leading-none text-blue-100/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Remember me

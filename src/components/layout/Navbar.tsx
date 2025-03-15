@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,10 +9,19 @@ const Navbar = () => {
   const location = useLocation();
   const {
     user,
-    logout
+    logout,
+    authChecked
   } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    if (!authChecked) {
+      console.warn('Cannot logout before auth initialization');
+      return;
+    }
+    await logout();
+  };
 
   // Add scroll event listener
   useEffect(() => {
@@ -86,7 +94,7 @@ const Navbar = () => {
           <div className="space-x-2">
             {user ? (
               <>
-                <Button variant="outline" size="sm" onClick={logout} className="text-primary hover:text-primary-foreground hover:bg-primary/90">
+                <Button variant="outline" size="sm" onClick={handleLogout} className="text-primary hover:text-primary-foreground hover:bg-primary/90">
                   Salir
                 </Button>
                 <Button variant={isAuthPage ? "outline" : "default"} size="sm" asChild>
@@ -147,7 +155,7 @@ const Navbar = () => {
                   <Button variant="secondary" size="sm" className="w-full" asChild>
                     <Link to="/profile">Mi Perfil</Link>
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full text-primary hover:text-primary-foreground hover:bg-primary/90" onClick={logout}>
+                  <Button variant="outline" size="sm" className="w-full text-primary hover:text-primary-foreground hover:bg-primary/90" onClick={handleLogout}>
                     Salir
                   </Button>
                 </div>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -80,9 +79,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Logout function
+  const logout = async () => {
+    if (!authChecked) {
+      console.warn('Cannot logout before auth initialization');
+      return;
+    }
+    
+    console.log('Attempting logout');
+    setIsLoading(true);
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      console.log('Logout successful');
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out",
+      });
+      navigate('/', { replace: true });
+    } catch (error: any) {
+      console.error('Logout failed:', error);
+      setAuthError(error.message || "Failed to log out");
+      toast({
+        title: "Logout failed",
+        description: "Failed to log out",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Initialize authentication state
   useEffect(() => {
+    let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+    let sessionCheckInterval: NodeJS.Timeout | null = null;
+
     const initializeAuth = async () => {
+      if (!mounted) return;
+      
       setIsLoading(true);
       console.log('Initializing auth state...');
       
@@ -92,122 +128,225 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (sessionError) {
           console.error('Error getting session:', sessionError);
-          setAuthChecked(true);
-          setIsLoading(false);
+          if (mounted) {
+            setAuthChecked(true);
+            setIsLoading(false);
+          }
           return;
         }
-        
-        if (session) {
-          console.log('Session found, user is logged in:', session.user.id);
-          const profile = await getProfile(session.user.id);
+
+        // Set up auth state change listener - only listen for critical auth events
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+          console.log(`Auth state changed: ${event}`, currentSession ? 'Session exists' : 'No session');
           
-          if (profile) {
-            setUser(profile);
-          } else {
-            // If no profile found but session exists, create a temporary basic profile
-            // This will be updated when the database trigger creates the actual profile
-            const tempUser: User = {
-              id: session.user.id,
-              email: session.user.email || '',
-              name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-              role: 'user' // Default role is always 'user'
-            };
-            setUser(tempUser);
+          if (!mounted) return;
+
+          // Only process these specific auth events to avoid loops
+          const criticalEvents = ['SIGNED_IN', 'SIGNED_OUT', 'USER_UPDATED', 'USER_DELETED', 'PASSWORD_RECOVERY'];
+          
+          if (!criticalEvents.includes(event) && event !== 'INITIAL_SESSION') {
+            console.log(`Ignoring non-critical auth event: ${event}`);
+            return;
+          }
+          
+          // Avoid processing duplicate INITIAL_SESSION events
+          if (event === 'INITIAL_SESSION' && authChecked) {
+            console.log('Ignoring duplicate INITIAL_SESSION event');
+            return;
+          }
+
+          if (currentSession?.user) {
+            setIsLoading(true);
             
-            // Try to create a profile if it doesn't exist
             try {
-              await supabase.from('profiles').insert([{
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                role: 'user',
-                subscription: 'free'
-              }]);
-            } catch (insertError) {
-              console.error('Error creating profile:', insertError);
+              // Avoid unnecessary profile fetches if we already have this user
+              if (user?.id === currentSession.user.id && event !== 'USER_UPDATED') {
+                console.log('User already loaded, skipping profile fetch');
+                setIsLoading(false);
+                return;
+              }
+              
+              const profile = await getProfile(currentSession.user.id);
+              
+              if (mounted) {
+                if (profile) {
+                  setUser(profile);
+                } else {
+                  const tempUser: User = {
+                    id: currentSession.user.id,
+                    email: currentSession.user.email || '',
+                    name: currentSession.user.user_metadata?.name || currentSession.user.email?.split('@')[0] || 'User',
+                    role: 'user'
+                  };
+                  setUser(tempUser);
+
+                  // Try to create profile in background
+                  supabase.from('profiles').insert([{
+                    id: currentSession.user.id,
+                    email: currentSession.user.email || '',
+                    name: currentSession.user.user_metadata?.name || currentSession.user.email?.split('@')[0] || 'User',
+                    role: 'user',
+                    subscription: 'free'
+                  }]).then(() => {
+                    if (mounted) {
+                      getProfile(currentSession.user.id).then(newProfile => {
+                        if (mounted && newProfile) setUser(newProfile);
+                      });
+                    }
+                  });
+                }
+              }
+
+              // Navigate to courses page after login or signup
+              if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+                navigate('/courses');
+              }
+            } catch (error) {
+              console.error('Error in auth state change:', error);
+              if (mounted) {
+                const fallbackUser: User = {
+                  id: currentSession.user.id,
+                  email: currentSession.user.email || '',
+                  name: currentSession.user.user_metadata?.name || currentSession.user.email?.split('@')[0] || 'User',
+                  role: 'user'
+                };
+                setUser(fallbackUser);
+                
+                toast({
+                  title: "Profile Error",
+                  description: "There was an error loading your profile. Some features may be limited.",
+                  variant: "destructive",
+                });
+              }
+            } finally {
+              if (mounted) {
+                setIsLoading(false);
+                setAuthChecked(true);
+              }
+            }
+          } else {
+            if (mounted) {
+              console.log('No session, setting user to null');
+              setUser(null);
+              setIsLoading(false);
+              setAuthChecked(true);
+              
+              // Force redirect to home page if on a protected route
+              const protectedRoutes = ['/courses', '/profile', '/admin', '/dashboard'];
+              const isOnProtectedRoute = protectedRoutes.some(route => 
+                window.location.pathname.startsWith(route)
+              );
+              
+              if (isOnProtectedRoute) {
+                console.log('User is on protected route, redirecting to home');
+                navigate('/', { replace: true });
+              }
             }
           }
-        } else {
-          console.log('No session found, user is not logged in');
-          setUser(null);
+        });
+
+        authSubscription = { unsubscribe: subscription.unsubscribe };
+
+        // Handle initial session
+        if (session?.user) {
+          try {
+            const profile = await getProfile(session.user.id);
+            if (mounted) {
+              if (profile) {
+                setUser(profile);
+              } else {
+                const tempUser: User = {
+                  id: session.user.id,
+                  email: session.user.email || '',
+                  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+                  role: 'user'
+                };
+                setUser(tempUser);
+              }
+            }
+          } catch (error) {
+            console.error('Error handling initial session:', error);
+            if (mounted) {
+              setUser(null);
+              toast({
+                title: "Authentication Error",
+                description: "Failed to load your profile. Please try logging in again.",
+                variant: "destructive",
+              });
+            }
+          }
+        }
+        
+        // Set up session refresh mechanism
+        if (session) {
+          // Check session validity every minute
+          sessionCheckInterval = setInterval(async () => {
+            if (!mounted) return;
+            
+            try {
+              // Refresh the session to keep it active
+              const { data, error } = await supabase.auth.refreshSession();
+              
+              if (error) {
+                console.warn('Session refresh failed:', error);
+                // If refresh fails, check if we still have a valid session
+                const { data: { session: currentSession } } = await supabase.auth.getSession();
+                
+                if (!currentSession && mounted) {
+                  console.log('Session expired, logging out');
+                  clearInterval(sessionCheckInterval!);
+                  sessionCheckInterval = null;
+                  setUser(null);
+                  setAuthChecked(true);
+                  
+                  // Only navigate if on a protected route
+                  const protectedRoutes = ['/courses', '/profile', '/admin', '/dashboard'];
+                  const isOnProtectedRoute = protectedRoutes.some(route => 
+                    window.location.pathname.startsWith(route)
+                  );
+                  
+                  if (isOnProtectedRoute) {
+                    navigate('/', { replace: true });
+                  }
+                }
+              } else {
+                console.log('Session refreshed successfully');
+              }
+            } catch (refreshError) {
+              console.error('Error during session refresh:', refreshError);
+            }
+          }, 60000); // Check every minute
         }
       } catch (error) {
         console.error('Error during auth initialization:', error);
-        toast({
-          title: "Authentication Error",
-          description: "Failed to initialize authentication. Please refresh the page.",
-          variant: "destructive",
-        });
-        setUser(null);
-      } finally {
-        setAuthChecked(true);
-        setIsLoading(false);
-      }
-    };
-    
-    initializeAuth();
-    
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log(`Auth state changed: ${event}`, session ? 'Session exists' : 'No session');
-        
-        if (session && session.user) {
-          // Set loading true during auth state change
-          setIsLoading(true);
-          
-          try {
-            // Always get a fresh profile after auth changes
-            const profile = await getProfile(session.user.id);
-            
-            if (profile) {
-              setUser(profile);
-            } else {
-              // Create a temporary user object if profile not found
-              const tempUser: User = {
-                id: session.user.id,
-                email: session.user.email || '',
-                name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-                role: 'user' // Default role is always 'user'
-              };
-              setUser(tempUser);
-            }
-            
-            // Navigate to courses page after login or signup
-            // Fix the TypeScript error by using valid event types from Supabase
-            if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-              navigate('/courses');
-            }
-          } catch (error) {
-            console.error('Error handling auth state change:', error);
-          } finally {
-            setIsLoading(false);
-          }
-        } else {
-          console.log('Auth change: No session, setting user to null');
+        if (mounted) {
+          toast({
+            title: "Authentication Error",
+            description: "Failed to initialize authentication. Please refresh the page.",
+            variant: "destructive",
+          });
           setUser(null);
+        }
+      } finally {
+        if (mounted) {
+          setAuthChecked(true);
           setIsLoading(false);
-          
-          // Force redirect to home page if on a protected route
-          const protectedRoutes = ['/courses', '/profile', '/admin', '/dashboard'];
-          const isOnProtectedRoute = protectedRoutes.some(route => 
-            window.location.pathname.startsWith(route)
-          );
-          
-          if (isOnProtectedRoute) {
-            console.log('User is on protected route, redirecting to home');
-            navigate('/', { replace: true });
-          }
         }
       }
-    );
-    
-    // Cleanup subscription on unmount
-    return () => {
-      console.log('Cleaning up auth subscription');
-      subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+
+    initializeAuth();
+
+    return () => {
+      mounted = false;
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
+      if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+      }
+    };
+  }, [navigate, toast, user?.id]);
 
   // Login function
   const login = async (email: string, password: string) => {
@@ -216,6 +355,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     
     try {
+      // Check if we can access storage before attempting login
+      try {
+        localStorage.getItem('test-storage-access');
+      } catch (storageError) {
+        console.warn('Storage access issue detected before login attempt:', storageError);
+        // Continue anyway, our custom storage handler should handle this
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -236,12 +383,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Navigation will be handled by the onAuthStateChange listener
     } catch (error: any) {
       console.error('Login process failed:', error);
-      setAuthError(error.message || "Invalid email or password");
-      toast({
-        title: "Login failed",
-        description: error.message || "Invalid email or password",
-        variant: "destructive",
-      });
+      
+      // Check if this is a storage access error
+      if (error.message && (
+        error.message.includes('storage') || 
+        error.message.includes('localStorage') || 
+        error.message.includes('Access') ||
+        error.message.includes('permission')
+      )) {
+        setAuthError("Browser storage access denied. Try disabling private browsing or browser extensions.");
+        toast({
+          title: "Storage access error",
+          description: "Your browser is blocking storage access. Try disabling private browsing or browser extensions.",
+          variant: "destructive",
+        });
+      } else {
+        setAuthError(error.message || "Invalid email or password");
+        toast({
+          title: "Login failed",
+          description: error.message || "Invalid email or password",
+          variant: "destructive",
+        });
+      }
+      
       throw error; // Re-throw to allow component to handle error state
     } finally {
       setIsLoading(false);
@@ -255,6 +419,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     
     try {
+      // Check if we can access storage before attempting Google sign-in
+      try {
+        localStorage.getItem('test-storage-access');
+      } catch (storageError) {
+        console.warn('Storage access issue detected before Google sign-in attempt:', storageError);
+        // Continue anyway, our custom storage handler should handle this
+      }
+      
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -277,12 +449,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Navigation will be handled by the onAuthStateChange listener
     } catch (error: any) {
       console.error('Google sign-in process failed:', error);
-      setAuthError(error.message || "Could not sign in with Google");
-      toast({
-        title: "Google sign-in failed",
-        description: error.message || "Could not sign in with Google",
-        variant: "destructive",
-      });
+      
+      // Check if this is a storage access error
+      if (error.message && (
+        error.message.includes('storage') || 
+        error.message.includes('localStorage') || 
+        error.message.includes('Access') ||
+        error.message.includes('permission')
+      )) {
+        setAuthError("Browser storage access denied. Try disabling private browsing or browser extensions.");
+        toast({
+          title: "Storage access error",
+          description: "Your browser is blocking storage access. Try disabling private browsing or browser extensions.",
+          variant: "destructive",
+        });
+      } else {
+        setAuthError(error.message || "Could not sign in with Google");
+        toast({
+          title: "Google sign-in failed",
+          description: error.message || "Could not sign in with Google",
+          variant: "destructive",
+        });
+      }
+      
       throw error;
     } finally {
       setIsLoading(false);
@@ -296,6 +485,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     
     try {
+      // Check if we can access storage before attempting signup
+      try {
+        localStorage.getItem('test-storage-access');
+      } catch (storageError) {
+        console.warn('Storage access issue detected before signup attempt:', storageError);
+        // Continue anyway, our custom storage handler should handle this
+      }
+      
       // Sign up with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -323,39 +520,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Navigation will be handled by the onAuthStateChange listener
     } catch (error: any) {
       console.error('Signup process failed:', error);
-      setAuthError(error.message || "Failed to create account");
-      toast({
-        title: "Signup failed",
-        description: error.message || "Failed to create account",
-        variant: "destructive",
-      });
+      
+      // Check if this is a storage access error
+      if (error.message && (
+        error.message.includes('storage') || 
+        error.message.includes('localStorage') || 
+        error.message.includes('Access') ||
+        error.message.includes('permission')
+      )) {
+        setAuthError("Browser storage access denied. Try disabling private browsing or browser extensions.");
+        toast({
+          title: "Storage access error",
+          description: "Your browser is blocking storage access. Try disabling private browsing or browser extensions.",
+          variant: "destructive",
+        });
+      } else {
+        setAuthError(error.message || "Failed to create account");
+        toast({
+          title: "Signup failed",
+          description: error.message || "Failed to create account",
+          variant: "destructive",
+        });
+      }
+      
       throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Logout function
-  const logout = async () => {
-    console.log('Attempting logout');
-    setIsLoading(true);
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      console.log('Logout successful');
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out",
-      });
-      navigate('/', { replace: true });
-    } catch (error: any) {
-      console.error('Logout failed:', error);
-      setAuthError(error.message || "Failed to log out");
-      toast({
-        title: "Logout failed",
-        description: "Failed to log out",
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }

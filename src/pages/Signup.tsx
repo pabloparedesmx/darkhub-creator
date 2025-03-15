@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -82,55 +81,58 @@ const Signup = () => {
               <p className="text-blue-100/70 text-sm">Sign up to get started with AI Makers</p>
             </div>
             
-            <form onSubmit={handleSignup}>
+            <form onSubmit={handleSignup} autoComplete="off">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-blue-100">Full Name</Label>
+                  <Label htmlFor="app_fullName" className="text-blue-100">Full Name</Label>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400">
                       <User className="h-4 w-4" />
                     </div>
                     <Input
-                      id="fullName"
+                      id="app_fullName"
                       type="text"
                       placeholder="John Doe"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50 pl-10"
                       disabled={isLoading}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-blue-100">Email</Label>
+                  <Label htmlFor="app_email" className="text-blue-100">Email</Label>
                   <div className="relative">
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400">
                       <Mail className="h-4 w-4" />
                     </div>
                     <Input
-                      id="email"
+                      id="app_email"
                       type="email"
                       placeholder="name@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50 pl-10"
                       disabled={isLoading}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-blue-100">Password</Label>
+                  <Label htmlFor="app_password" className="text-blue-100">Password</Label>
                   <div className="relative">
                     <Input
-                      id="password"
+                      id="app_password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="bg-blue-950/40 border-blue-500/30 text-blue-100 placeholder:text-blue-400/50"
                       disabled={isLoading}
+                      autoComplete="off"
                     />
                     <button
                       type="button"
@@ -149,14 +151,14 @@ const Signup = () => {
                 
                 <div className="flex items-center space-x-2">
                   <Checkbox 
-                    id="terms" 
+                    id="app_terms" 
                     checked={agreeTerms}
                     onCheckedChange={(checked) => setAgreeTerms(!!checked)}
                     disabled={isLoading}
                     className="border-blue-500/50 data-[state=checked]:bg-blue-600"
                   />
                   <label
-                    htmlFor="terms"
+                    htmlFor="app_terms"
                     className="text-sm font-medium leading-none text-blue-100/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     I agree to the <Link to="/terms" className="text-blue-400 hover:text-blue-300 hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-blue-400 hover:text-blue-300 hover:underline">Privacy Policy</Link>
