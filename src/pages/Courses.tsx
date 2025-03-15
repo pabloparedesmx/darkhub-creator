@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
@@ -12,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
 import SEO from '@/components/ui/SEO';
+import ElevenLabsWidget from '@/components/course/ElevenLabsWidget';
 
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
@@ -241,6 +241,9 @@ const Courses = () => {
         title="Tutoriales de IA | AI Makers" 
         description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva." 
       />
+      
+      {/* Add ElevenLabs widget */}
+      <ElevenLabsWidget />
       
       {/* Hero Section with Cover Image */}
       <div className="relative w-full bg-gradient-to-b from-blue-50 to-white pt-20">

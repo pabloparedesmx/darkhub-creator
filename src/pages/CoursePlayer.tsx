@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import NewsletterSubscribe from '@/components/ui/NewsletterSubscribe';
+import ElevenLabsWidget from '@/components/course/ElevenLabsWidget';
 
 interface Lesson {
   id: string;
@@ -287,6 +288,9 @@ const CoursePlayer = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      {/* Add ElevenLabs widget */}
+      <ElevenLabsWidget />
+      
       {/* Header */}
       <header className="bg-background border-b border-border py-4 px-6">
         <div className="container mx-auto flex items-center justify-between">

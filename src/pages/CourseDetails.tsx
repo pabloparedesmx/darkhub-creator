@@ -16,6 +16,7 @@ import ErrorState from '@/components/ui/ErrorState';
 import { Badge } from '@/components/ui/badge';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import SEO from '@/components/ui/SEO';
+import ElevenLabsWidget from '@/components/course/ElevenLabsWidget';
 
 interface CourseDetailData extends Omit<DbCourse, 'badges'> {
   badges: Array<'tutorial' | 'pro' | 'free'>;
@@ -109,6 +110,9 @@ const CourseDetails = () => {
         description={seoDescription}
         type="article"
       />
+      
+      {/* Add ElevenLabs widget */}
+      <ElevenLabsWidget />
       
       <Navbar />
       <main className="flex-grow pt-24 pb-20 px-4">
