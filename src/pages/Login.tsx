@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,6 @@ import { useAuth } from '@/contexts/AuthContext';
 const Login = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, signInWithGoogle, isLoading, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,11 +25,9 @@ const Login = () => {
   // If already authenticated, redirect to courses
   useEffect(() => {
     if (isAuthenticated) {
-      // Get the intended destination or default to /courses
-      const from = location.state?.from?.pathname || '/courses';
-      navigate(from, { replace: true });
+      navigate('/courses');
     }
-  }, [isAuthenticated, navigate, location.state]);
+  }, [isAuthenticated, navigate]);
   
   // Clear timeout error when user makes changes to form
   useEffect(() => {

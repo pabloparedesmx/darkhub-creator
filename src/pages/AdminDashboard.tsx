@@ -599,6 +599,7 @@ const AdminDashboard = () => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     
     try {
+      // First update the role in Supabase
       const { error } = await supabase
         .from('profiles')
         .update({ role: newRole })
@@ -606,10 +607,12 @@ const AdminDashboard = () => {
       
       if (error) throw error;
       
-      // Update local state
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, role: newRole as 'user' | 'admin' } : user
-      ));
+      // Then update the local state to reflect the change
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId ? { ...user, role: newRole } : user
+        )
+      );
       
       toast({
         title: "Success",

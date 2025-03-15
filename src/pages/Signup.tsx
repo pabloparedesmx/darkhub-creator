@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,23 +12,12 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { signup, signInWithGoogle, isLoading, isAuthenticated } = useAuth();
+  const { signup, signInWithGoogle, isLoading } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-
-  // If already authenticated, redirect to courses
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Get the intended destination or default to /courses
-      const from = location.state?.from?.pathname || '/courses';
-      navigate(from, { replace: true });
-    }
-  }, [isAuthenticated, navigate, location.state]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
