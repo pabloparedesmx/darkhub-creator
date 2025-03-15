@@ -81,10 +81,7 @@ const Navbar = () => {
                 </Link>
               }
             </>
-          ) : (
-            // Simplified menu for non-authenticated users
-            isAuthPage || null // Don't show menu items for non-authenticated users on auth pages
-          )}
+          ) : null }
           
           {/* Authentication and profile buttons */}
           <div className="space-x-2">
