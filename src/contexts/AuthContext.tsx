@@ -152,24 +152,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           // Navigate to courses page after login or signup
-          // Fix the TypeScript error by using valid event types from Supabase
           if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
             navigate('/courses');
           }
         } else {
           console.log('Auth change: No session, setting user to null');
           setUser(null);
-          
-          // Force redirect to home page if on a protected route
-          const protectedRoutes = ['/courses', '/profile', '/admin', '/dashboard'];
-          const isOnProtectedRoute = protectedRoutes.some(route => 
-            window.location.pathname.startsWith(route)
-          );
-          
-          if (isOnProtectedRoute) {
-            console.log('User is on protected route, redirecting to home');
-            navigate('/', { replace: true });
-          }
         }
         
         setIsLoading(false);
@@ -275,7 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
       
-      console.log('Signup successful');
+      console.log('Signup successful', data);
       toast({
         title: "Signup successful",
         description: `Welcome, ${name}!`,
