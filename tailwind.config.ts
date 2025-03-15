@@ -67,6 +67,10 @@ export default {
 					pro: '#8B5CF6',
 					free: '#10B981',
 					tutorial: '#3B82F6',
+				},
+				checkbox: {
+					border: '#E2E8F0',
+					background: '#F8FAFC'
 				}
 			},
 			borderRadius: {
