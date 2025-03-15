@@ -55,6 +55,19 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     ? course.toolName.replace('Herramienta: ', '')
     : course.toolName;
   
+  // Translate difficulty to Spanish
+  const getDifficultyInSpanish = (difficulty?: string) => {
+    if (!difficulty) return "";
+    
+    const translations: Record<string, string> = {
+      'beginner': 'Principiante',
+      'intermediate': 'Intermedio',
+      'advanced': 'Avanzado'
+    };
+    
+    return translations[difficulty] || difficulty;
+  };
+  
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
@@ -83,7 +96,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                 <span 
                   className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
                 >
-                  {course.difficulty}
+                  {getDifficultyInSpanish(course.difficulty)}
                 </span>
               )}
             </div>

@@ -128,6 +128,13 @@ const CourseForm = ({
     // Tool associations will be saved in the parent component after the course is created/updated
   };
 
+  // Difficulty levels mapping for display
+  const difficultyLabels = {
+    beginner: 'Principiante',
+    intermediate: 'Intermedio',
+    advanced: 'Avanzado'
+  };
+
   return (
     <div className="space-y-4 py-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -209,18 +216,18 @@ const CourseForm = ({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label htmlFor="courseDifficulty">Difficulty</label>
+          <label htmlFor="courseDifficulty">Dificultad</label>
           <Select
             value={newCourse.difficulty || 'beginner'}
             onValueChange={(value) => setNewCourse({...newCourse, difficulty: value})}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Select a difficulty level" />
+              <SelectValue placeholder="Selecciona un nivel de dificultad" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="beginner">Beginner</SelectItem>
-              <SelectItem value="intermediate">Intermediate</SelectItem>
-              <SelectItem value="advanced">Advanced</SelectItem>
+              <SelectItem value="beginner">Principiante</SelectItem>
+              <SelectItem value="intermediate">Intermedio</SelectItem>
+              <SelectItem value="advanced">Avanzado</SelectItem>
             </SelectContent>
           </Select>
         </div>
