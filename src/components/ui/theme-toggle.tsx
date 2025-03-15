@@ -27,9 +27,9 @@ export function ThemeToggle() {
       size="icon" 
       onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-      className="rounded-full border border-blue-500/30 bg-background relative overflow-hidden"
+      className="rounded-full border border-cyan-500/30 bg-background relative overflow-hidden"
     >
-      <div className="absolute inset-0 bg-blue-500/10 backdrop-blur-sm rounded-full"></div>
+      <div className="absolute inset-0 bg-cyan-500/10 backdrop-blur-sm rounded-full"></div>
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -40,7 +40,7 @@ export function ThemeToggle() {
         {theme === 'light' ? (
           <Moon className="h-5 w-5 text-foreground" />
         ) : (
-          <Sun className="h-5 w-5 text-foreground" />
+          <Sun className="h-5 w-5 text-cyan-400" />
         )}
       </motion.div>
       <span className="sr-only">Toggle theme</span>

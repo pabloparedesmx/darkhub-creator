@@ -4,39 +4,6 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
- 
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --ring: 212 100% 47%;
-
-    --radius: 0.5rem;
-  }
- 
-  .light {
     --background: 0 0% 100%;
     --foreground: 222.2 47.4% 11.2%;
  
@@ -77,23 +44,23 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
  
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -104,7 +71,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --ring: 212 100% 47%;
+    --ring: 224 76% 48%;
 
     --sidebar-background: 217 33% 17%;
     --sidebar-foreground: 210 40% 98%;
@@ -231,19 +198,19 @@
 
 /* Futuristic AI Styles */
 .ai-gradient-text {
-  @apply bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text;
+  @apply bg-gradient-to-r from-cyan-400 via-cyan-500 to-blue-600 text-transparent bg-clip-text;
 }
 
 .ai-blue-glow {
-  text-shadow: 0 0 15px rgba(59, 130, 246, 0.5), 0 0 30px rgba(59, 130, 246, 0.3);
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.5), 0 0 30px rgba(56, 189, 248, 0.3);
 }
 
 .ai-card {
-  @apply bg-secondary/30 backdrop-blur-xl border border-blue-500/20 rounded-lg shadow-lg shadow-blue-500/10;
+  @apply bg-secondary/80 backdrop-blur-xl border border-cyan-500/20 rounded-lg shadow-lg shadow-cyan-500/10;
 }
 
 .ai-button {
-  @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all;
+  @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all;
 }
 
 .ai-hero-bg {
@@ -260,4 +227,33 @@
   background-image: url('/lovable-uploads/2d11c5ed-a05a-4379-9b30-a8004decb20c.png');
   background-size: cover;
   background-position: center;
+}
+
+/* Dark mode card styling inspired by reference image */
+.dark .dashboard-card {
+  @apply bg-[#0c1626] border border-cyan-500/20 shadow-md shadow-cyan-500/5;
+}
+
+.dark .dashboard-section {
+  @apply bg-[#071323];
+}
+
+.dark .tech-badge {
+  @apply bg-[#071323] text-cyan-400 border border-cyan-500/30 px-2 py-1 text-xs rounded;
+}
+
+.dark .nav-link {
+  @apply text-gray-400 hover:text-cyan-400 transition-colors;
+}
+
+.dark .nav-link.active {
+  @apply text-cyan-400;
+}
+
+.dark .button-outline {
+  @apply border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10;
+}
+
+.dark .icon-button {
+  @apply text-cyan-400 hover:text-cyan-300;
 }
