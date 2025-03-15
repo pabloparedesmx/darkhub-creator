@@ -2,6 +2,13 @@
 import React, { useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
+// Add TinyMCE global type declaration
+declare global {
+  interface Window {
+    tinymce: any;
+  }
+}
+
 interface RichTextEditorProps {
   value: string;
   onChange: (content: string) => void;
@@ -79,10 +86,9 @@ const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly =
         branding: false,
         promotion: false,
         statusbar: false,
-        // Add browser_spellcheck option
         browser_spellcheck: true,
-        // Set unique selector to avoid conflicts
-        selector: `#${editorId}`
+        // Fix the selector type issue by using a valid init config property
+        selector: undefined // Remove the selector property as it's handled by the id prop
       }}
     />
   );
