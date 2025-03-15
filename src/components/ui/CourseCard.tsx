@@ -28,8 +28,22 @@ interface CourseCardProps {
 const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   
-  // Prioritize short_description if available
-  const displayText = course.short_description || course.summary || course.description.replace(/<[^>]*>/g, '');
+  // Helper function to decode HTML entities
+  const decodeHtmlEntities = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
+  };
+  
+  // Prioritize short_description if available and decode HTML entities
+  const getRawDisplayText = () => {
+    if (course.short_description) return course.short_description;
+    if (course.summary) return course.summary;
+    return course.description.replace(/<[^>]*>/g, '');
+  };
+  
+  // Get and decode the display text
+  const displayText = decodeHtmlEntities(getRawDisplayText());
   
   // Function to render tool icon (either as emoji or image)
   const renderToolIcon = (icon?: string) => {
@@ -110,7 +124,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                 }}
                 transition={{ duration: 0.2 }}
               >
-                {course.title}
+                {decodeHtmlEntities(course.title)}
               </motion.h3>
               
               <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
