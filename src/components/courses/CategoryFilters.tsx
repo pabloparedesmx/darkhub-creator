@@ -5,18 +5,21 @@ import { ChevronDown, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Category } from '@/types/admin';
 import { supabase } from "@/lib/supabase";
+
 interface CategoryFiltersProps {
   selectedCategories: string[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
+
 const CategoryFilters = ({
   selectedCategories,
   setSelectedCategories
 }: CategoryFiltersProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Changed to true to make it open by default
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -34,7 +37,9 @@ const CategoryFilters = ({
     };
     fetchCategories();
   }, []);
+
   const filteredCategories = categories.filter(category => category.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
   const handleCategoryToggle = (categoryId: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(categoryId)) {
@@ -44,9 +49,11 @@ const CategoryFilters = ({
       }
     });
   };
+
   const clearCategoryFilters = () => {
     setSelectedCategories([]);
   };
+
   if (isLoading) {
     return <div className="border-t border-border pt-4">
         <div className="flex justify-between items-center w-full text-left mb-2">
@@ -60,9 +67,11 @@ const CategoryFilters = ({
         </div>
       </div>;
   }
+
   if (categories.length === 0) {
     return null;
   }
+
   return <div className="border-t border-border pt-4">
       <button className="flex justify-between items-center w-full text-left mb-2" onClick={() => setIsOpen(!isOpen)}>
         <span className="text-sm font-medium">Categorías</span>
@@ -87,4 +96,5 @@ const CategoryFilters = ({
         </div>}
     </div>;
 };
+
 export default CategoryFilters;
