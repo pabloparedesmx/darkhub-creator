@@ -86,9 +86,8 @@ const RichTextEditor = ({ value, onChange, height = 300, placeholder, readOnly =
         branding: false,
         promotion: false,
         statusbar: false,
-        browser_spellcheck: true,
-        // Fix the selector type issue by using a valid init config property
-        selector: undefined // Remove the selector property as it's handled by the id prop
+        browser_spellcheck: true
+        // Remove the selector property entirely as it's handled by the id prop
       }}
     />
   );
