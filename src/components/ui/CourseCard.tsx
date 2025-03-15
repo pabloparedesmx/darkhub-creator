@@ -58,7 +58,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
-        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-md border-border ${featured ? 'border-primary/40' : 'hover:border-primary/20'} backdrop-blur-sm`}
+        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-md border-border ${featured ? 'border-primary/40' : 'hover:border-primary/20'} backdrop-blur-sm dark:hover:border-cyan-500/40`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -68,12 +68,24 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             <div className="flex gap-2 pt-4 px-4">
               {course.badges.map((badge, index) => (
                 <span 
-                  key={index} 
-                  className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                  key={index}
+                  className={`text-xs px-2 py-1 rounded-full ${
+                    badge === 'pro' 
+                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' 
+                    : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                  }`}
                 >
                   {badge === 'pro' ? 'Pro' : 'Gratis'}
                 </span>
               ))}
+              
+              {course.difficulty && (
+                <span 
+                  className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                >
+                  {course.difficulty}
+                </span>
+              )}
             </div>
             
             {/* Course title */}
@@ -94,7 +106,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             </div>
             
             {/* Tool icon at the bottom */}
-            <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center">
+            <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center dark:bg-[#071323]/80">
               {renderToolIcon(course.toolIcon || course.icon)}
               <span className="text-xs text-muted-foreground truncate">
                 {displayToolName || course.slug}

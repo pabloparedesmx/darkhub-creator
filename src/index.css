@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -206,11 +207,11 @@
 }
 
 .ai-card {
-  @apply bg-secondary/80 backdrop-blur-xl border border-cyan-500/20 rounded-lg shadow-lg shadow-cyan-500/10;
+  @apply bg-secondary/80 backdrop-blur-xl border border-cyan-500/20 rounded-xl shadow-lg shadow-cyan-500/10;
 }
 
 .ai-button {
-  @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-md transition-all;
+  @apply bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl transition-all;
 }
 
 .ai-hero-bg {
@@ -231,15 +232,15 @@
 
 /* Dark mode card styling inspired by reference image */
 .dark .dashboard-card {
-  @apply bg-[#0c1626] border border-cyan-500/20 shadow-md shadow-cyan-500/5;
+  @apply bg-[#0c1626] border border-cyan-500/20 shadow-md shadow-cyan-500/5 rounded-xl;
 }
 
 .dark .dashboard-section {
-  @apply bg-[#071323];
+  @apply bg-[#071323] rounded-xl;
 }
 
 .dark .tech-badge {
-  @apply bg-[#071323] text-cyan-400 border border-cyan-500/30 px-2 py-1 text-xs rounded;
+  @apply bg-[#071323] text-cyan-400 border border-cyan-500/30 px-2 py-1 text-xs rounded-lg;
 }
 
 .dark .nav-link {
@@ -251,7 +252,7 @@
 }
 
 .dark .button-outline {
-  @apply border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10;
+  @apply border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 rounded-lg;
 }
 
 .dark .icon-button {

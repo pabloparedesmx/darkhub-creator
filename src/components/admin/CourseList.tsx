@@ -49,7 +49,7 @@ const CourseList = ({
     <div className="space-y-4">
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
         </div>
       ) : (
         <>
@@ -62,12 +62,12 @@ const CourseList = ({
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {courses.map(course => (
-                <Card key={course.id} className="overflow-hidden border border-border hover:border-border/80 transition-all">
+                <Card key={course.id} className="overflow-hidden border border-border hover:border-cyan-500/30 transition-all dark:dashboard-card">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
                       {/* Course icon column */}
-                      <div className="flex items-center justify-center p-6 bg-secondary/30 md:w-24 md:h-auto">
-                        <div className="flex items-center justify-center w-16 h-16 text-3xl bg-background rounded-full border border-border shadow-sm">
+                      <div className="flex items-center justify-center p-6 bg-secondary/30 dark:bg-[#071323] md:w-24 md:h-auto">
+                        <div className="flex items-center justify-center w-16 h-16 text-3xl bg-background rounded-full border border-border shadow-sm dark:bg-[#0c1626] dark:border-cyan-500/20">
                           {renderToolIcon(course.icon)}
                         </div>
                       </div>
@@ -76,7 +76,7 @@ const CourseList = ({
                       <div className="flex-1 p-6">
                         <div className="flex justify-between items-start">
                           <div>
-                            <Link to={`/courses/${course.slug}`} className="hover:text-primary transition-colors">
+                            <Link to={`/courses/${course.slug}`} className="hover:text-primary transition-colors dark:hover:text-cyan-400">
                               <h3 className="text-xl font-semibold mb-2">{course.title}</h3>
                             </Link>
                             {/* Display badges */}
@@ -113,7 +113,7 @@ const CourseList = ({
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="mr-2"
+                              className="mr-2 dark:border-cyan-500/30 dark:text-cyan-400"
                               onClick={() => handleManageTools(course.id)}
                             >
                               <Wrench className="h-4 w-4 mr-1" />
@@ -122,12 +122,12 @@ const CourseList = ({
                             
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" className="dark:text-cyan-400 dark:hover:bg-cyan-500/10">
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
+                              <DropdownMenuContent align="end" className="dark:border-cyan-500/30 dark:bg-[#0c1626]">
+                                <DropdownMenuItem asChild className="dark:hover:bg-cyan-500/10 dark:hover:text-cyan-400">
                                   <Link to={`/admin/courses/edit/${course.id}`}>
                                     <Edit className="mr-2 h-4 w-4" />
                                     Edit
@@ -135,7 +135,7 @@ const CourseList = ({
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   onClick={() => handleDeleteCourse(course.id)}
-                                  className="text-destructive"
+                                  className="text-destructive dark:hover:bg-red-500/10"
                                 >
                                   <Trash className="mr-2 h-4 w-4" />
                                   Delete

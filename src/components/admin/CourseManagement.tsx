@@ -47,9 +47,9 @@ const CourseManagement = ({
       <div className="flex justify-between items-center mb-6">
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar contenido..." className="pl-10" />
+          <Input placeholder="Buscar contenido..." className="pl-10 rounded-lg dark:border-cyan-500/30" />
         </div>
-        <Button asChild>
+        <Button asChild variant="cyan" className="rounded-lg">
           <Link to="/admin/courses/new">
             <PlusCircle className="mr-2 h-4 w-4" />
             Añadir Curso
