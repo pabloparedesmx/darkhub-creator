@@ -10,9 +10,9 @@ const CategoryBadge = ({ type, className }: CategoryBadgeProps) => {
   const baseClasses = "px-2 py-1 text-xs font-medium rounded";
   
   const styleMap = {
-    tutorial: "bg-badge-tutorial/10 text-badge-tutorial border border-badge-tutorial/20",
-    pro: "bg-badge-pro/10 text-badge-pro border border-badge-pro/20",
-    free: "bg-badge-free/10 text-badge-free border border-badge-free/20",
+    tutorial: "bg-blue-100 text-blue-700 border border-blue-200",
+    pro: "bg-purple-100 text-purple-700 border border-purple-200",
+    free: "bg-green-100 text-green-700 border border-green-200",
   };
 
   return (

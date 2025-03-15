@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
 
 export type Course = {
   id: string;
@@ -89,18 +88,18 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
     if (!difficulty) return "";
     
     const colorClasses: Record<string, string> = {
-      'beginner': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-      'intermediate': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
-      'advanced': 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+      'beginner': 'bg-blue-100 text-blue-700',
+      'intermediate': 'bg-yellow-100 text-yellow-700',
+      'advanced': 'bg-red-100 text-red-700',
     };
     
-    return colorClasses[difficulty] || 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300';
+    return colorClasses[difficulty] || 'bg-blue-100 text-blue-700';
   };
   
   return (
     <Link to={`/courses/${course.slug}`}>
       <Card 
-        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-md border-border ${featured ? 'border-primary/40' : 'hover:border-primary/20'} backdrop-blur-sm dark:hover:border-cyan-500/40`}
+        className={`h-full overflow-hidden transition-all duration-300 hover:shadow-md ${featured ? 'border-primary/40' : 'border hover:border-primary/20'}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -127,8 +126,8 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
                   key={index}
                   className={`text-xs px-2 py-1 rounded-full ${
                     badge === 'pro' 
-                    ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' 
-                    : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                    ? 'bg-purple-100 text-purple-700' 
+                    : 'bg-green-100 text-green-700'
                   }`}
                 >
                   {badge === 'pro' ? 'Pro' : 'Gratis'}
@@ -162,7 +161,7 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
             </div>
             
             {/* Tool icon at the bottom */}
-            <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex items-center dark:bg-[#071323]/80">
+            <div className="px-4 py-3 border-t border-border/50 bg-gray-50 flex items-center">
               {renderToolIcon(course.toolIcon || course.icon)}
               <span className="text-xs text-muted-foreground truncate">
                 {displayToolName || course.slug}

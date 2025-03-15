@@ -34,15 +34,15 @@ const CourseFilters = ({
   const [isDifficultyOpen, setIsDifficultyOpen] = useState(false);
 
   return (
-    <div className="w-full lg:w-64 space-y-6">
+    <div className="w-full lg:w-64 rounded-lg border bg-white p-5">
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <h3 className="text-lg font-medium">Filtros</h3>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={clearAllFilters}
-            className="h-8 px-2 text-xs"
+            className="h-8 px-2 text-xs text-blue-600 hover:text-blue-800 hover:bg-blue-50"
           >
             Limpiar todo
           </Button>
@@ -61,7 +61,7 @@ const CourseFilters = ({
         />
 
         {/* Difficulty filter */}
-        <div className="border-t border-border pt-4">
+        <div className="border-t border-gray-100 pt-4">
           <button 
             className="flex justify-between items-center w-full text-left mb-2"
             onClick={() => setIsDifficultyOpen(!isDifficultyOpen)}

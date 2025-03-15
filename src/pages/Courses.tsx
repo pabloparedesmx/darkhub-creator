@@ -11,6 +11,7 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
 import SEO from '@/components/ui/SEO';
+
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -172,6 +173,7 @@ const Courses = () => {
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
+
   const handleSortChange = (value: string) => {
     setSortOrder(value);
   };
@@ -230,53 +232,60 @@ const Courses = () => {
     });
     return filters;
   };
-  return <Layout>
+
+  return (
+    <Layout>
       {/* Add SEO component */}
-      <SEO title="Tutoriales de IA | AI Makers" description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva." />
+      <SEO 
+        title="Tutoriales de IA | AI Makers" 
+        description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva." 
+      />
       
       {/* Hero Section with Cover Image */}
-      <div className="relative w-full h-[450px] bg-gradient-to-b from-primary/10 to-background/5 dark:from-primary/5 dark:to-background/0">
-        <div className="container h-full flex flex-col justify-center">
-          <motion.div initial={{
-          opacity: 0,
-          y: 20
-        }} animate={{
-          opacity: 1,
-          y: 0
-        }} transition={{
-          duration: 0.5
-        }} className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">Tutoriales de IA</h1>
-            <p className="text-xl text-muted-foreground mb-10">
+      <div className="relative w-full bg-gradient-to-b from-blue-50 to-white">
+        <div className="container py-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Tutoriales de IA</h1>
+            <p className="text-xl text-muted-foreground">
               Aprende a dominar las herramientas y técnicas de inteligencia artificial más populares del momento.
             </p>
           </motion.div>
         </div>
-        
-        {/* Decorative Elements */}
-        
       </div>
       
-      <motion.div initial={{
-      opacity: 0,
-      y: 20
-    }} animate={{
-      opacity: 1,
-      y: 0
-    }} transition={{
-      duration: 0.5
-    }} className="container py-16">
-        {isLoading ? <div className="flex justify-center py-12">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="container py-8"
+      >
+        {isLoading ? (
+          <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div> : <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* Filters sidebar */}
-            <div className="md:col-span-3 space-y-8">
-              <CourseFilters difficulties={difficulties} setDifficulties={setDifficulties} selectedTools={selectedTools} setSelectedTools={setSelectedTools} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} clearAllFilters={clearAllFilters} />
+            <div className="md:col-span-3 space-y-6">
+              <CourseFilters 
+                difficulties={difficulties} 
+                setDifficulties={setDifficulties} 
+                selectedTools={selectedTools} 
+                setSelectedTools={setSelectedTools} 
+                selectedCategories={selectedCategories} 
+                setSelectedCategories={setSelectedCategories} 
+                clearAllFilters={clearAllFilters} 
+              />
             </div>
 
             {/* Main content */}
             <div className="md:col-span-9">
-              <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <CourseSearch searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
                 <CourseSort onSortChange={handleSortChange} />
               </div>
@@ -284,10 +293,17 @@ const Courses = () => {
               {/* Filter Tags */}
               <FilterTags activeFilters={getActiveFilters()} />
 
-              <CourseGrid courses={courses} coursesData={coursesData} clearAllFilters={clearAllFilters} />
+              <CourseGrid 
+                courses={courses} 
+                coursesData={coursesData} 
+                clearAllFilters={clearAllFilters} 
+              />
             </div>
-          </div>}
+          </div>
+        )}
       </motion.div>
-    </Layout>;
+    </Layout>
+  );
 };
+
 export default Courses;

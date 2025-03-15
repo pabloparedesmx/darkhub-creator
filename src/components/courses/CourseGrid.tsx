@@ -13,11 +13,11 @@ interface CourseGridProps {
 const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }: CourseGridProps) => {
   return (
     <>
-      <div className="text-sm text-muted-foreground mb-6">
+      <div className="text-sm text-muted-foreground mb-4">
         Mostrando {courses.length} de {coursesData.length}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {courses.map((course, index) => (
           <motion.div
             key={course.id}
@@ -34,12 +34,12 @@ const CourseGrid = ({ courses, coursesData, clearAllFilters, featured = false }:
       </div>
 
       {courses.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">No hay cursos que coincidan con tus filtros. Intenta ajustar tus criterios de búsqueda.</p>
+        <div className="text-center py-10 bg-gray-50 rounded-lg border my-8">
+          <p className="text-muted-foreground mb-4">No hay cursos que coincidan con tus filtros. Intenta ajustar tus criterios de búsqueda.</p>
           <Button 
             variant="outline" 
             onClick={clearAllFilters}
-            className="mt-4"
+            className="bg-white hover:bg-gray-100"
           >
             Limpiar todos los filtros
           </Button>
