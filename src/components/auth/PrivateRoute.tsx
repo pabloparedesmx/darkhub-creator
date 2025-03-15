@@ -12,14 +12,12 @@ const PrivateRoute = () => {
   useEffect(() => {
     // Set authChecked to true once we've checked authentication status
     if (!isLoading) {
-      console.log('Authentication check completed:', isAuthenticated ? 'Authenticated' : 'Not authenticated');
       setAuthChecked(true);
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading]);
 
   // Only show loading state when initially checking authentication
   if (isLoading && !authChecked) {
-    console.log('Showing loading state while checking authentication');
     return <LoadingState message="Checking authentication..." />;
   }
 
@@ -30,7 +28,6 @@ const PrivateRoute = () => {
   }
 
   // Only return the outlet if authenticated
-  console.log('User is authenticated, rendering protected route');
   return <Outlet />;
 };
 

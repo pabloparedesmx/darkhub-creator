@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -24,8 +25,7 @@ const Login = () => {
   // If already authenticated, redirect to courses
   useEffect(() => {
     if (isAuthenticated) {
-      console.log("User is already authenticated, redirecting to /courses");
-      navigate('/courses', { replace: true });
+      navigate('/courses');
     }
   }, [isAuthenticated, navigate]);
   

@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,25 +12,15 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const { signup, signInWithGoogle, isLoading, isAuthenticated } = useAuth();
+  const { signup, signInWithGoogle, isLoading } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // If already authenticated, redirect to courses
-  useEffect(() => {
-    if (isAuthenticated) {
-      console.log("User is already authenticated, redirecting to /courses");
-      navigate('/courses', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
-
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signup form submitted with email:", email);
     
     // Basic validation
     if (!fullName || !email || !password) {
@@ -54,7 +44,6 @@ const Signup = () => {
     try {
       // Pass the user's full name to the signup function
       await signup(fullName, email, password);
-      console.log("Signup function called successfully");
     } catch (error) {
       console.error("Signup error:", error);
     }
