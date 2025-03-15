@@ -22,7 +22,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     
     // If no user preference exists, apply route-based default
     if (!storedTheme) {
-      setTheme(isPublicRoute ? 'dark' : 'light');
+      // Public routes get dark theme, everything else gets light
+      const defaultTheme = isPublicRoute ? 'dark' : 'light';
+      setTheme(defaultTheme);
     }
   }, [location.pathname, setTheme]);
   

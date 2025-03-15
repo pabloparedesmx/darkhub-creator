@@ -16,7 +16,7 @@ type ThemeProviderState = {
 };
 
 const initialState: ThemeProviderState = {
-  theme: 'dark',
+  theme: 'light', // Changed default to light
   setTheme: () => null,
 };
 
@@ -24,7 +24,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'dark',
+  defaultTheme = 'light', // Changed default to light
   storageKey = 'dashboard-theme',
   ...props
 }: ThemeProviderProps) {
@@ -41,34 +41,29 @@ export function ThemeProvider({
     currentPath === '/login' || 
     currentPath === '/signup';
 
-  // Force dark theme on public routes
+  // Force dark theme only on public routes, but don't override user preference after login
   useEffect(() => {
     if (isPublicRoute) {
-      setTheme('dark');
-    }
-  }, [isPublicRoute]);
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    
-    // Remove both classes first
-    root.classList.remove('light', 'dark');
-    
-    // Add the current theme class
-    root.classList.add(theme);
-    
-    // Only store theme preference if we're not on a public route
-    if (!isPublicRoute) {
+      // Apply dark theme to DOM, but don't update state
+      const root = window.document.documentElement;
+      root.classList.remove('light');
+      root.classList.add('dark');
+    } else {
+      // When not on public routes, apply the user's theme preference
+      const root = window.document.documentElement;
+      root.classList.remove('light', 'dark');
+      root.classList.add(theme);
+      
+      // Save the theme preference
       localStorage.setItem(storageKey, theme);
     }
-  }, [theme, storageKey, isPublicRoute]);
+  }, [theme, isPublicRoute, storageKey]);
 
   const value = {
     theme,
-    setTheme: (theme: Theme) => {
-      if (!isPublicRoute) {
-        setTheme(theme);
-      }
+    setTheme: (newTheme: Theme) => {
+      // Always allow theme changes, even on public routes
+      setTheme(newTheme);
     },
   };
 
