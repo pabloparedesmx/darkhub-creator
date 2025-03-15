@@ -14,8 +14,6 @@ import CourseTools from '@/components/course/CourseTools';
 import LoadingState from '@/components/ui/LoadingState';
 import ErrorState from '@/components/ui/ErrorState';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Bookmark, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import CategoryBadge from '@/components/ui/CategoryBadge';
 import SEO from '@/components/ui/SEO';
 
@@ -118,32 +116,38 @@ const CourseDetails = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main content area - 2/3 width on desktop */}
             <div className="w-full lg:w-2/3">
-              {/* Course Tags Section */}
-              <div className="mb-4 space-y-4">
+              {/* Course Header with title, breadcrumbs, and description */}
+              <CourseHeader course={course} />
+              
+              {/* Course Tags Section - MOVED BELOW the image and content */}
+              <div className="mb-10 space-y-6 border-t border-b py-6 border-gray-100">
                 {/* Tool & Category Tags */}
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">Etiquetas</div>
+                  <div className="text-sm font-medium text-gray-500">Etiquetas</div>
                   <div className="flex flex-wrap gap-2">
-                    {course.toolName && <Badge variant="filter" className="border-blue-500/30">
-                        {course.toolName}
-                      </Badge>}
-                    {course.badges && course.badges.map(badge => <CategoryBadge key={badge} type={badge} />)}
+                    {course.toolName && (
+                      <Badge variant="outline" className="border-blue-500/30">
+                        Contenido
+                      </Badge>
+                    )}
+                    {course.badges && course.badges.map(badge => (
+                      <CategoryBadge key={badge} type={badge} />
+                    ))}
                   </div>
                 </div>
                 
                 {/* Level Badge */}
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-muted-foreground">Nivel</div>
+                  <div className="text-sm font-medium text-gray-500">Nivel</div>
                   <div className="flex">
                     <Badge variant="outline" className="border-blue-500/30 bg-secondary/20">
-                      {course.difficulty === 'beginner' ? 'Principiante' : course.difficulty === 'intermediate' ? 'Intermedio' : course.difficulty === 'advanced' ? 'Avanzado' : 'Principiante'}
+                      {course.difficulty === 'beginner' ? 'Principiante' : 
+                       course.difficulty === 'intermediate' ? 'Intermedio' : 
+                       course.difficulty === 'advanced' ? 'Avanzado' : 'Principiante'}
                     </Badge>
                   </div>
                 </div>
               </div>
-
-              {/* Course Header with title, breadcrumbs, and description */}
-              <CourseHeader course={course} />
               
               {/* Course Tools Section */}
               <CourseTools courseId={course.id} />

@@ -15,37 +15,6 @@ interface CourseHeaderProps {
 const CourseHeader = ({ course }: CourseHeaderProps) => {
   return (
     <div className="mb-12">
-      {/* Cover Image */}
-      {course.cover_image && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="w-full h-[450px] rounded-lg overflow-hidden mb-8 relative"
-        >
-          <img 
-            src={course.cover_image} 
-            alt={course.title} 
-            className="w-full h-full object-cover"
-          />
-          {/* Display badges at the bottom of the image */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-wrap gap-2">
-            {course.badges.map((type, index) => (
-              <CategoryBadge key={index} type={type} />
-            ))}
-          </div>
-        </motion.div>
-      )}
-      
-      {/* Badges for courses without cover images */}
-      {!course.cover_image && course.badges && course.badges.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {course.badges.map((type, index) => (
-            <CategoryBadge key={index} type={type} />
-          ))}
-        </div>
-      )}
-      
       {/* Breadcrumb */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}
@@ -67,6 +36,22 @@ const CourseHeader = ({ course }: CourseHeaderProps) => {
           </BreadcrumbList>
         </Breadcrumb>
       </motion.div>
+
+      {/* Cover Image */}
+      {course.cover_image && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="w-full h-[450px] rounded-lg overflow-hidden mb-8 relative"
+        >
+          <img 
+            src={course.cover_image} 
+            alt={course.title} 
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
+      )}
 
       {/* Course title and description */}
       <motion.div 
