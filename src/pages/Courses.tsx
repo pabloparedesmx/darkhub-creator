@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
@@ -12,11 +11,12 @@ import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
 import SEO from '@/components/ui/SEO';
-
 const Courses = () => {
   const [coursesData, setCoursesData] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [tools, setTools] = useState<Record<string, string>>({});
   const [categories, setCategories] = useState<Record<string, string>>({});
 
@@ -25,7 +25,10 @@ const Courses = () => {
     const fetchCourses = async () => {
       try {
         // First fetch all courses
-        const { data: coursesData, error: coursesError } = await supabase.from('courses').select(`
+        const {
+          data: coursesData,
+          error: coursesError
+        } = await supabase.from('courses').select(`
             id, 
             title, 
             description, 
@@ -36,16 +39,24 @@ const Courses = () => {
             difficulty,
             category_id,
             cover_image
-          `).order('created_at', { ascending: false });
+          `).order('created_at', {
+          ascending: false
+        });
         if (coursesError) throw coursesError;
 
         // Then fetch course-tool relationships
-        const { data: courseToolsData, error: courseToolsError } = await supabase.from('course_tools').select('course_id, tool_id, tools(id, name, favicon)');
+        const {
+          data: courseToolsData,
+          error: courseToolsError
+        } = await supabase.from('course_tools').select('course_id, tool_id, tools(id, name, favicon)');
         if (courseToolsError) throw courseToolsError;
 
         // Create a map of course IDs to tool IDs and tool data
         const courseToolsMap: Record<string, string[]> = {};
-        const courseToolInfoMap: Record<string, { name?: string; icon?: string; }> = {};
+        const courseToolInfoMap: Record<string, {
+          name?: string;
+          icon?: string;
+        }> = {};
         courseToolsData.forEach(item => {
           // Add tool ID to the course's tool IDs array
           if (!courseToolsMap[item.course_id]) {
@@ -112,7 +123,10 @@ const Courses = () => {
     const fetchToolsAndCategories = async () => {
       try {
         // Fetch all tools
-        const { data: toolsData, error: toolsError } = await supabase.from('tools').select('id, name');
+        const {
+          data: toolsData,
+          error: toolsError
+        } = await supabase.from('tools').select('id, name');
         if (toolsError) throw toolsError;
 
         // Create a map of tool IDs to names, removing "Herramienta: " prefix if it exists
@@ -127,7 +141,10 @@ const Courses = () => {
         setTools(toolsMap);
 
         // Fetch all categories
-        const { data: categoriesData, error: categoriesError } = await supabase.from('categories').select('id, name');
+        const {
+          data: categoriesData,
+          error: categoriesError
+        } = await supabase.from('categories').select('id, name');
         if (categoriesError) throw categoriesError;
 
         // Create a map of category IDs to names
@@ -142,7 +159,6 @@ const Courses = () => {
     };
     fetchToolsAndCategories();
   }, []);
-
   const {
     searchTerm,
     setSearchTerm,
@@ -156,7 +172,6 @@ const Courses = () => {
     clearAllFilters,
     setSortOrder
   } = useCourseFilters(coursesData);
-
   const handleSortChange = (value: string) => {
     setSortOrder(value);
   };
@@ -215,24 +230,22 @@ const Courses = () => {
     });
     return filters;
   };
-
-  return (
-    <Layout>
+  return <Layout>
       {/* Add SEO component */}
-      <SEO
-        title="Tutoriales de IA | AI Makers"
-        description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva."
-      />
+      <SEO title="Tutoriales de IA | AI Makers" description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva." />
       
       {/* Hero Section with Cover Image */}
       <div className="relative w-full h-[450px] bg-gradient-to-b from-primary/10 to-background/5 dark:from-primary/5 dark:to-background/0">
         <div className="container h-full flex flex-col justify-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-2xl"
-          >
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.5
+        }} className="max-w-2xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Tutoriales de IA</h1>
             <p className="text-xl text-muted-foreground mb-10">
               Aprende a dominar las herramientas y técnicas de inteligencia artificial más populares del momento.
@@ -241,32 +254,24 @@ const Courses = () => {
         </div>
         
         {/* Decorative Elements */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent"></div>
+        
       </div>
       
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="container py-16"
-      >
-        {isLoading ? (
-          <div className="flex justify-center py-12">
+      <motion.div initial={{
+      opacity: 0,
+      y: 20
+    }} animate={{
+      opacity: 1,
+      y: 0
+    }} transition={{
+      duration: 0.5
+    }} className="container py-16">
+        {isLoading ? <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+          </div> : <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             {/* Filters sidebar */}
             <div className="md:col-span-3 space-y-8">
-              <CourseFilters 
-                difficulties={difficulties} 
-                setDifficulties={setDifficulties} 
-                selectedTools={selectedTools} 
-                setSelectedTools={setSelectedTools} 
-                selectedCategories={selectedCategories} 
-                setSelectedCategories={setSelectedCategories} 
-                clearAllFilters={clearAllFilters} 
-              />
+              <CourseFilters difficulties={difficulties} setDifficulties={setDifficulties} selectedTools={selectedTools} setSelectedTools={setSelectedTools} selectedCategories={selectedCategories} setSelectedCategories={setSelectedCategories} clearAllFilters={clearAllFilters} />
             </div>
 
             {/* Main content */}
@@ -281,11 +286,8 @@ const Courses = () => {
 
               <CourseGrid courses={courses} coursesData={coursesData} clearAllFilters={clearAllFilters} />
             </div>
-          </div>
-        )}
+          </div>}
       </motion.div>
-    </Layout>
-  );
+    </Layout>;
 };
-
 export default Courses;
