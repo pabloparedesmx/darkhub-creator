@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -171,6 +172,19 @@ const CourseEditor = () => {
           description: "Course added successfully",
         });
       } else {
+        // Fix: Add debugging logs to see what's being sent to the server
+        console.log('Updating course with values:', {
+          title,
+          description,
+          short_description,
+          slug,
+          icon,
+          category_id,
+          is_pro: isPro,
+          is_free: isFree, // This is what we need to ensure gets passed correctly
+          difficulty
+        });
+        
         // Update existing course
         const { error } = await supabase
           .from('courses')
@@ -182,12 +196,15 @@ const CourseEditor = () => {
             icon: icon || '📚',
             category_id: category_id || null,
             is_pro: isPro,
-            is_free: isFree,
+            is_free: isFree, // Explicitly set this value
             difficulty
           })
           .eq('id', courseId);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase update error:', error);
+          throw error;
+        }
         
         toast({
           title: "Success",
@@ -472,7 +489,7 @@ const CourseEditor = () => {
                     <Switch 
                       id="isPro"
                       checked={course.isPro}
-                      onCheckedChange={(checked) => handleInputChange('isPro', checked)}
+                      onCheckedChange={(checked) => setCourse({...course, isPro: checked})}
                     />
                     <label htmlFor="isPro" className="text-sm cursor-pointer">
                       Pro Content
@@ -482,7 +499,10 @@ const CourseEditor = () => {
                     <Switch 
                       id="isFree"
                       checked={course.isFree}
-                      onCheckedChange={(checked) => handleInputChange('isFree', checked)}
+                      onCheckedChange={(checked) => {
+                        console.log('Toggling isFree to:', checked);
+                        setCourse({...course, isFree: checked});
+                      }}
                     />
                     <label htmlFor="isFree" className="text-sm cursor-pointer">
                       Free Access

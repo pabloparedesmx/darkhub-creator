@@ -247,7 +247,10 @@ const CourseForm = ({
             <Switch 
               id="isFree"
               checked={newCourse.isFree}
-              onCheckedChange={(checked) => setNewCourse({...newCourse, isFree: checked})}
+              onCheckedChange={(checked) => {
+                console.log('CourseForm: toggling isFree to', checked);
+                setNewCourse({...newCourse, isFree: checked});
+              }}
             />
             <label htmlFor="isFree" className="text-sm cursor-pointer">
               Free Access
