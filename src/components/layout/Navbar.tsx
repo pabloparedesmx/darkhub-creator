@@ -58,25 +58,25 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center gap-6">
           {user ? (
             <>
-              <Link to="/courses" className={cn("text-sm font-medium hover:text-primary transition-colors", 
+              <Link to="/courses" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/courses') && "text-primary")}>
+                location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                 Cursos
               </Link>
-              <Link to="/prompts" className={cn("text-sm font-medium hover:text-primary transition-colors", 
+              <Link to="/prompts" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/prompts') && "text-primary")}>
+                location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                 Prompts
               </Link>
-              <Link to="/tools" className={cn("text-sm font-medium hover:text-primary transition-colors", 
+              <Link to="/tools" className={cn("text-sm font-medium transition-colors", 
                 isAuthPage && "text-white hover:text-white/80", 
-                location.pathname.startsWith('/tools') && "text-primary")}>
+                location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                 Herramientas
               </Link>
               {user.role === 'admin' && 
-                <Link to="/admin" className={cn("text-sm font-medium hover:text-primary transition-colors", 
+                <Link to="/admin" className={cn("text-sm font-medium transition-colors", 
                   isAuthPage && "text-white hover:text-white/80", 
-                  location.pathname.startsWith('/admin') && "text-primary")}>
+                  location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                   Admin
                 </Link>
               }
@@ -128,17 +128,21 @@ const Navbar = () => {
           <nav className="flex flex-col space-y-4">
             {user ? (
               <>
-                <Link to="/courses" className="text-sm font-medium hover:text-primary">
+                <Link to="/courses" className={cn("text-sm font-medium transition-colors", 
+                  location.pathname.startsWith('/courses') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                   Cursos
                 </Link>
-                <Link to="/prompts" className="text-sm font-medium hover:text-primary">
+                <Link to="/prompts" className={cn("text-sm font-medium transition-colors", 
+                  location.pathname.startsWith('/prompts') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                   Prompts
                 </Link>
-                <Link to="/tools" className="text-sm font-medium hover:text-primary">
+                <Link to="/tools" className={cn("text-sm font-medium transition-colors", 
+                  location.pathname.startsWith('/tools') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                   Herramientas
                 </Link>
                 {user.role === 'admin' && (
-                  <Link to="/admin" className="text-sm font-medium hover:text-primary">
+                  <Link to="/admin" className={cn("text-sm font-medium transition-colors", 
+                    location.pathname.startsWith('/admin') ? "text-primary" : "hover:text-cyan-400 dark:hover:text-cyan-400")}>
                     Admin
                   </Link>
                 )}
