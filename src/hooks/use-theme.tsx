@@ -26,8 +26,8 @@ export function ThemeProvider({
     root.classList.add('light');
   }, []);
 
-  // Always return light theme
-  const value = {
+  // Return the fixed value that matches the type definition
+  const value: ThemeProviderState = {
     theme: 'light',
   };
 

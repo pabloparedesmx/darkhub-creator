@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-// Placeholder component that doesn't render anything
+// This component doesn't render anything as we're only using light theme
 export function ThemeToggle() {
   return null;
 }
