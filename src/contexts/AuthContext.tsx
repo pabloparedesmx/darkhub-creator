@@ -3,8 +3,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
-import { Session, User as SupabaseUser } from '@supabase/supabase-js';
-import { Database } from '@/lib/database.types';
 
 // Define user type
 export interface User {
@@ -154,7 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           
           // Navigate to courses page after login or signup
-          if (event === 'SIGNED_IN' || event === 'SIGNED_UP') {
+          if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
             navigate('/courses');
           }
         } else {
