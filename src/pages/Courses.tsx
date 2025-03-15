@@ -34,7 +34,8 @@ const Courses = () => {
             is_pro,
             is_free,
             difficulty,
-            category_id
+            category_id,
+            cover_image
           `).order('created_at', { ascending: false });
         if (coursesError) throw coursesError;
 
@@ -87,7 +88,8 @@ const Courses = () => {
             toolName: toolInfo.name,
             toolIcon: toolInfo.icon,
             toolIds: courseToolsMap[course.id] || [],
-            categoryId: course.category_id
+            categoryId: course.category_id,
+            cover_image: course.cover_image
           };
         });
         setCoursesData(transformedCourses);
@@ -222,19 +224,32 @@ const Courses = () => {
         description="Navega por nuestra colección de tutoriales sobre herramientas de IA. Aprende a usar distintas tecnologías de forma efectiva."
       />
       
+      {/* Hero Section with Cover Image */}
+      <div className="relative w-full h-[450px] bg-gradient-to-b from-primary/10 to-background/5 dark:from-primary/5 dark:to-background/0">
+        <div className="container h-full flex flex-col justify-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl"
+          >
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Tutoriales de IA</h1>
+            <p className="text-xl text-muted-foreground mb-10">
+              Aprende a dominar las herramientas y técnicas de inteligencia artificial más populares del momento.
+            </p>
+          </motion.div>
+        </div>
+        
+        {/* Decorative Elements */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent"></div>
+      </div>
+      
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="container py-16"
       >
-        <div className="mt-8 mb-12">
-          <h1 className="text-3xl font-bold mb-6">Tutoriales de IA</h1>
-          <p className="text-muted-foreground mb-10">
-            Navega por nuestros tutoriales de IA
-          </p>
-        </div>
-
         {isLoading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>

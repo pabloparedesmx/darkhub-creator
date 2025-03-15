@@ -14,6 +14,23 @@ interface CourseHeaderProps {
 const CourseHeader = ({ course }: CourseHeaderProps) => {
   return (
     <div className="mb-12">
+      {/* Cover Image */}
+      {course.cover_image && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="w-full h-[450px] rounded-lg overflow-hidden mb-8 relative"
+        >
+          <img 
+            src={course.cover_image} 
+            alt={course.title} 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+        </motion.div>
+      )}
+      
       {/* Breadcrumb */}
       <motion.div 
         initial={{ opacity: 0, y: 10 }}

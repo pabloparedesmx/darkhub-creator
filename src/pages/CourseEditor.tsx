@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -15,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Image as ImageIcon } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +33,8 @@ const CourseEditor = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [tools, setTools] = useState<any[]>([]);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   
   const [course, setCourse] = useState({
     title: '',
@@ -44,7 +45,8 @@ const CourseEditor = () => {
     category_id: '',
     isPro: false,
     isFree: true,
-    difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced'
+    difficulty: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
+    cover_image: ''
   });
 
   // Modified fetchData function to remove "Herramienta: " prefix
@@ -101,7 +103,8 @@ const CourseEditor = () => {
             category_id: courseData.category_id || '',
             isPro: courseData.is_pro || false,
             isFree: courseData.is_free || true,
-            difficulty: courseData.difficulty || 'beginner'
+            difficulty: courseData.difficulty || 'beginner',
+            cover_image: courseData.cover_image || ''
           });
           
           // Fetch associated tools
@@ -129,8 +132,50 @@ const CourseEditor = () => {
     fetchData();
   }, [courseId, isNewCourse, toast]);
 
+  // Upload cover image to Supabase storage
+  const uploadCoverImage = async () => {
+    if (!coverImageFile) return null;
+    
+    setIsUploading(true);
+    
+    try {
+      // Create a unique file name
+      const fileExt = coverImageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${courseId || 'new'}_${fileName}`;
+      
+      // Upload file to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('course_images')
+        .upload(filePath, coverImageFile, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+      
+      if (error) throw error;
+      
+      // Get public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('course_images')
+        .getPublicUrl(data.path);
+      
+      setCourse(prev => ({ ...prev, cover_image: publicUrl }));
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to upload cover image",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSaveCourse = async () => {
-    const { title, description, short_description, slug, icon, category_id, isPro, isFree, difficulty } = course;
+    const { title, description, short_description, slug, icon, category_id, isPro, isFree, difficulty, cover_image } = course;
     
     if (!title || !description || !slug) {
       toast({
@@ -144,6 +189,15 @@ const CourseEditor = () => {
     setIsSaving(true);
     
     try {
+      // Upload cover image if a new file was selected
+      let courseImageUrl = cover_image;
+      if (coverImageFile) {
+        const uploadedImageUrl = await uploadCoverImage();
+        if (uploadedImageUrl) {
+          courseImageUrl = uploadedImageUrl;
+        }
+      }
+      
       let courseIdToUse = courseId;
       
       if (isNewCourse) {
@@ -160,7 +214,8 @@ const CourseEditor = () => {
             is_pro: isPro,
             is_free: isFree,
             difficulty: difficulty,
-            author_id: user?.id
+            author_id: user?.id,
+            cover_image: courseImageUrl
           }])
           .select();
         
@@ -172,19 +227,6 @@ const CourseEditor = () => {
           description: "Course added successfully",
         });
       } else {
-        // Fix: Add debugging logs to see what's being sent to the server
-        console.log('Updating course with values:', {
-          title,
-          description,
-          short_description,
-          slug,
-          icon,
-          category_id,
-          is_pro: isPro,
-          is_free: isFree, // This is what we need to ensure gets passed correctly
-          difficulty
-        });
-        
         // Update existing course
         const { error } = await supabase
           .from('courses')
@@ -196,8 +238,9 @@ const CourseEditor = () => {
             icon: icon || '📚',
             category_id: category_id || null,
             is_pro: isPro,
-            is_free: isFree, // Explicitly set this value
-            difficulty
+            is_free: isFree,
+            difficulty,
+            cover_image: courseImageUrl
           })
           .eq('id', courseId);
         
@@ -274,6 +317,34 @@ const CourseEditor = () => {
     }
   };
 
+  // Handle file input change for cover image
+  const handleCoverImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      
+      // Check file type and size (max 5MB)
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Image should not exceed 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      setCoverImageFile(file);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -306,7 +377,7 @@ const CourseEditor = () => {
               </div>
               <Button 
                 onClick={handleSaveCourse} 
-                disabled={isSaving}
+                disabled={isSaving || isUploading}
                 className="flex items-center gap-2"
               >
                 <Save className="h-4 w-4" />
@@ -393,7 +464,7 @@ const CourseEditor = () => {
                 <CardTitle>Media</CardTitle>
                 <CardDescription>Visual elements for the course</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div className="space-y-2">
                   <label htmlFor="icon" className="text-sm font-medium">Icon (Emoji)</label>
                   <Input
@@ -404,6 +475,58 @@ const CourseEditor = () => {
                   />
                   <p className="text-xs text-muted-foreground">
                     Add an emoji that represents this course
+                  </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Cover Image (1080 x 450 px)</label>
+                  
+                  {course.cover_image && (
+                    <div className="w-full h-[225px] rounded-md overflow-hidden border border-border mb-2">
+                      <img 
+                        src={course.cover_image} 
+                        alt="Course cover" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => document.getElementById('cover-image')?.click()}
+                      className="flex items-center gap-2"
+                      disabled={isUploading}
+                    >
+                      <Upload className="h-4 w-4" />
+                      {coverImageFile ? 'Change Image' : (course.cover_image ? 'Replace Image' : 'Upload Image')}
+                    </Button>
+                    
+                    {coverImageFile && (
+                      <span className="text-sm text-muted-foreground">
+                        {coverImageFile.name} ({Math.round(coverImageFile.size / 1024)} KB)
+                      </span>
+                    )}
+                    
+                    <input
+                      id="cover-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleCoverImageChange}
+                      className="hidden"
+                    />
+                  </div>
+                  
+                  {isUploading && (
+                    <div className="w-full mt-2 flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                      <span className="ml-2 text-sm">Uploading...</span>
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-muted-foreground mt-2">
+                    For best results, use an image that is 1080px wide by 450px tall.
                   </p>
                 </div>
               </CardContent>
@@ -516,7 +639,7 @@ const CourseEditor = () => {
                   <Button 
                     onClick={handleSaveCourse} 
                     className="w-full" 
-                    disabled={isSaving}
+                    disabled={isSaving || isUploading}
                   >
                     {isSaving ? 'Saving...' : (isNewCourse ? 'Create Course' : 'Update Course')}
                   </Button>

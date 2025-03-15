@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,7 @@ import { Category, Tool } from '@/types/admin';
 import { Switch } from '@/components/ui/switch';
 import { supabase } from '@/lib/supabase';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Upload, Image as ImageIcon } from 'lucide-react';
 
 interface CourseFormProps {
   newCourse: {
@@ -28,6 +28,7 @@ interface CourseFormProps {
     isPro: boolean;
     isFree: boolean;
     difficulty?: 'beginner' | 'intermediate' | 'advanced';
+    cover_image?: string;
   };
   setNewCourse: (course: any) => void;
   isEditing: boolean;
@@ -49,6 +50,9 @@ const CourseForm = ({
   const [tools, setTools] = useState<Tool[]>([]);
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [isLoadingTools, setIsLoadingTools] = useState(false);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   // Fetch all tools
   useEffect(() => {
@@ -117,15 +121,81 @@ const CourseForm = ({
     });
   };
 
-  // Save tool associations when saving course
-  const handleSaveWithTools = async () => {
+  // Handle cover image file selection
+  const handleCoverImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      
+      // Check file type and size (max 5MB)
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size should not exceed 5MB');
+        return;
+      }
+      
+      setCoverImageFile(file);
+    }
+  };
+
+  // Handle cover image upload to Supabase storage
+  const uploadCoverImage = async () => {
+    if (!coverImageFile) return null;
+    
+    setIsUploading(true);
+    setUploadProgress(0);
+    
+    try {
+      // Create a unique file name
+      const fileExt = coverImageFile.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${courseId || 'new'}_${fileName}`;
+      
+      // Upload file to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('course_images')
+        .upload(filePath, coverImageFile, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+      
+      if (error) throw error;
+      
+      // Get public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('course_images')
+        .getPublicUrl(data.path);
+      
+      setUploadProgress(100);
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      alert('Failed to upload cover image');
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Updated save function to handle image upload
+  const handleSaveWithCoverImage = async () => {
+    // Upload cover image if a new file was selected
+    if (coverImageFile) {
+      const publicUrl = await uploadCoverImage();
+      if (publicUrl) {
+        setNewCourse({...newCourse, cover_image: publicUrl});
+      }
+    }
+    
+    // Continue with course save
     if (isEditing) {
       await handleUpdateCourse();
     } else {
       await handleAddCourse();
     }
-    
-    // Tool associations will be saved in the parent component after the course is created/updated
   };
 
   // Difficulty levels mapping for display
@@ -214,6 +284,61 @@ const CourseForm = ({
         </div>
       </div>
       
+      <div className="space-y-2">
+        <label className="block text-sm font-medium">Cover Image (recommended size: 1080 x 450 px)</label>
+        <div className="flex flex-col space-y-2">
+          {newCourse.cover_image && (
+            <div className="relative w-full h-[200px] rounded-md overflow-hidden border border-border">
+              <img 
+                src={newCourse.cover_image} 
+                alt="Cover preview" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+          
+          <div className="flex items-center gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => document.getElementById('cover-image-input')?.click()}
+              className="flex items-center gap-2"
+              disabled={isUploading}
+            >
+              <Upload className="h-4 w-4" />
+              {coverImageFile ? 'Change Image' : 'Upload Image'}
+            </Button>
+            
+            {coverImageFile && (
+              <span className="text-sm text-muted-foreground">
+                {coverImageFile.name} ({Math.round(coverImageFile.size / 1024)} KB)
+              </span>
+            )}
+            
+            <input
+              id="cover-image-input"
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageChange}
+              className="hidden"
+            />
+          </div>
+          
+          {isUploading && (
+            <div className="w-full bg-secondary rounded-full h-2.5 mt-2">
+              <div 
+                className="bg-primary h-2.5 rounded-full" 
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+          )}
+          
+          <p className="text-xs text-muted-foreground">
+            Upload a cover image for this course. For best results, use an image that is 1080px wide and 450px tall.
+          </p>
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <label htmlFor="courseDifficulty">Dificultad</label>
@@ -293,9 +418,21 @@ const CourseForm = ({
       
       <DialogFooter>
         {isEditing ? (
-          <Button onClick={handleUpdateCourse} data-selected-tools={JSON.stringify(selectedTools)}>Update Course</Button>
+          <Button 
+            onClick={handleSaveWithCoverImage} 
+            data-selected-tools={JSON.stringify(selectedTools)}
+            disabled={isUploading}
+          >
+            {isUploading ? 'Uploading...' : 'Update Course'}
+          </Button>
         ) : (
-          <Button onClick={handleAddCourse} data-selected-tools={JSON.stringify(selectedTools)}>Add Course</Button>
+          <Button 
+            onClick={handleSaveWithCoverImage} 
+            data-selected-tools={JSON.stringify(selectedTools)}
+            disabled={isUploading}
+          >
+            {isUploading ? 'Uploading...' : 'Add Course'}
+          </Button>
         )}
       </DialogFooter>
     </div>

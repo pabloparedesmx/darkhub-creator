@@ -10,7 +10,7 @@ export type Course = {
   title: string;
   description: string;
   short_description?: string;
-  badges: Array<'pro' | 'free'>;  // Only 'pro' or 'free' are allowed
+  badges: Array<'pro' | 'free'>;
   slug: string;
   icon?: string;
   toolName?: string;
@@ -19,6 +19,7 @@ export type Course = {
   toolIds?: string[]; // For filtering
   categoryId?: string; // Add category for filtering
   summary?: string; // Brief summary description
+  cover_image?: string; // Added cover image field
 };
 
 interface CourseCardProps {
@@ -105,8 +106,22 @@ const CourseCard = ({ course, featured = false }: CourseCardProps) => {
       >
         <CardContent className="p-0">
           <div className="flex flex-col h-full">
+            {/* Cover Image */}
+            {course.cover_image && (
+              <div className="w-full h-40 overflow-hidden">
+                <img 
+                  src={course.cover_image} 
+                  alt={course.title} 
+                  className="w-full h-full object-cover transform transition-transform duration-300"
+                  style={{
+                    transform: isHovered ? 'scale(1.05)' : 'scale(1)'
+                  }}
+                />
+              </div>
+            )}
+            
             {/* Badges at the top */}
-            <div className="flex gap-2 pt-4 px-4">
+            <div className={`flex gap-2 pt-4 px-4 ${course.cover_image ? 'mt-2' : ''}`}>
               {course.badges.map((badge, index) => (
                 <span 
                   key={index}

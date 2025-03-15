@@ -10,6 +10,7 @@ export type DbCourse = Database['public']['Tables']['courses']['Row'] & {
   toolName?: string;
   toolIcon?: string;
   short_description?: string; // Explicitly add short_description property
+  cover_image?: string; // Add cover_image property
 };
 
 // Type for user profiles
