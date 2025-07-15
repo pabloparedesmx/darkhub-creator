@@ -38,6 +38,142 @@ export type Database = {
         }
         Relationships: []
       }
+      course_tools: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          tool_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          tool_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          tool_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_tools_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_tools_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          author_id: string | null
+          category_id: string | null
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          icon: string | null
+          id: string
+          is_free: boolean | null
+          is_pro: boolean | null
+          short_description: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          icon?: string | null
+          id?: string
+          is_free?: boolean | null
+          is_pro?: boolean | null
+          short_description?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          icon?: string | null
+          id?: string
+          is_free?: boolean | null
+          is_pro?: boolean | null
+          short_description?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "courses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: string | null
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -67,6 +203,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          lesson_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prompts: {
         Row: {
@@ -102,6 +276,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tools: {
+        Row: {
+          created_at: string
+          description: string | null
+          favicon: string | null
+          has_pro_perk: boolean | null
+          id: string
+          name: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          favicon?: string | null
+          has_pro_perk?: boolean | null
+          id?: string
+          name: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          favicon?: string | null
+          has_pro_perk?: boolean | null
+          id?: string
+          name?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
