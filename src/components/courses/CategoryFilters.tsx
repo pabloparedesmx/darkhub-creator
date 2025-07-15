@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Category } from '@/types/admin';
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CategoryFiltersProps {
   selectedCategories: string[];

@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { ChevronLeft, ChevronRight, Play, Lock, Check, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import NewsletterSubscribe from '@/components/ui/NewsletterSubscribe';
 import ElevenLabsWidget from '@/components/course/ElevenLabsWidget';
 

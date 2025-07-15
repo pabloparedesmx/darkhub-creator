@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Copy, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { PromptWithCategory } from '@/types/prompt';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';

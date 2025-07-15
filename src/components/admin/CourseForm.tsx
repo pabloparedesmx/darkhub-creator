@@ -13,7 +13,7 @@ import {
 import RichTextEditor from '@/components/ui/RichTextEditor';
 import { Category, Tool } from '@/types/admin';
 import { Switch } from '@/components/ui/switch';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Upload, Image as ImageIcon } from 'lucide-react';
 

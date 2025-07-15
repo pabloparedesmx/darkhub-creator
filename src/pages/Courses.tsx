@@ -7,7 +7,7 @@ import CourseSearch from '@/components/courses/CourseSearch';
 import CourseSort from '@/components/courses/CourseSort';
 import CourseGrid from '@/components/courses/CourseGrid';
 import { useCourseFilters } from '@/hooks/useCourseFilters';
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FilterTags } from '@/components/ui/FilterTags';
 import SEO from '@/components/ui/SEO';
